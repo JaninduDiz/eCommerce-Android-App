@@ -39,14 +39,14 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import com.example.shoppingapp.helpers.CartState
-import com.example.shoppingapp.screens.sample.Category
-import com.example.shoppingapp.screens.sample.Product
-import com.example.shoppingapp.screens.sample.bedroomFurnitureCategory
-import com.example.shoppingapp.screens.sample.diningFurnitureCategory
-import com.example.shoppingapp.screens.sample.gamingFurnitureCategory
-import com.example.shoppingapp.screens.sample.livingRoomFurnitureCategory
-import com.example.shoppingapp.screens.sample.officeFurnitureCategory
-import com.example.shoppingapp.screens.sample.sampleProducts
+import com.example.shoppingapp.sampleData.Category
+import com.example.shoppingapp.sampleData.Product
+import com.example.shoppingapp.sampleData.bedroomFurnitureCategory
+import com.example.shoppingapp.sampleData.diningFurnitureCategory
+import com.example.shoppingapp.sampleData.gamingFurnitureCategory
+import com.example.shoppingapp.sampleData.livingRoomFurnitureCategory
+import com.example.shoppingapp.sampleData.officeFurnitureCategory
+import com.example.shoppingapp.sampleData.sampleProducts
 
 data class BottomNavigationItem(
     val title: String,
@@ -101,6 +101,7 @@ fun HomeScreen(navController: NavController, cartState: CartState) {
     Scaffold(
         topBar = {
             TopAppBar(
+                windowInsets = WindowInsets.Companion.statusBars,
                 title = { Text(text = "Furniture Store") },
                 actions = {
                     IconButton(onClick = { navController.navigate("profile")},

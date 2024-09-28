@@ -11,8 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.shoppingapp.helpers.CartState
-import com.example.shoppingapp.onBoard.LoginScreen
-import com.example.shoppingapp.onBoard.RegisterScreen
+import com.example.shoppingapp.screens.onBoardScreens.LoginScreen
+import com.example.shoppingapp.screens.onBoardScreens.RegisterScreen
 import com.example.shoppingapp.screens.CartScreen
 import com.example.shoppingapp.screens.CategoryScreen
 import com.example.shoppingapp.screens.HomeScreen
