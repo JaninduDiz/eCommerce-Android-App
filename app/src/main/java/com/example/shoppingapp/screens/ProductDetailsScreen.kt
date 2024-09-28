@@ -27,7 +27,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
 import com.example.shoppingapp.helpers.CartState
-import com.example.shoppingapp.screens.sample.sampleProducts
+import com.example.shoppingapp.sampleData.Product
+import com.example.shoppingapp.sampleData.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,7 +141,7 @@ fun ProductImageSection() {
 }
 
 @Composable
-fun ProductInfoSection(product: com.example.shoppingapp.screens.sample.Product) {
+fun ProductInfoSection(product: Product) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row (modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
