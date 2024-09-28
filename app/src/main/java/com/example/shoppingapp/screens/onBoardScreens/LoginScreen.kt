@@ -1,4 +1,4 @@
-package com.example.shoppingapp.onBoard
+package com.example.shoppingapp.screens.onBoardScreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
