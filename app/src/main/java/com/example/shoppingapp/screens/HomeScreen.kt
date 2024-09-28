@@ -21,12 +21,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.R
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Search
@@ -36,6 +34,8 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import com.example.shoppingapp.helpers.CartState
@@ -66,7 +66,7 @@ val categoryColors = mapOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController,  cartState: CartState) {
+fun HomeScreen(navController: NavController, cartState: CartState) {
     val items = listOf(
         BottomNavigationItem(
             title = "Home",
@@ -91,23 +91,30 @@ fun HomeScreen(navController: NavController,  cartState: CartState) {
             selectedIcon = Icons.Filled.Search,
             unselectedIcon = Icons.Outlined.Search,
             hasNews = false,
-        ),
-        BottomNavigationItem(
-            title = "Profile",
-            selectedIcon = Icons.Filled.AccountCircle,
-            unselectedIcon = Icons.Outlined.AccountCircle,
-            hasNews = false,
-        ),
+        )
     )
 
     var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Furniture Store") }
+                title = { Text(text = "Furniture Store") },
+                actions = {
+                    IconButton(onClick = { navController.navigate("profile")},
+                        modifier = Modifier
+                            .background(Color(0xFFffcb69), shape = CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "Profile",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
             )
         },
         bottomBar = {
@@ -154,7 +161,6 @@ fun HomeScreen(navController: NavController,  cartState: CartState) {
                     1 -> OrdersScreen(navController = navController)
                     2 -> CartScreen(navController = navController, cartState)
                     3 -> SearchScreen(navController = navController)
-                    4 -> ProfileScreen(navController = navController)
                 }
             }
         }

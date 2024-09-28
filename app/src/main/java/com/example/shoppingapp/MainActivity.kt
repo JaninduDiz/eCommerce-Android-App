@@ -17,6 +17,7 @@ import com.example.shoppingapp.screens.CartScreen
 import com.example.shoppingapp.screens.CategoryScreen
 import com.example.shoppingapp.screens.HomeScreen
 import com.example.shoppingapp.screens.ProductDetailsScreen
+import com.example.shoppingapp.screens.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +44,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("cart") { CartScreen(navController, cartState) }
+                    composable("profile") { ProfileScreen(navController) }
                 }
             }
         }

@@ -2,12 +2,12 @@ package com.example.shoppingapp.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -34,7 +34,34 @@ fun CartScreen(navController: NavController, cartState: CartState) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Cart", fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 16.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Cart",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            if (cartState.items.isNotEmpty()) {
+                IconButton(
+                    onClick = { cartState.clearCart() },
+                    modifier = Modifier
+                        .background(Color(0xFFB7B7A4), shape = CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Clear Cart",
+                        tint = Color.Red,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+            }
+        }
 
         // Display each item in the cart
         cartState.items.forEach { cartItem ->
