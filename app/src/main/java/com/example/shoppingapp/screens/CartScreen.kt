@@ -66,7 +66,8 @@ fun CartScreen(navController: NavController, cartState: CartState) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
+                    .height(56.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(text = "Checkout", color = Color.White, fontSize = 18.sp)
             }
@@ -76,7 +77,8 @@ fun CartScreen(navController: NavController, cartState: CartState) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C6644)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
+                    .height(56.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(text = "Your cart is empty", color = Color.White, fontSize = 18.sp)
             }
