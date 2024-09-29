@@ -24,11 +24,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
+import com.example.shoppingapp.models.Order
+import com.example.shoppingapp.models.OrderItem
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.viewmodels.OrderState
 
 @Composable
-fun CartScreen(navController: NavController, cartState: CartState) {
+fun CartScreen(
+    navController: NavController,
+    cartState: CartState,
+    orderState: OrderState
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +75,7 @@ fun CartScreen(navController: NavController, cartState: CartState) {
             CartItemRow(
                 imageRes = R.drawable.ic_launcher_background,  // Replace with actual product image resource
                 name = cartItem.product.name,
-                brand = cartItem.product.category.name,  // Assuming you have a category name
+                brand = cartItem.product.category.name,
                 price = "$${cartItem.product.price}",
                 quantity = cartItem.quantity.value,
                 onIncreaseClick = { cartState.increaseQuantity(cartItem.product) },
@@ -80,16 +87,23 @@ fun CartScreen(navController: NavController, cartState: CartState) {
         Spacer(modifier = Modifier.weight(1f))
 
         if (cartState.items.isNotEmpty()) {
-            // Total Price
+            // Total Price Calculation
+            val totalPrice = cartState.items.sumOf { it.product.price.toInt() * it.quantity.value }
             Text(
-                text = "Total: $${cartState.items.sumOf { it.product.price.toInt() * it.quantity.value }}",
+                text = "Total: $$totalPrice",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Button(
-                onClick = { /* Handle checkout */ },
+                onClick = {
+                    // Generate an order using the OrderState
+                    val order = orderState.generateOrder(cartState, customerId = "customer_123")
+
+                    // Navigate to the CheckoutScreen and pass the order and total price
+                    navController.navigate("checkoutScreen/$totalPrice")
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C)),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -100,7 +114,7 @@ fun CartScreen(navController: NavController, cartState: CartState) {
             }
         } else {
             Button(
-                onClick = { /* Handle checkout */ },
+                onClick = { /* Handle empty cart action */ },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C6644)),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -174,6 +188,6 @@ fun CartItemRow(
 @Composable
 fun CartScreenPreview() {
     ShoppingAppTheme {
-        CartScreen(navController = rememberNavController(), cartState = CartState())
+        CartScreen(navController = rememberNavController(), cartState = CartState(), orderState = OrderState())
     }
 }
