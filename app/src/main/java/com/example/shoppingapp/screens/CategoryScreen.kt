@@ -27,9 +27,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
 import com.example.shoppingapp.components.CustomTopAppBar
-import com.example.shoppingapp.sampleData.Product
+import com.example.shoppingapp.models.Product
 
-import com.example.shoppingapp.sampleData.sampleProducts
+import com.example.shoppingapp.models.sampleProducts
 
 @Composable
 fun CategoryScreen(navController: NavHostController, categoryId: String?) {

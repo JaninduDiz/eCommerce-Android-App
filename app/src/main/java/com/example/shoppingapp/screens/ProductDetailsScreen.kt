@@ -27,8 +27,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
 import com.example.shoppingapp.helpers.CartState
-import com.example.shoppingapp.sampleData.Product
-import com.example.shoppingapp.sampleData.sampleProducts
+import com.example.shoppingapp.models.Product
+import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
