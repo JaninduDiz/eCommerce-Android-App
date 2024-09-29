@@ -55,14 +55,13 @@ fun CartScreen(
             if (cartState.items.isNotEmpty()) {
                 IconButton(
                     onClick = { cartState.clearCart() },
-                    modifier = Modifier
-                        .background(Color(0xFFB7B7A4), shape = CircleShape)
+                    modifier = Modifier.size(24.dp),
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Clear Cart",
                         tint = Color.Red,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
