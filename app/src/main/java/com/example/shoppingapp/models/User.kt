@@ -17,3 +17,4 @@ val sampleUser = User(
     city = "Springfield",
     postalCode = "12345"
 )
+

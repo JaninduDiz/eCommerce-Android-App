@@ -16,6 +16,8 @@ import com.example.shoppingapp.views.CategoryScreen
 import com.example.shoppingapp.views.tabViews.HomeScreen
 import com.example.shoppingapp.views.ProductDetailsScreen
 import com.example.shoppingapp.views.ProfileScreen
+import com.example.shoppingapp.views.onBoardViews.LoginScreen
+import com.example.shoppingapp.views.onBoardViews.RegisterScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,9 +28,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val cartState = remember { CartState() }
 
-                NavHost(navController, startDestination = "home") {
-//                    composable("login") { LoginScreen(navController) }
-//                    composable("register") { RegisterScreen(navController) }
+                NavHost(navController, startDestination = "register") {
+                    composable("login") { LoginScreen(navController) }
+                    composable("register") { RegisterScreen(navController) }
                     composable("home") { HomeScreen(navController, cartState) }
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")

@@ -33,11 +33,21 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import android.widget.Toast
+import com.example.shoppingapp.Services.LoginRequest
+import com.example.shoppingapp.utils.RetrofitInstance
+
 @Composable
 fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -109,7 +119,29 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /* Handle login logic */ },
+                onClick = {
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
+                        // Launch coroutine for network call
+                        (context as ComponentActivity).lifecycleScope.launch {
+                            try {
+                                val response = RetrofitInstance.api.login(LoginRequest(email, password))
+                                if (response.isSuccessful) {
+                                    response.body()?.let { loginResponse ->
+                                        Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+                                        // Navigate to the next screen, e.g.:
+                                        // navController.navigate("home")
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Login failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Login")
