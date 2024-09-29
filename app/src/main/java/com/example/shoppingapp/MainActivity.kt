@@ -10,8 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.tabViews.CartScreen

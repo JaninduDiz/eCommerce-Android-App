@@ -31,18 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Order
-import com.example.shoppingapp.models.OrderItem
-import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.models.sampleUser
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.views.components.CustomButton
 import com.example.shoppingapp.views.components.CustomTopAppBar
 
