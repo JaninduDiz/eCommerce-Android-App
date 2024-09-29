@@ -47,6 +47,7 @@ import com.example.shoppingapp.models.gamingFurnitureCategory
 import com.example.shoppingapp.models.livingRoomFurnitureCategory
 import com.example.shoppingapp.models.officeFurnitureCategory
 import com.example.shoppingapp.models.sampleProducts
+import com.example.shoppingapp.viewmodels.OrderState
 
 data class BottomNavigationItem(
     val title: String,
@@ -66,7 +67,7 @@ val categoryColors = mapOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, cartState: CartState) {
+fun HomeScreen(navController: NavController, cartState: CartState, orderState: OrderState) {
     val items = listOf(
         BottomNavigationItem(
             title = "Home",
@@ -160,7 +161,7 @@ fun HomeScreen(navController: NavController, cartState: CartState) {
                 when (selectedItemIndex) {
                     0 -> HomeContent(navController = navController)
                     1 -> OrdersScreen(navController = navController)
-                    2 -> CartScreen(navController = navController, cartState)
+                    2 -> CartScreen(navController = navController, cartState, orderState)
                     3 -> SearchScreen(navController = navController)
                 }
             }
@@ -330,6 +331,6 @@ fun SectionTitle(title: String) {
 @Composable
 fun HomeScreenPreview() {
     ShoppingAppTheme {
-        HomeScreen(navController = rememberNavController(), cartState = CartState())
+        HomeScreen(navController = rememberNavController(), cartState = CartState(), orderState = OrderState())
     }
 }
