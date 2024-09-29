@@ -24,8 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
-import com.example.shoppingapp.models.Order
-import com.example.shoppingapp.models.OrderItem
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.OrderState
