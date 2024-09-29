@@ -1,4 +1,4 @@
-package com.example.shoppingapp.screens
+package com.example.shoppingapp.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.shoppingapp.components.CustomTopAppBar
+import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.shoppingapp.screens
+package com.example.shoppingapp.views.tabViews
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,22 +12,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 
 @Composable
-fun SearchScreen(navController: NavController) {
+fun OrdersScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Search", fontSize = 24.sp)
-        // Add your Search screen content here
+        Text(text = "Orders", fontSize = 24.sp)
+        // Add your Orders screen content here
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun SearchScreenPreview() {
+fun OrdersScreenPreview() {
     ShoppingAppTheme {
-        SearchScreen(navController = rememberNavController())
+        OrdersScreen(navController = rememberNavController())
     }
 }

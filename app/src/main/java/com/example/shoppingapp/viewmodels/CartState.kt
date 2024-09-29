@@ -1,4 +1,4 @@
-package com.example.shoppingapp.helpers
+package com.example.shoppingapp.viewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf

@@ -1,4 +1,4 @@
-package com.example.shoppingapp.screens
+package com.example.shoppingapp.views
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
-import com.example.shoppingapp.helpers.CartState
+import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme

@@ -8,3 +8,12 @@ data class User(
     val city: String,
     val postalCode: String
 )
+
+val sampleUser = User(
+    userName = "john_doe",
+    emailAddress = "john.doe@example.com",
+    addressLine1 = "123 Main St",
+    addressLine2 = "Apt 4B",
+    city = "Springfield",
+    postalCode = "12345"
+)

@@ -1,4 +1,4 @@
-package com.example.shoppingapp.screens
+package com.example.shoppingapp.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -26,10 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
-import com.example.shoppingapp.components.CustomTopAppBar
+import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.models.Product
 
 import com.example.shoppingapp.models.sampleProducts
+import com.example.shoppingapp.views.tabViews.categoryColors
 
 @Composable
 fun CategoryScreen(navController: NavHostController, categoryId: String?) {

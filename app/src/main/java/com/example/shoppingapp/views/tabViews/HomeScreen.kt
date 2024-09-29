@@ -1,4 +1,4 @@
-package com.example.shoppingapp.screens
+package com.example.shoppingapp.views.tabViews
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,7 +38,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
-import com.example.shoppingapp.helpers.CartState
+import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.models.bedroomFurnitureCategory
