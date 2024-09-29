@@ -35,31 +35,30 @@ import com.example.shoppingapp.models.User
 import com.example.shoppingapp.models.sampleUser
 import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.session.UserSessionManager
+import com.example.shoppingapp.models.User
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController, userSessionManager: UserSessionManager) {
+    val currentUser = userSessionManager.getUser() // Retrieve current user
+
     CustomTopAppBar(
         title = "Profile",
         onNavigationClick = { navController.popBackStack() },
         centeredHeader = true
     ) { paddingValues ->
-            ProfileContent(paddingValues, sampleUser) { /* Handle save */ }
+        ProfileContent(paddingValues, currentUser, userSessionManager, navController)
     }
 }
 
 @Composable
-fun ProfileContent(paddingValues: PaddingValues, user: User, onSave: (User) -> Unit) {
-    // State to control whether we're in edit mode or not
-    var isEditing by remember { mutableStateOf(false) }
-
-    // States for the editable fields
-    var userName by remember { mutableStateOf(user.userName) }
-    var emailAddress by remember { mutableStateOf(user.emailAddress) }
-    var addressLine1 by remember { mutableStateOf(user.addressLine1) }
-    var addressLine2 by remember { mutableStateOf(user.addressLine2) }
-    var city by remember { mutableStateOf(user.city) }
-    var postalCode by remember { mutableStateOf(user.postalCode) }
-
+fun ProfileContent(
+    paddingValues: PaddingValues,
+    currentUser: User?,
+    userSessionManager: UserSessionManager,
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,63 +80,35 @@ fun ProfileContent(paddingValues: PaddingValues, user: User, onSave: (User) -> U
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // User Information
-        TextField(
-            value = userName,
-            onValueChange = { userName = it },
-            label = { Text("Name") },
-            readOnly = !isEditing,
-            modifier = Modifier.fillMaxWidth()
+        // User Name
+        Text(
+            text = currentUser?.userName ?: "Unknown User", // Show username or fallback
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(
-            value = emailAddress,
-            onValueChange = { emailAddress = it },
-            label = { Text("Email Address") },
-            readOnly = !isEditing,
-            modifier = Modifier.fillMaxWidth()
+
+        // User Email
+        Text(
+            text = currentUser?.emailAddress ?: "No Email", // Show email or fallback
+            fontSize = 16.sp,
+            color = Color.Gray
+
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(
-            value = addressLine1,
-            onValueChange = { addressLine1 = it },
-            label = { Text("Address Line 1") },
-            readOnly = !isEditing,
-            modifier = Modifier.fillMaxWidth()
-        )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // User Joined Date
+        Text(
+            text = "Joined: January 15, 2022", // This can be updated to show actual joined date if available
+            fontSize = 16.sp,
+            color = Color.Gray
 
-        TextField(
-            value = addressLine2,
-            onValueChange = { addressLine2 = it },
-            label = { Text("Address Line 2") },
-            readOnly = !isEditing,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(
-            value = city,
-            onValueChange = { city = it },
-            label = { Text("City") },
-            readOnly = !isEditing,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(
-            value = postalCode,
-            onValueChange = { postalCode = it },
-            label = { Text("Postal Code") },
-            readOnly = !isEditing,
-            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -172,7 +143,10 @@ fun ProfileContent(paddingValues: PaddingValues, user: User, onSave: (User) -> U
 
         // Logout Button
         Button(
-            onClick = { /* Handle logout */ },
+            onClick = {
+                userSessionManager.logout() // Logout user
+                navController.navigate("login") // Navigate back to login screen
+            },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier
                 .fillMaxWidth()
@@ -185,10 +159,12 @@ fun ProfileContent(paddingValues: PaddingValues, user: User, onSave: (User) -> U
 
 @Preview(showBackground = true)
 @Composable
-fun ProfileContentPreview() {
-    ProfileContent(
-        paddingValues = PaddingValues(),
-        user = sampleUser,
-        onSave = { }
-    )
+fun ProfileScreenPreview() {
+    ShoppingAppTheme {
+        val navController = rememberNavController()
+        val mockUser = User(userName = "Mark Adam", emailAddress = "markadam@hotmail.com", addressLine1 = null, addressLine2 = null, city = null, postalCode = null)
+        val userSessionManager = UserSessionManager(context = LocalContext.current) // Mock instance
+        userSessionManager.saveUser(mockUser) // Simulate user being logged in
+        ProfileScreen(navController = navController, userSessionManager = userSessionManager)
+    }
 }
