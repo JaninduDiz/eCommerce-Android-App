@@ -8,6 +8,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,20 +23,30 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.session.UserSessionManager
+import com.example.shoppingapp.models.User
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController, userSessionManager: UserSessionManager) {
+    val currentUser = userSessionManager.getUser() // Retrieve current user
+
     CustomTopAppBar(
         title = "Profile",
         onNavigationClick = { navController.popBackStack() },
         centeredHeader = true
     ) { paddingValues ->
-            ProfileContent(paddingValues)
+        ProfileContent(paddingValues, currentUser, userSessionManager, navController)
     }
 }
 
 @Composable
-fun ProfileContent(paddingValues: PaddingValues) {
+fun ProfileContent(
+    paddingValues: PaddingValues,
+    currentUser: User?,
+    userSessionManager: UserSessionManager,
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +71,7 @@ fun ProfileContent(paddingValues: PaddingValues) {
 
         // User Name
         Text(
-            text = "Mark Adam",
+            text = currentUser?.userName ?: "Unknown User", // Show username or fallback
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
@@ -70,7 +81,7 @@ fun ProfileContent(paddingValues: PaddingValues) {
 
         // User Email
         Text(
-            text = "markadam@hotmail.com",
+            text = currentUser?.emailAddress ?: "No Email", // Show email or fallback
             fontSize = 16.sp,
             color = Color.Gray
         )
@@ -79,7 +90,7 @@ fun ProfileContent(paddingValues: PaddingValues) {
 
         // User Joined Date
         Text(
-            text = "Joined: January 15, 2022",
+            text = "Joined: January 15, 2022", // This can be updated to show actual joined date if available
             fontSize = 16.sp,
             color = Color.Gray
         )
@@ -88,14 +99,16 @@ fun ProfileContent(paddingValues: PaddingValues) {
 
         // Logout Button
         Button(
-            onClick = { /* Handle logout */ },
+            onClick = {
+                userSessionManager.logout() // Logout user
+                navController.navigate("login") // Navigate back to login screen
+            },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
         ) {
-            Text(text = "Sign Out", color = Color(0xFFb23a48
-            ), fontSize = 16.sp)
+            Text(text = "Sign Out", color = Color(0xFFb23a48), fontSize = 16.sp)
         }
     }
 }
@@ -104,6 +117,10 @@ fun ProfileContent(paddingValues: PaddingValues) {
 @Composable
 fun ProfileScreenPreview() {
     ShoppingAppTheme {
-        ProfileScreen(navController = rememberNavController())
+        val navController = rememberNavController()
+        val mockUser = User(userName = "Mark Adam", emailAddress = "markadam@hotmail.com", addressLine1 = null, addressLine2 = null, city = null, postalCode = null)
+        val userSessionManager = UserSessionManager(context = LocalContext.current) // Mock instance
+        userSessionManager.saveUser(mockUser) // Simulate user being logged in
+        ProfileScreen(navController = navController, userSessionManager = userSessionManager)
     }
 }
