@@ -1,4 +1,4 @@
-package com.example.shoppingapp.sampleData
+package com.example.shoppingapp.models
 
 data class Product(
     val productId: String,

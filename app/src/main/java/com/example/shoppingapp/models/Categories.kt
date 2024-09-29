@@ -1,5 +1,5 @@
 
-package com.example.shoppingapp.sampleData
+package com.example.shoppingapp.models
 
 data class Category(
     val categoryId: String,

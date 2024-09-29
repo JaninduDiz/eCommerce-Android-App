@@ -1,4 +1,4 @@
-package com.example.shoppingapp.screens
+package com.example.shoppingapp.views.tabViews
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,15 +38,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
-import com.example.shoppingapp.helpers.CartState
-import com.example.shoppingapp.sampleData.Category
-import com.example.shoppingapp.sampleData.Product
-import com.example.shoppingapp.sampleData.bedroomFurnitureCategory
-import com.example.shoppingapp.sampleData.diningFurnitureCategory
-import com.example.shoppingapp.sampleData.gamingFurnitureCategory
-import com.example.shoppingapp.sampleData.livingRoomFurnitureCategory
-import com.example.shoppingapp.sampleData.officeFurnitureCategory
-import com.example.shoppingapp.sampleData.sampleProducts
+import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.models.Category
+import com.example.shoppingapp.models.Product
+import com.example.shoppingapp.models.bedroomFurnitureCategory
+import com.example.shoppingapp.models.diningFurnitureCategory
+import com.example.shoppingapp.models.gamingFurnitureCategory
+import com.example.shoppingapp.models.livingRoomFurnitureCategory
+import com.example.shoppingapp.models.officeFurnitureCategory
+import com.example.shoppingapp.models.sampleProducts
 
 data class BottomNavigationItem(
     val title: String,

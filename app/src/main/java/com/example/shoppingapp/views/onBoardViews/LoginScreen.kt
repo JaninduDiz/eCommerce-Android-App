@@ -1,4 +1,4 @@
-package com.example.shoppingapp.screens.onBoardScreens
+package com.example.shoppingapp.views.onBoardViews
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,21 +34,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 
 @Composable
-fun RegisterScreen(navController: NavController) {
-    var username by remember { mutableStateOf("") }
+fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var emailError by remember { mutableStateOf(false) }
-    var passwordError by remember { mutableStateOf(false) }
-
-    fun validateEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    fun validatePassword(password: String): Boolean {
-        return password.length >= 6
-    }
 
     Box(
         modifier = Modifier
@@ -64,7 +53,7 @@ fun RegisterScreen(navController: NavController) {
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Register",
+                text = "Login",
                 style = TextStyle(
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
@@ -75,33 +64,8 @@ fun RegisterScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             BasicTextField(
-                value = username,
-                onValueChange = { username = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, MaterialTheme.shapes.small)
-                    .padding(16.dp),
-                textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
-                singleLine = true,
-                decorationBox = { innerTextField ->
-                    if (username.isEmpty()) {
-                        Text(
-                            text = "Username",
-                            style = TextStyle(color = Color.Gray, fontSize = 18.sp)
-                        )
-                    }
-                    innerTextField()
-                }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            BasicTextField(
                 value = email,
-                onValueChange = {
-                    email = it
-                    emailError = !validateEmail(it)
-                },
+                onValueChange = { email = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White, MaterialTheme.shapes.small)
@@ -118,22 +82,12 @@ fun RegisterScreen(navController: NavController) {
                     innerTextField()
                 }
             )
-            if (emailError) {
-                Text(
-                    text = "Invalid email format",
-                    color = Color.Red,
-                    style = TextStyle(fontSize = 14.sp)
-                )
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             BasicTextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    passwordError = !validatePassword(it)
-                },
+                onValueChange = { password = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White, MaterialTheme.shapes.small)
@@ -151,35 +105,23 @@ fun RegisterScreen(navController: NavController) {
                     innerTextField()
                 }
             )
-            if (passwordError) {
-                Text(
-                    text = "Password must be at least 6 characters",
-                    color = Color.Red,
-                    style = TextStyle(fontSize = 14.sp)
-                )
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = {
-                    if (!emailError && !passwordError) {
-                        // Handle registration logic
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !emailError && !passwordError
+                onClick = { /* Handle login logic */ },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Register")
+                Text(text = "Login")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Already have an account? Login",
+                text = "No account? Register",
                 color = Color.Blue,
                 modifier = Modifier.clickable {
-                    navController.popBackStack()
+                    navController.navigate("register")
                 }
             )
         }
@@ -188,9 +130,9 @@ fun RegisterScreen(navController: NavController) {
 
 @Preview(showBackground = true)
 @Composable
-fun RegisterScreenPreview() {
+fun LoginScreenPreview() {
     ShoppingAppTheme {
-        val navController = rememberNavController()
-        RegisterScreen(navController = navController)
+        val navController = rememberNavController() // A placeholder for NavController
+        LoginScreen(navController = navController)
     }
 }

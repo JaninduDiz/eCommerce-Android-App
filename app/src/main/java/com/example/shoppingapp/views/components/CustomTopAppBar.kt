@@ -1,4 +1,4 @@
-package com.example.shoppingapp.components
+package com.example.shoppingapp.views.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons

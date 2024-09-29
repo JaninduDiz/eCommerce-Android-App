@@ -10,14 +10,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.shoppingapp.helpers.CartState
-import com.example.shoppingapp.screens.onBoardScreens.LoginScreen
-import com.example.shoppingapp.screens.onBoardScreens.RegisterScreen
-import com.example.shoppingapp.screens.CartScreen
-import com.example.shoppingapp.screens.CategoryScreen
-import com.example.shoppingapp.screens.HomeScreen
-import com.example.shoppingapp.screens.ProductDetailsScreen
-import com.example.shoppingapp.screens.ProfileScreen
+import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.views.tabViews.CartScreen
+import com.example.shoppingapp.views.CategoryScreen
+import com.example.shoppingapp.views.tabViews.HomeScreen
+import com.example.shoppingapp.views.ProductDetailsScreen
+import com.example.shoppingapp.views.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
