@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,47 +26,79 @@ import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderItem
 import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.CustomButton
+import com.example.shoppingapp.views.components.CustomModal
 import com.example.shoppingapp.views.components.CustomTopAppBar
+import com.example.shoppingapp.views.components.ModalType
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
-fun OrderDetailsScreen(navController: NavController, order: Order) {
+fun OrderDetailsScreen(navController: NavController, orderId: String, orderState: OrderState, isBackHome: Boolean? = false) {
+    val order = orderState.getOrderById(orderId)
+    var showModal by remember { mutableStateOf(false) }  // State for showing modal
+
     CustomTopAppBar(
         title = "Order Details",
-        onNavigationClick = { navController.popBackStack() },
+        onNavigationClick = {
+            if (isBackHome == true) navController.navigate("home")
+            else navController.popBackStack()
+        },
         centeredHeader = true
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            // Order status and date placed
-            Text(text = "Order ID: ${order.id}", fontWeight = FontWeight.Bold)
-            Text(text = "Status: ${order.status}", fontWeight = FontWeight.Bold)
+        order?.let {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+            ) {
+                // Order status and date placed
+                Text(text = "Order ID: ${it.id}", fontWeight = FontWeight.Bold)
+                Text(text = "Status: ${it.status}", fontWeight = FontWeight.Bold)
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // List the items in the order
-            order.items.forEach { orderItem ->
-                OrderItemCard(orderItem)
+                // List the items in the order
+                it.items.forEach { orderItem ->
+                    OrderItemCard(orderItem)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OrderSummary(
+                    totalItems = it.items.size,
+                    totalPrice = it.items.sumOf { item -> item.product.price * item.quantity.value }
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Cancel Order Button
+                CustomButton(
+                    text = "Cancel Order",
+                    onClick = {  showModal = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146))
+                )
+
+                if (showModal) {
+                    CustomModal(
+                        type = ModalType.ERROR,
+                        title = "Cancel Order?",
+                        text = "Are you sure you want to cancel this order?",
+                        primaryButtonText = "Confirm",
+                        onPrimaryButtonClick = {
+                            showModal = false
+                            //TODO: Implement cancel order logic
+                        },
+                        primaryButtonStyle = ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146)),
+                        secondaryButtonText = "Close",
+                        onSecondaryButtonClick = { showModal = false },
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Total price at the bottom
-            Text(text = "Total: $${"%.2f".format(order.items.sumOf { it.product.price * it.quantity.value })}")
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Cancel Order Button
-            CustomButton(
-                text = "Cancel Order",
-                onClick = { /* Handle order cancellation */ },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146))
-            )
+        } ?: run {
+            Text(text = "Order not found.", modifier = Modifier.padding(16.dp))
         }
     }
 }
@@ -116,7 +152,8 @@ fun OrderDetailsScreenPreview() {
     ShoppingAppTheme {
         OrderDetailsScreen(
             navController = rememberNavController(),
-            order = sampleOrder
+            orderId = sampleOrder.id,
+            orderState = OrderState(),
         )
     }
 }

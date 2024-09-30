@@ -42,23 +42,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderItem
-import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.models.sampleUser
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
-import com.example.shoppingapp.viewmodels.OrderState
+import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.views.components.CustomButton
 import com.example.shoppingapp.views.components.CustomModal
 import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.views.components.ModalType
 
 @Composable
-fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Int) {
+fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Double) {
     var showModal by remember { mutableStateOf(false) }  // State for showing modal
+    var apiResponseStatus by remember { mutableStateOf<ApiResponseStatus?>(null) }  // State for API response status
+    val cartState = remember { CartState() }
 
     CustomTopAppBar(
         title = "Checkout",
@@ -85,7 +85,10 @@ fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Int) 
             Spacer(modifier = Modifier.weight(1f))
             CustomButton(
                 text = "Purchase Order",
-                onClick = { showModal = true },  // Show the modal on click
+                onClick = {
+                    val success = simulateApiCall()
+                    apiResponseStatus = if (success) ApiResponseStatus.SUCCESS else ApiResponseStatus.ERROR
+                    showModal = true },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB98B73))
             )
@@ -94,18 +97,31 @@ fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Int) 
         // Modal logic
         if (showModal) {
             CustomModal(
-                type = ModalType.SUCCESS,
-                text = "Order placed successfully!",
+                type = if (apiResponseStatus == ApiResponseStatus.SUCCESS) ModalType.SUCCESS else ModalType.ERROR,
+                title = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Order placed successfully!" else "Order placement failed!",
+                text = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Thank you for your order. You will receive a confirmation shortly." else "There was an issue placing your order. Please try again.",
                 primaryButtonText = "OK",
                 onPrimaryButtonClick = {
                     showModal = false
-                    println("Order placed successfully!")
+                    if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
+                        navController.navigate("orderDetails/${order.id}/true")
+                        cartState.clearCart()
+                    }
                 },
+                primaryButtonStyle = if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
+                    ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C))
+                } else ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146)),
                 secondaryButtonText = null,
                 tertiaryButtonText = null
             )
         }
     }
+}
+
+enum class ApiResponseStatus { SUCCESS, ERROR }
+fun simulateApiCall(): Boolean {
+    // Simulate an API call and return success or failure
+    return true // or false based on the simulated response
 }
 
 @Composable
@@ -153,7 +169,7 @@ fun AddressSection(user: User) {
 }
 
 @Composable
-fun OrderSummary(totalItems: Int, totalPrice: Int) {
+fun OrderSummary(totalItems: Int, totalPrice: Double) {
     val deliveryCharge = 2
     Text(
         text = "Order Summary",
@@ -287,7 +303,7 @@ fun CheckoutScreenPreview() {
         CheckoutScreen(
             navController = rememberNavController(),
             order = sampleOrder,
-            totalPrice = (sampleProducts[0].price * 1 + sampleProducts[1].price * 2).toInt()
+            totalPrice = (sampleProducts[0].price * 1 + sampleProducts[1].price * 2)
         )
     }
 }

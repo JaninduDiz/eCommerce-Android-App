@@ -1,12 +1,9 @@
 package com.example.shoppingapp.views.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +18,7 @@ enum class ModalType {
 @Composable
 fun CustomModal(
     type: ModalType,
+    title: String = "",
     text: String,
     primaryButtonText: String,
     onPrimaryButtonClick: () -> Unit,
@@ -42,7 +40,7 @@ fun CustomModal(
         onDismissRequest = { /* Handle dismiss */ },
         title = {
             Text(
-                text = if (type == ModalType.SUCCESS) "Success" else "Error",
+                text = if (title.isNotEmpty()) title else if (type == ModalType.SUCCESS) "Success" else "Error",
                 color = textColor,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp

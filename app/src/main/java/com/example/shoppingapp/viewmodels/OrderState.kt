@@ -1,10 +1,14 @@
 package com.example.shoppingapp.viewmodels
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderItem
 
 class OrderState {
+
+    // A list of all orders in the system
+    private val orders = SnapshotStateList<Order>()
 
     private val currentOrder = mutableStateOf<Order?>(null)
 
@@ -27,6 +31,8 @@ class OrderState {
             note = note
         )
 
+        // Store the new order
+        orders.add(order)
         currentOrder.value = order
         return order
     }
@@ -34,6 +40,11 @@ class OrderState {
     // Get the current order (if any)
     fun getCurrentOrder(): Order? {
         return currentOrder.value
+    }
+
+    // Get an order by its ID
+    fun getOrderById(orderId: String): Order? {
+        return orders.find { it.id == orderId }
     }
 
     // Helper function to generate a random order ID

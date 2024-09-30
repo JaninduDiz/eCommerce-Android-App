@@ -36,7 +36,7 @@ import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 fun ProductDetailsScreen(
     navController: NavHostController,
     productId: String?,
-    cartState: CartState // Pass the CartState to manage the cart
+    cartState: CartState
 ) {
     val context = LocalContext.current  // Get the current context
     val product = sampleProducts.find { it.productId == productId }

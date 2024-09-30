@@ -20,7 +20,7 @@ import com.example.shoppingapp.views.tabViews.HomeScreen
 import com.example.shoppingapp.views.ProductDetailsScreen
 import com.example.shoppingapp.views.ProfileScreen
 import com.example.shoppingapp.views.onBoardViews.LoginScreen
-import android.util.Log
+import com.example.shoppingapp.views.OrderDetailsScreen
 
 
 
@@ -35,11 +35,8 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val cartState = remember { CartState() }
                 val orderState = remember { OrderState() }
-
                 val userSessionManager = UserSessionManager(this)
-
                 val currentUser = userSessionManager.getUser()
-
 
                 NavHost(navController, startDestination = if (currentUser != null) "home" else "login") {
 
@@ -61,7 +58,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("cart") { CartScreen(navController, cartState, orderState) }
                     composable("checkoutScreen/{totalPrice}") { backStackEntry ->
-                        val totalPrice = backStackEntry.arguments?.getString("totalPrice")?.toIntOrNull() ?: 0
+                        val totalPrice = backStackEntry.arguments?.getString("totalPrice")?.toDoubleOrNull() ?: 0.0
                         val order = orderState.getCurrentOrder()
 
                         order?.let {
@@ -69,6 +66,12 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     composable("profile") { ProfileScreen(navController , userSessionManager) }
+                    composable("orderDetails/{orderId}/{isBackHome}") { backStackEntry ->
+                        val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+                        val isBackHome = backStackEntry.arguments?.getString("isBackHome")?.toBoolean() ?: false
+
+                        OrderDetailsScreen(navController, orderId, orderState, isBackHome)
+                    }
                 }
             }
         }
