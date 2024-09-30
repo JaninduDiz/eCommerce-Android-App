@@ -19,7 +19,7 @@ import com.example.shoppingapp.views.ProductDetailsScreen
 import com.example.shoppingapp.views.ProfileScreen
 import com.example.shoppingapp.views.onBoardViews.LoginScreen
 import android.util.Log
-
+import com.example.shoppingapp.views.onBoardViews.RegisterScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     composable("login") {
                         LoginScreen(navController, userSessionManager) // Pass the session manager
                     }
-//                    composable("register") { RegisterScreen(navController) }
+                    composable("register") { RegisterScreen(navController) }
                     composable("home") { HomeScreen(navController, cartState) }
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
