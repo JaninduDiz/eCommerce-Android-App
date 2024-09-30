@@ -77,15 +77,16 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         ),
         BottomNavigationItem(
             title = "Orders",
-            selectedIcon = Icons.Filled.Email, // Replace with appropriate Orders icon
-            unselectedIcon = Icons.Outlined.Email, // Replace with appropriate Orders icon
+            selectedIcon = Icons.Filled.Email,
+            unselectedIcon = Icons.Outlined.Email,
             hasNews = false,
         ),
         BottomNavigationItem(
             title = "Cart",
             selectedIcon = Icons.Filled.ShoppingCart,
             unselectedIcon = Icons.Outlined.ShoppingCart,
-            hasNews = false,
+            hasNews = cartState.items.isNotEmpty(),
+            badgeCount = if (cartState.items.isNotEmpty()) cartState.items.size else null
         ),
         BottomNavigationItem(
             title = "Search",

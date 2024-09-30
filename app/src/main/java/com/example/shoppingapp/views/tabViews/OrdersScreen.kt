@@ -1,5 +1,7 @@
 package com.example.shoppingapp.views.tabViews
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -7,6 +9,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
@@ -18,8 +31,107 @@ fun OrdersScreen(navController: NavController) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Orders", fontSize = 24.sp)
-        // Add your Orders screen content here
+        Text(
+            text = "Orders",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        OrderSelector()
+    }
+}
+
+@Composable
+fun OrderSelector() {
+    var selectedTab by remember { mutableIntStateOf(0) }
+
+    val activeButtonColor = Color(0xFFB98B73)  // Active button background color
+    val inactiveButtonColor = Color.White
+    val activeTextColor = Color.White
+    val inactiveTextColor = Color(0xFF3F4238)  // Darker text color for inactive
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .height(50.dp)
+            .shadow(8.dp, shape = RoundedCornerShape(50.dp))
+            .background(Color.White, shape = RoundedCornerShape(50.dp))
+            .border(0.1.dp, Color.White, shape = RoundedCornerShape(50.dp)),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Order History Button
+        Button(
+            onClick = { selectedTab = 0 },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (selectedTab == 0) activeButtonColor else inactiveButtonColor
+            ),
+            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier
+                .weight(1f)
+                .height(50.dp)
+
+        ) {
+            Text(
+                text = "Order History",
+                color = if (selectedTab == 0) activeTextColor else inactiveTextColor
+            )
+        }
+
+        // Order Tracking Button
+        Button(
+            onClick = { selectedTab = 1 },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (selectedTab == 1) activeButtonColor else inactiveButtonColor
+            ),
+            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier
+                .weight(1f)
+                .height(50.dp)
+
+        ) {
+            Text(
+                text = "Order Tracking",
+                color = if (selectedTab == 1) activeTextColor else inactiveTextColor
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+
+    when (selectedTab) {
+        0 -> OrderHistoryComponent()
+        1 -> OrderTrackingComponent()
+    }
+}
+
+
+@Composable
+fun OrderHistoryComponent() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(text = "Order History", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+        Text(text = "Details of past orders go here.")
+    }
+}
+
+@Composable
+fun OrderTrackingComponent() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(text = "Order Tracking", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+        Text(text = "Current order tracking details go here.")
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.shoppingapp.views
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,22 +27,39 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.Order
+import com.example.shoppingapp.models.OrderItem
 import com.example.shoppingapp.models.User
+import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.models.sampleUser
+import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.views.components.CustomButton
+import com.example.shoppingapp.views.components.CustomModal
 import com.example.shoppingapp.views.components.CustomTopAppBar
+import com.example.shoppingapp.views.components.ModalType
 
 @Composable
-fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Int) {
+fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Double) {
+    var showModal by remember { mutableStateOf(false) }  // State for showing modal
+    var apiResponseStatus by remember { mutableStateOf<ApiResponseStatus?>(null) }  // State for API response status
+    val cartState = remember { CartState() }
+
     CustomTopAppBar(
         title = "Checkout",
         onNavigationClick = { navController.popBackStack() },
@@ -53,25 +71,57 @@ fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Int) 
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-
             OrderSummary(totalItems = order.items.size, totalPrice = totalPrice)
 
             Spacer(modifier = Modifier.height(16.dp))
 
             AddressSection(user = sampleUser)
 
+            Spacer(modifier = Modifier.height(16.dp))
+
             PaymentMethodSection()
 
             // Confirm Order Button
             Spacer(modifier = Modifier.weight(1f))
             CustomButton(
-                text = "Confirm Order",
-                onClick = { /* Handle confirm order */ },
+                text = "Purchase Order",
+                onClick = {
+                    val success = simulateApiCall()
+                    apiResponseStatus = if (success) ApiResponseStatus.SUCCESS else ApiResponseStatus.ERROR
+                    showModal = true },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB98B73))
             )
         }
+
+        // Modal logic
+        if (showModal) {
+            CustomModal(
+                type = if (apiResponseStatus == ApiResponseStatus.SUCCESS) ModalType.SUCCESS else ModalType.ERROR,
+                title = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Order placed successfully!" else "Order placement failed!",
+                text = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Thank you for your order. You will receive a confirmation shortly." else "There was an issue placing your order. Please try again.",
+                primaryButtonText = "OK",
+                onPrimaryButtonClick = {
+                    showModal = false
+                    if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
+                        navController.navigate("orderDetails/${order.id}/true")
+                        cartState.clearCart()
+                    }
+                },
+                primaryButtonStyle = if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
+                    ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C))
+                } else ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146)),
+                secondaryButtonText = null,
+                tertiaryButtonText = null
+            )
+        }
     }
+}
+
+enum class ApiResponseStatus { SUCCESS, ERROR }
+fun simulateApiCall(): Boolean {
+    // Simulate an API call and return success or failure
+    return true // or false based on the simulated response
 }
 
 @Composable
@@ -119,7 +169,7 @@ fun AddressSection(user: User) {
 }
 
 @Composable
-fun OrderSummary(totalItems: Int, totalPrice: Int) {
+fun OrderSummary(totalItems: Int, totalPrice: Double) {
     val deliveryCharge = 2
     Text(
         text = "Order Summary",
@@ -159,6 +209,9 @@ fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
 
 @Composable
 fun PaymentMethodSection() {
+    // State to track the selected payment method
+    var selectedPaymentMethod by remember { mutableStateOf("Cash") }
+
     Text(
         text = "Choose payment method",
         fontWeight = FontWeight.Bold,
@@ -171,11 +224,12 @@ fun PaymentMethodSection() {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { selectedPaymentMethod = "Cash" } // Handle selection
             .padding(bottom = 16.dp)
     ) {
         Icon(
             imageVector = Icons.Default.Check,
-            contentDescription = "Cash",
+            contentDescription = "Cash on Delivery",
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
@@ -186,20 +240,23 @@ fun PaymentMethodSection() {
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = "Cash", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         Spacer(modifier = Modifier.weight(1f))
-        Icon(
-            imageVector = Icons.Default.Check,
-            contentDescription = "Selected",
-            tint = Color(0xFF3F4238),
-            modifier = Modifier.size(30.dp)
-        )
+        // Show a checkmark if "Cash" is selected
+        if (selectedPaymentMethod == "Cash") {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Selected",
+                tint = Color(0xFF3F4238),
+                modifier = Modifier.size(30.dp)
+            )
+        }
     }
 
     // Add New Payment Method
-    Row (
+    Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Handle add new payment method */ }
+            .clickable { selectedPaymentMethod = "Add New" } // Handle selection
     ) {
         Icon(
             imageVector = Icons.Default.Add,
@@ -213,56 +270,40 @@ fun PaymentMethodSection() {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = "Add new payment method", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        // Show a checkmark if "Add New" is selected
+        if (selectedPaymentMethod == "Add New") {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Selected",
+                tint = Color(0xFF3F4238),
+                modifier = Modifier.size(30.dp)
+            )
+        }
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun CheckoutScreenPreview() {
-//    // Sample products for order
-//    val sampleProduct1 = Product(
-//        productId = "prod1",
-//        name = "Chair",
-//        category = Category("cat1", "Furniture"),
-//        vendorId = "vendor1",
-//        isActive = true,
-//        price = 150.0,
-//        description = "Comfortable office chair",
-//        stock = 10
-//    )
-//
-//    val sampleProduct2 = Product(
-//        productId = "prod2",
-//        name = "Desk",
-//        category = Category("cat2", "Furniture"),
-//        vendorId = "vendor2",
-//        isActive = true,
-//        price = 200.0,
-//        description = "Spacious office desk",
-//        stock = 5
-//    )
-//
-//    // Sample order items
-//    val sampleOrderItems = listOf(
-//        OrderItem(product = sampleProduct1, quantity = , isDelivered = false),
-//        OrderItem(product = sampleProduct2, quantity = 1, isDelivered = false)
-//    )
-//
-//    // Sample order
-//    val sampleOrder = Order(
-//        id = "order1",
-//        customerId = "customer1",
-//        items = sampleOrderItems,
-//        status = 1,
-//        cancellationReason = null,
-//        note = "Please deliver carefully."
-//    )
-//
-//    // Mock NavController for preview
-//    val navController = rememberNavController()
-//
-//    // Render CheckoutScreen with mock data
-//    ShoppingAppTheme {
-//        CheckoutScreen(navController = navController, order = sampleOrder, totalPrice = 500)
-//    }
-//}
+@SuppressLint("UnrememberedMutableState")
+@Preview(showBackground = true)
+@Composable
+fun CheckoutScreenPreview() {
+    val sampleOrder = Order(
+        id = "order_1",
+        customerId = "customer_1",
+        items = listOf(
+            OrderItem(product = sampleProducts[0], quantity = mutableIntStateOf(1), isDelivered = false),
+            OrderItem(product = sampleProducts[1], quantity = mutableIntStateOf(2), isDelivered = false)
+        ),
+        status = 1,
+        cancellationReason = null,
+        note = "Please deliver during the afternoon."
+    )
+
+    ShoppingAppTheme {
+        CheckoutScreen(
+            navController = rememberNavController(),
+            order = sampleOrder,
+            totalPrice = (sampleProducts[0].price * 1 + sampleProducts[1].price * 2)
+        )
+    }
+}

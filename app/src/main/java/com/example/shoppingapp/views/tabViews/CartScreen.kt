@@ -3,7 +3,6 @@ package com.example.shoppingapp.views.tabViews
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -55,14 +54,13 @@ fun CartScreen(
             if (cartState.items.isNotEmpty()) {
                 IconButton(
                     onClick = { cartState.clearCart() },
-                    modifier = Modifier
-                        .background(Color(0xFFB7B7A4), shape = CircleShape)
+                    modifier = Modifier.size(24.dp),
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Clear Cart",
                         tint = Color.Red,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
@@ -86,7 +84,7 @@ fun CartScreen(
 
         if (cartState.items.isNotEmpty()) {
             // Total Price Calculation
-            val totalPrice = cartState.items.sumOf { it.product.price.toInt() * it.quantity.value }
+            val totalPrice = cartState.items.sumOf { it.product.price * it.quantity.value }
             Text(
                 text = "Total: $$totalPrice",
                 fontSize = 20.sp,
@@ -97,7 +95,7 @@ fun CartScreen(
             Button(
                 onClick = {
                     // Generate an order using the OrderState
-                    val order = orderState.generateOrder(cartState, customerId = "customer_123")
+                    val order = orderState.generateOrder(cartState, customerId = "customer_1123")
 
                     // Navigate to the CheckoutScreen and pass the order and total price
                     navController.navigate("checkoutScreen/$totalPrice")
