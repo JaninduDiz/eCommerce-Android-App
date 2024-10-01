@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitInstance {
     val api: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/") // Replace with your localhost IP if running on a real device
+            .baseUrl("https://ecommerceapp2-young-silence-7292.fly.dev/api/") // Replace with your localhost IP if running on a real device
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
