@@ -173,7 +173,7 @@ fun RegisterScreen(navController: NavController) {
                         // Handle registration logic
                         (context as ComponentActivity).lifecycleScope.launch {
                             try {
-                                val response = RetrofitInstance.api.register(RegisterRequest(username, email, password))
+                                val response = RetrofitInstance.api.register(RegisterRequest(username, email, password, 0))
                                 if (response.isSuccessful && response.body() != null) {
                                     Toast.makeText(context, "Registration successful ", Toast.LENGTH_SHORT).show()
                                     navController.navigate("login") // Navigate to login screen after successful registration

@@ -30,6 +30,18 @@ class UserSessionManager(context: Context) {
         )
     }
 
+    fun updateUser(updatedUser: User) {
+        prefs.edit().apply {
+            putString("userName", updatedUser.userName)
+            putString("emailAddress", updatedUser.emailAddress)
+            putString("addressLine1", updatedUser.addressLine1)
+            putString("addressLine2", updatedUser.addressLine2)
+            putString("city", updatedUser.city)
+            putString("postalCode", updatedUser.postalCode)
+            apply()
+        }
+    }
+
     fun clearSession() {
         prefs.edit().clear().apply()
     }
@@ -40,6 +52,4 @@ class UserSessionManager(context: Context) {
             apply()
         }
     }
-
-
 }
