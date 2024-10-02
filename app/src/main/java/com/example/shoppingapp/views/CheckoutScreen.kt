@@ -1,6 +1,10 @@
 package com.example.shoppingapp.views
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,10 +29,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,22 +49,32 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.Order
-import com.example.shoppingapp.models.OrderItem
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.models.sampleUser
+import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.CustomButton
 import com.example.shoppingapp.views.components.CustomModal
 import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.views.components.ModalType
+import java.time.LocalDateTime
+import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Double) {
-    var showModal by remember { mutableStateOf(false) }  // State for showing modal
+fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPrice: Double) {
+    var showModal by remember { mutableStateOf(false) }
     var apiResponseStatus by remember { mutableStateOf<ApiResponseStatus?>(null) }  // State for API response status
-    val cartState = remember { CartState() }
+    var note by remember { mutableStateOf("") }
+
+    val userSessionManager = UserSessionManager(LocalContext.current)
+    val currentUser = userSessionManager.getUser()
+
+    val orderState = OrderState()
+    var order: Order = Order("", "", emptyList(), 0, null, null, LocalDateTime.now())
 
     CustomTopAppBar(
         title = "Checkout",
@@ -71,24 +87,49 @@ fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Doubl
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            OrderSummary(totalItems = order.items.size, totalPrice = totalPrice)
+            OrderSummary(totalItems = cartState.items.size, totalPrice = totalPrice)
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            AddressSection(user = sampleUser)
+            if (currentUser != null) {
+                AddressSection(user = currentUser)
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             PaymentMethodSection()
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column {
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    label = { Text("Add note") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFFf8f7ff),
+                        unfocusedContainerColor = Color(0xFFf8f7ff),
+                        focusedBorderColor = Color(0xFF9381ff),
+                        unfocusedBorderColor = Color(0xFFf8f7ff),
+                        cursorColor = Color(0xFF9381ff),
+                    )
+                )
+            }
 
             // Confirm Order Button
             Spacer(modifier = Modifier.weight(1f))
             CustomButton(
                 text = "Purchase Order",
                 onClick = {
+                    order = orderState.generateOrder(cartState, customerId = "customer_1123", note)         //TODO: Replace customerId with currentUser.id
                     val success = simulateApiCall()
-                    apiResponseStatus = if (success) ApiResponseStatus.SUCCESS else ApiResponseStatus.ERROR
-                    showModal = true },
+                    apiResponseStatus =
+                        if (success) ApiResponseStatus.SUCCESS else ApiResponseStatus.ERROR
+                    showModal = true
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB98B73))
             )
@@ -104,8 +145,9 @@ fun CheckoutScreen(navController: NavController, order: Order, totalPrice: Doubl
                 onPrimaryButtonClick = {
                     showModal = false
                     if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
+                        Log.d(TAG, "CheckoutScreen: Order placed successfully: $order")
                         navController.navigate("orderDetails/${order.id}/true")
-                        cartState.clearCart()
+                        cartState.clearCart()       //TODO: check this, this worked, not now
                     }
                 },
                 primaryButtonStyle = if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
@@ -126,7 +168,7 @@ fun simulateApiCall(): Boolean {
 
 @Composable
 fun AddressSection(user: User) {
-    Column { // Address Section
+    Column {
         Text(
             text = "Delivery Address",
             fontWeight = FontWeight.Bold,
@@ -135,7 +177,9 @@ fun AddressSection(user: User) {
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
@@ -145,7 +189,7 @@ fun AddressSection(user: User) {
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFB98B73))
+                        .background(Color(0xFFa57f60))
                         .padding(12.dp),
                     tint = Color.White
                 )
@@ -168,6 +212,7 @@ fun AddressSection(user: User) {
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun OrderSummary(totalItems: Int, totalPrice: Double) {
     val deliveryCharge = 2
@@ -187,11 +232,11 @@ fun OrderSummary(totalItems: Int, totalPrice: Double) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             SummaryRow(label = "Total Items", value = "$totalItems")
-            SummaryRow(label = "Subtotal", value = "$$totalPrice")
+            SummaryRow(label = "Subtotal", value = String.format(Locale.getDefault(),"$%.2f", totalPrice))
             Spacer(modifier = Modifier.height(10.dp))
             SummaryRow(label = "Delivery Charges", value = "$$deliveryCharge")
             Divider(modifier = Modifier.padding(vertical = 8.dp))
-            SummaryRow(label = "Total", value = "$${totalPrice + deliveryCharge}", isBold = true)
+            SummaryRow(label = "Total", value = String.format(Locale.getDefault(), "$%.2f", totalPrice + deliveryCharge), isBold = true)
         }
     }
 }
@@ -209,7 +254,6 @@ fun SummaryRow(label: String, value: String, isBold: Boolean = false) {
 
 @Composable
 fun PaymentMethodSection() {
-    // State to track the selected payment method
     var selectedPaymentMethod by remember { mutableStateOf("Cash") }
 
     Text(
@@ -219,12 +263,11 @@ fun PaymentMethodSection() {
         modifier = Modifier.padding(bottom = 16.dp)
     )
 
-    // Cash Payment Method
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { selectedPaymentMethod = "Cash" } // Handle selection
+            .clickable { selectedPaymentMethod = "Cash" }
             .padding(bottom = 16.dp)
     ) {
         Icon(
@@ -233,14 +276,14 @@ fun PaymentMethodSection() {
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFB98B73))
+                .background(Color(0xFFc4a381))
                 .padding(12.dp),
             tint = Color.White
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = "Cash", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         Spacer(modifier = Modifier.weight(1f))
-        // Show a checkmark if "Cash" is selected
+
         if (selectedPaymentMethod == "Cash") {
             Icon(
                 imageVector = Icons.Default.Check,
@@ -251,12 +294,11 @@ fun PaymentMethodSection() {
         }
     }
 
-    // Add New Payment Method
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { selectedPaymentMethod = "Add New" } // Handle selection
+            .clickable { selectedPaymentMethod = "Add New" }
     ) {
         Icon(
             imageVector = Icons.Default.Add,
@@ -264,14 +306,14 @@ fun PaymentMethodSection() {
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFB98B73))
+                .background(Color(0xFFc4a381))
                 .padding(12.dp),
             tint = Color.White
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = "Add new payment method", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         Spacer(modifier = Modifier.weight(1f))
-        // Show a checkmark if "Add New" is selected
+
         if (selectedPaymentMethod == "Add New") {
             Icon(
                 imageVector = Icons.Default.Check,
@@ -283,26 +325,15 @@ fun PaymentMethodSection() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnrememberedMutableState")
 @Preview(showBackground = true)
 @Composable
 fun CheckoutScreenPreview() {
-    val sampleOrder = Order(
-        id = "order_1",
-        customerId = "customer_1",
-        items = listOf(
-            OrderItem(product = sampleProducts[0], quantity = mutableIntStateOf(1), isDelivered = false),
-            OrderItem(product = sampleProducts[1], quantity = mutableIntStateOf(2), isDelivered = false)
-        ),
-        status = 1,
-        cancellationReason = null,
-        note = "Please deliver during the afternoon."
-    )
-
     ShoppingAppTheme {
         CheckoutScreen(
             navController = rememberNavController(),
-            order = sampleOrder,
+            cartState = CartState(),
             totalPrice = (sampleProducts[0].price * 1 + sampleProducts[1].price * 2)
         )
     }

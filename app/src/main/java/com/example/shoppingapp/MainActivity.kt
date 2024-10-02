@@ -1,9 +1,11 @@
 package com.example.shoppingapp
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +27,7 @@ import com.example.shoppingapp.views.onBoardViews.RegisterScreen
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -41,7 +44,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController, startDestination = if (currentUser != null) "home" else "login") {
 
                     composable("login") {
-                        LoginScreen(navController, userSessionManager) // Pass the session manager
+                        LoginScreen(navController, userSessionManager) // pass the session manager
                     }
                     composable("register") { RegisterScreen(navController) }
                     composable("home") { HomeScreen(navController, cartState, orderState) }
@@ -56,14 +59,11 @@ class MainActivity : ComponentActivity() {
                             categoryId = categoryId
                         )
                     }
-                    composable("cart") { CartScreen(navController, cartState, orderState) }
+                    composable("cart") { CartScreen(navController, cartState) }
                     composable("checkoutScreen/{totalPrice}") { backStackEntry ->
                         val totalPrice = backStackEntry.arguments?.getString("totalPrice")?.toDoubleOrNull() ?: 0.0
-                        val order = orderState.getCurrentOrder()
+                        CheckoutScreen(navController = navController, cartState, totalPrice = totalPrice)
 
-                        order?.let {
-                            CheckoutScreen(navController = navController, order = it, totalPrice = totalPrice)
-                        }
                     }
                     composable("profile") { ProfileScreen(navController , userSessionManager) }
                     composable("orderDetails/{orderId}/{isBackHome}") { backStackEntry ->

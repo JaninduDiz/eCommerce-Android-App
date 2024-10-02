@@ -162,7 +162,7 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
                 when (selectedItemIndex) {
                     0 -> HomeContent(navController = navController)
                     1 -> OrdersScreen(navController = navController)
-                    2 -> CartScreen(navController = navController, cartState, orderState)
+                    2 -> CartScreen(navController = navController, cartState)
                     3 -> SearchScreen(navController = navController)
                 }
             }
