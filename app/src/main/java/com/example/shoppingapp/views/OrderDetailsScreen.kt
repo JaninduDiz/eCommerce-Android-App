@@ -6,11 +6,22 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -124,8 +135,8 @@ fun OrderDetailsScreen(navController: NavController, orderId: String, orderState
 @Composable
 fun orderStatusText(status: Int): Pair<String, Color> {
     return when (status) {
-        0 -> "Placed" to Color(0xFF4CAF50) // Green
-        1 -> "Processing" to Color(0xFFFFC107) // Amber
+        0 -> "Processing" to Color(0xFF4CAF50) // Green
+        1 -> "Ready For Delivery" to Color(0xFFFFC107) // Amber
         2 -> "Shipped" to Color(0xFF2196F3) // Blue
         3 -> "Delivered" to Color(0xFF8BC34A) // Light Green
         4 -> "Cancelled" to Color(0xFFF44336) // Red

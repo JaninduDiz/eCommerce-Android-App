@@ -127,5 +127,43 @@ val sampleOrders = listOf(
         cancellationReason = null,
         note = "Deliver to the second floor.",
         createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
+    ),
+    Order(
+        id = "order_1727715349667",
+        customerId = "customer_456",
+        items = listOf(
+            OrderItem(
+                product = Product(
+                    productId = "20",
+                    name = "King Size Bed",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 999.99,
+                    description = "King size bed with upholstered headboard and wooden frame.",
+                    stock = 4
+                ),
+                quantity = 5,
+                isDelivered = true
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "21",
+                    name = "Nightstand",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 129.99,
+                    description = "Modern nightstand with drawer and open shelf.",
+                    stock = 10
+                ),
+                quantity = 1,
+                isDelivered = true
+            )
+        ),
+        status = 4,
+        cancellationReason = null,
+        note = "Deliver to the second floor.",
+        createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
     )
 )
