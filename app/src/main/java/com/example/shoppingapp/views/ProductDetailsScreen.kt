@@ -3,12 +3,12 @@ package com.example.shoppingapp.views
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -32,7 +32,6 @@ import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.views.components.CustomTopAppBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailsScreen(
     navController: NavHostController,
@@ -139,6 +138,7 @@ fun ProductImageSection() {
 
 @Composable
 fun ProductInfoSection(product: Product) {
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth()) {
         Row (modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -180,6 +180,15 @@ fun ProductInfoSection(product: Product) {
             text = "Category: ${product.category.name}",
             style = MaterialTheme.typography.titleMedium,
             color = Color.Gray
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Vendor: Isuru Stores",
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.Gray,
+            modifier = Modifier.clickable {
+                Toast.makeText(context, "Vendor clicked", Toast.LENGTH_SHORT).show()
+            }
         )
     }
 }

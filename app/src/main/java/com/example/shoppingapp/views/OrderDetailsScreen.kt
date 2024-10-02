@@ -141,7 +141,7 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             .padding(vertical = 8.dp)
             .clickable {
                 Toast.makeText(navController.context, "Navigate to product details", Toast.LENGTH_SHORT).show()
-                //navController.navigate("review/${orderItem.product.productId}")
+                navController.navigate("reviewScreen/${orderItem.product.productId}")
             },
         shape = RoundedCornerShape(8.dp),
     ) {

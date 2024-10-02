@@ -23,6 +23,7 @@ import com.example.shoppingapp.views.ProductDetailsScreen
 import com.example.shoppingapp.views.ProfileScreen
 import com.example.shoppingapp.views.onBoardViews.LoginScreen
 import com.example.shoppingapp.views.OrderDetailsScreen
+import com.example.shoppingapp.views.ReviewScreen
 import com.example.shoppingapp.views.onBoardViews.RegisterScreen
 
 
@@ -51,6 +52,10 @@ class MainActivity : ComponentActivity() {
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
                         ProductDetailsScreen(navController, productId, cartState)
+                    }
+                    composable("reviewScreen/{productId}") { backStackEntry ->
+                        val productId = backStackEntry.arguments?.getString("productId")
+                        ReviewScreen(navController, productId)
                     }
                     composable("categoryScreen/{categoryId}") { backStackEntry ->
                         val categoryId = backStackEntry.arguments?.getString("categoryId")
