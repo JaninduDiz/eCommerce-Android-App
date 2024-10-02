@@ -53,7 +53,8 @@ fun OrderDetailsScreen(navController: NavController, orderId: String, orderState
             if (isBackHome == true) navController.navigate("home")
             else navController.popBackStack()
         },
-        centeredHeader = true
+        centeredHeader = true,
+        isHeaderPinned = true,
     ) { paddingValues ->
         order.let {
             LazyColumn(

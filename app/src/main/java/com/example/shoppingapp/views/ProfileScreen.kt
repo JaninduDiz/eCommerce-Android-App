@@ -50,7 +50,8 @@ fun ProfileScreen(navController: NavController, userSessionManager: UserSessionM
     CustomTopAppBar(
         title = "Profile",
         onNavigationClick = { navController.popBackStack() },
-        centeredHeader = true
+        centeredHeader = true,
+        isHeaderPinned = true
     ) { paddingValues ->
         ProfileContent(paddingValues, currentUser, userSessionManager, navController)
     }
