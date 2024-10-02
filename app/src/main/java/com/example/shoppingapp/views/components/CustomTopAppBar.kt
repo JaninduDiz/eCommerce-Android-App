@@ -20,12 +20,18 @@ fun CustomTopAppBar(
     showActionIcon: Boolean = false,
     actionIcon: @Composable (() -> Unit)? = null,
     centeredHeader: Boolean = false,
+    isHeaderPinned: Boolean = false,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    // Apply scrolling behavior only when isHeaderPinned is false
+    val scrollBehavior = if (isHeaderPinned) {
+        null  // No scrolling behavior when pinned
+    } else {
+        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = if (!isHeaderPinned) Modifier.nestedScroll(scrollBehavior!!.nestedScrollConnection) else Modifier,
         topBar = {
             if (centeredHeader) {
                 CenterAlignedTopAppBar(
@@ -61,7 +67,7 @@ fun CustomTopAppBar(
                         containerColor = Color(0xFFDDBEA9).copy(alpha = 0.8f),
                         titleContentColor = Color(0xFF000000),
 
-                    ),
+                        ),
                     title = {
                         Text(
                             text = title,
