@@ -1,5 +1,7 @@
 package com.example.shoppingapp.views.tabViews
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -65,6 +67,7 @@ val categoryColors = mapOf(
     gamingFurnitureCategory to Color(0xFF6B705C)
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, cartState: CartState, orderState: OrderState) {

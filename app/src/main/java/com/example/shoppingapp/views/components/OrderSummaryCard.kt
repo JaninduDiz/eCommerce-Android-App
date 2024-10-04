@@ -78,7 +78,7 @@ fun OrderSummaryCard(
                 color = Color.Gray,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
-            // Get the status text and color from the orderStatusText function
+
             val (statusText, statusColor) = orderStatusText(order.status)
             Row(
                 modifier = Modifier.fillMaxWidth(),

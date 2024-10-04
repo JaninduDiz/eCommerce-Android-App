@@ -132,11 +132,12 @@ fun OrderDetailsScreen(navController: NavController, orderId: String, orderState
     }
 }
 
+//get the order status text and color
 @Composable
 fun orderStatusText(status: Int): Pair<String, Color> {
     return when (status) {
         0 -> "Processing" to Color(0xFF4CAF50) // Green
-        1 -> "Ready For Delivery" to Color(0xFFFFC107) // Amber
+        1 -> "Ready For Delivery" to Color(0xFF009688) // Amber
         2 -> "Shipped" to Color(0xFF2196F3) // Blue
         3 -> "Delivered" to Color(0xFF8BC34A) // Light Green
         4 -> "Cancelled" to Color(0xFFF44336) // Red
