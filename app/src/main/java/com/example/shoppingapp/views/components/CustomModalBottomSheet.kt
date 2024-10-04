@@ -2,9 +2,11 @@
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
@@ -32,32 +35,38 @@ fun CustomModalBottomSheet(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
+    // Detect if the keyboard is visible
+    val isKeyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+
+    // Adjust height of the bottom sheet based on the keyboard visibility
+    val bottomSheetHeight = if (isKeyboardVisible) Modifier.fillMaxHeight() else Modifier.fillMaxHeight(0.5f)
+
     ModalBottomSheet(
         onDismissRequest = {
-            coroutineScope.launch { sheetState.hide() } // Close the sheet
+            coroutineScope.launch { sheetState.hide() }
             onDismiss()
         },
         sheetState = sheetState,
-        modifier = Modifier.fillMaxHeight(0.5f),  // Optional height customization
+        modifier = bottomSheetHeight,  // Dynamic height based on keyboard visibility
     ) {
-        // This is the content area inside the modal
+        // Box containing the sheet content
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .weight(1f), // Content takes most of the space
+                .weight(1f),
             contentAlignment = Alignment.TopStart
         ) {
-            sheetContent()  // Render the dynamic content passed via the children prop
+            sheetContent()
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Fixed button at the bottom
+        // Button at the bottom
         Button(
             onClick = {
                 coroutineScope.launch { sheetState.hide() }
-                onButtonClick() // Perform the action when the button is clicked
+                onButtonClick()
             },
             modifier = Modifier
                 .fillMaxWidth()

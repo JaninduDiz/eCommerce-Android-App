@@ -19,7 +19,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,18 +38,17 @@ import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.views.components.OrderHistoryComponent
 import com.example.shoppingapp.views.components.OrderTrackingComponent
 import com.valentinilk.shimmer.shimmer
-import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrdersScreen(navController: NavController) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    var loading by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        delay(2000)
-        loading = false
-    }
+//    LaunchedEffect(Unit) {
+//        delay(2000)
+//        loading = false
+//    }
 
     Column(
         modifier = Modifier

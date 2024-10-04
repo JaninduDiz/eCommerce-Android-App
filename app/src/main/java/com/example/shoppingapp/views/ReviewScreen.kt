@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +32,7 @@ import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.views.components.CustomButton
 import com.example.shoppingapp.views.components.CustomTopAppBar
+import com.example.shoppingapp.views.components.StarRatingWithComment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,11 +72,11 @@ fun ReviewScreen(
                         )
                     }
                 }
-            ) { innerPadding ->
+            ) { contentPadding ->
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
+                        .padding(contentPadding)
                         .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
                         .padding(16.dp)
@@ -93,12 +93,12 @@ fun ReviewScreen(
                     CustomModalBottomSheet(
                         onDismiss = { showModal = false },
                         sheetContent = {
-                            Text(
-                                text = "This is a modal",
-                                modifier = Modifier.padding(16.dp)
+                            StarRatingWithComment(
+                                onRatingChanged = { /* Handle rating change */ },
+                                onCommentChanged = { /* Handle comment change */ }
                             )
                         },
-                        buttonText = "Close",
+                        buttonText = "Submit",
                         onButtonClick = {
                             showModal = false // Close the modal when the button is pressed
                         }
