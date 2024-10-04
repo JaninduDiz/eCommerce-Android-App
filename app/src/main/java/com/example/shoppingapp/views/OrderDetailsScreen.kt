@@ -2,7 +2,6 @@ package com.example.shoppingapp.views
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -55,7 +54,8 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrderDetailsScreen(navController: NavController, orderId: String, orderState: OrderState, isBackHome: Boolean? = false) {
-    val order = sampleOrders[0] // orderState.getOrderById(orderId)
+    val order = sampleOrders.find { it.id == orderId } ?: sampleOrders[0]
+    // orderState.getOrderById(orderId)
     var showModal by remember { mutableStateOf(false) }
 
     CustomTopAppBar(
@@ -136,7 +136,7 @@ fun OrderDetailsScreen(navController: NavController, orderId: String, orderState
 @Composable
 fun orderStatusText(status: Int): Pair<String, Color> {
     return when (status) {
-        0 -> "Processing" to Color(0xFF4CAF50) // Green
+        0 -> "Processing" to Color(0xFF673AB7) // Green
         1 -> "Ready For Delivery" to Color(0xFF009688) // Amber
         2 -> "Shipped" to Color(0xFF2196F3) // Blue
         3 -> "Delivered" to Color(0xFF8BC34A) // Light Green
@@ -152,7 +152,6 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                Toast.makeText(navController.context, "Navigate to product details", Toast.LENGTH_SHORT).show()
                 navController.navigate("reviewScreen/${orderItem.product.productId}")
             },
         shape = RoundedCornerShape(8.dp),

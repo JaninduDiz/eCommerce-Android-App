@@ -51,7 +51,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.models.sampleProducts
-import com.example.shoppingapp.models.sampleUser
 import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.CartState

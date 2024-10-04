@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,10 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,11 +38,19 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.views.components.OrderHistoryComponent
 import com.example.shoppingapp.views.components.OrderTrackingComponent
+import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrdersScreen(navController: NavController) {
     var selectedTab by remember { mutableIntStateOf(0) }
+    var loading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        delay(2000)
+        loading = false
+    }
 
     Column(
         modifier = Modifier
@@ -56,9 +68,15 @@ fun OrdersScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        when (selectedTab) {
-            0 -> OrderTrackingComponent(navController)
-            1 -> OrderHistoryComponent(navController)
+        if (!loading) {
+            when (selectedTab) {
+                0 -> OrderTrackingComponent(navController)
+                1 -> OrderHistoryComponent(navController)
+            }
+        } else {
+            for (i in 0..4) {
+                OrderShimmeringPlaceholder()
+            }
         }
     }
 }
@@ -113,6 +131,61 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
             Text(
                 text = "Order History",
                 color = if (selectedTab == 1) activeTextColor else inactiveTextColor
+            )
+        }
+    }
+}
+
+@Composable
+fun OrderShimmeringPlaceholder() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .shimmer(),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(20.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(14.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
+                    .height(16.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.3f)
+                    .height(18.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
             )
         }
     }
