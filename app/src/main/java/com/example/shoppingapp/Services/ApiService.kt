@@ -3,7 +3,6 @@ package com.example.shoppingapp.Services
 
 import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Order
-import com.example.shoppingapp.models.OrderItem
 import com.example.shoppingapp.models.Product
 import retrofit2.Response
 import retrofit2.http.Body
@@ -24,9 +23,18 @@ data class RegisterRequest(
     val role: Int
 )
 
+data class OrderItem2(
+    val productId: String,
+    val vendorId: String,
+    val quantity: Int,
+    val isDelivered: Boolean,
+    val unitPrice: Double
+
+)
+
 data class OrderRequest(
     val customerId: String,
-    val items: List<OrderItem>,
+    val items: List<OrderItem2>,
     val status: Int,
     val cancellationReason: String?,
     val note: String?,
