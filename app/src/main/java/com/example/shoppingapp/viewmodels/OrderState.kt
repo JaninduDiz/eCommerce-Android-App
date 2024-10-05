@@ -12,7 +12,7 @@ import com.example.shoppingapp.models.OrderRequest
 
 class OrderState {
 
-    private val orders = SnapshotStateList<OrderRequest>()
+    val orders = SnapshotStateList<Order>()
 
     private val currentOrder = mutableStateOf<Order?>(null)
 
@@ -36,8 +36,13 @@ class OrderState {
             totalValue = calculateOrderTotal(totalAmount, deliveryCharge)
         )
         Log.d(TAG, "Order generated successfully: ${order.toString()}")
-        orders.add(order)
         return order
+    }
+
+    // Function to store user's orders
+    fun addOrder(order: List<Order>) {
+        orders.clear()
+        orders.addAll(order)
     }
 
     // Get the current order
@@ -46,14 +51,10 @@ class OrderState {
     }
 
     // Fetch an order by its ID from the orders list
-//    fun getOrderById(orderId: String): Order? {
-//        return orders.find { it.id == orderId }
-//    }
-
-    // Helper function to generate a unique order ID
-    private fun generateOrderId(): String {
-        return "order_" + System.currentTimeMillis()
+    fun getOrderById(orderId: String): Order? {
+        return orders.find { it.id == orderId }
     }
+
 
     //calculate orderTotal
     private fun calculateOrderTotal(currentTotal: Double, deliveryCharge: Double): Double {

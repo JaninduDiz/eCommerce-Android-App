@@ -1,6 +1,8 @@
 package com.example.shoppingapp.views.tabViews
 
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,27 +31,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.OrderHistoryComponent
 import com.example.shoppingapp.views.components.OrderTrackingComponent
 import com.valentinilk.shimmer.shimmer
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun OrdersScreen(navController: NavController) {
+fun OrdersScreen(navController: NavController, orderState: OrderState) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var loading by remember { mutableStateOf(false) }
+    val userSessionManager = UserSessionManager(LocalContext.current)
+    val currentUser = userSessionManager.getUser()
 
-//    LaunchedEffect(Unit) {
-//        delay(2000)
-//        loading = false
-//    }
+    //fetching orders
+    LaunchedEffect(Unit) {
+        try {
+            loading = true
+            val response = RetrofitInstance.api.getOrdersByCustomerId(currentUser.id)
+            if (response.isSuccessful) {
+                val orders = response.body()
+                if (orders != null) {
+                    orderState.addOrder(orders)
+                }
+                loading = false
+            }
+        } catch (e: Exception) {
+            loading = false
+            Log.d(TAG, "OrderScreen: ${e.message}, error fetching orders")
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -68,8 +90,8 @@ fun OrdersScreen(navController: NavController) {
 
         if (!loading) {
             when (selectedTab) {
-                0 -> OrderTrackingComponent(navController)
-                1 -> OrderHistoryComponent(navController)
+                0 -> OrderTrackingComponent(navController, orderState)
+                1 -> OrderHistoryComponent(navController, orderState)
             }
         } else {
             for (i in 0..4) {
@@ -194,6 +216,6 @@ fun OrderShimmeringPlaceholder() {
 @Composable
 fun OrdersScreenPreview() {
     ShoppingAppTheme {
-        OrdersScreen(navController = rememberNavController())
+        OrdersScreen(navController = rememberNavController(), orderState = OrderState())
     }
 }

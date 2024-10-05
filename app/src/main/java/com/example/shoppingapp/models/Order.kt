@@ -25,6 +25,7 @@ data class Order(
     val cancellationReason: String?,
     var note: String?,
     val createdAt: String,
+    val totalValue: Double
 )
 
 //@RequiresApi(Build.VERSION_CODES.O)
