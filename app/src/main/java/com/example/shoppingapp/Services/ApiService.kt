@@ -2,6 +2,8 @@
 package com.example.shoppingapp.Services
 
 import com.example.shoppingapp.models.Category
+import com.example.shoppingapp.models.Order
+import com.example.shoppingapp.models.OrderItem
 import com.example.shoppingapp.models.Product
 import retrofit2.Response
 import retrofit2.http.Body
@@ -22,6 +24,14 @@ data class RegisterRequest(
     val role: Int
 )
 
+data class OrderRequest(
+    val customerId: String,
+    val items: List<OrderItem>,
+    val status: Int,
+    val cancellationReason: String?,
+    val note: String?,
+    val totalValue: Double
+)
 
 
 interface ApiService {
@@ -39,5 +49,11 @@ interface ApiService {
 
     @GET("Product/{id}")
     suspend fun getProductById(@Path("id") id: String): Response<Product>
+
+    @POST("Order")
+    suspend fun createOrder(@Body request: OrderRequest): Response<Order>
+
+    @GET("Order/customer/{customerId}")
+    suspend fun getOrdersByCustomerId(@Path("customerId") customerId: String): Response<List<Order>>
 
 }

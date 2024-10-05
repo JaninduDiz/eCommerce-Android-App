@@ -1,22 +1,22 @@
 package com.example.shoppingapp.models
 
-import java.time.LocalDateTime
-
 
 data class OrderItem(
-    val product: Product,
+    val productId: String,
+    val vendorId: String,
     val quantity: Int,
-    val isDelivered: Boolean
+    val isDelivered: Boolean,
+    val unitPrice: Double
 )
 
 data class Order(
-    val id: String,
+    val orderId: String,
     val customerId: String,
     val items: List<OrderItem>,
     val status: Int,
-    val cancellationReason: String?,
-    var note: String?,
-    val createdAt: LocalDateTime
+    val note: String?,
+    val totalValue: Double,
+    val createdAt: String
 )
 
 //@RequiresApi(Build.VERSION_CODES.O)
