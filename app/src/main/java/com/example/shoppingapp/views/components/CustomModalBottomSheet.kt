@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -22,6 +21,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.views.components.CustomButton
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +39,7 @@ fun CustomModalBottomSheet(
     val isKeyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
 
     // Adjust height of the bottom sheet based on the keyboard visibility
-    val bottomSheetHeight = if (isKeyboardVisible) Modifier.fillMaxHeight() else Modifier.fillMaxHeight(0.5f)
+    val bottomSheetHeight = if (isKeyboardVisible) Modifier.fillMaxHeight(0.7f) else Modifier.fillMaxHeight(0.5f)
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -63,17 +63,14 @@ fun CustomModalBottomSheet(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Button at the bottom
-        Button(
+        CustomButton(
+            text = buttonText,
             onClick = {
                 coroutineScope.launch { sheetState.hide() }
                 onButtonClick()
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(buttonText)
-        }
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
     }
 }
 

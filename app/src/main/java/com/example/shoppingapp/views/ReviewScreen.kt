@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +43,8 @@ fun ReviewScreen(
 ) {
     val product = sampleProducts.find { it.productId == productId }
     var showModal by remember { mutableStateOf(false) }
+    var rating by remember { mutableIntStateOf(0) }  // Track the selected star rating
+    var comment by remember { mutableStateOf("") }  // Track the entered comment
 
     product?.let {
         CustomTopAppBar(
@@ -57,7 +60,7 @@ fun ReviewScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.surface)
-                            .padding(16.dp),
+                            .padding(horizontal = 20.dp, vertical = 28.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -79,7 +82,7 @@ fun ReviewScreen(
                         .padding(contentPadding)
                         .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
-                        .padding(16.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
                     ProductImageSection()
                     Spacer(modifier = Modifier.height(16.dp))
@@ -89,13 +92,18 @@ fun ReviewScreen(
                 }
 
                 if (showModal) {
-                    // Show the bottom sheet with a simple text "Modal"
                     CustomModalBottomSheet(
                         onDismiss = { showModal = false },
                         sheetContent = {
                             StarRatingWithComment(
-                                onRatingChanged = { /* Handle rating change */ },
-                                onCommentChanged = { /* Handle comment change */ }
+                                rating = rating,  // Pass current rating
+                                comment = comment,  // Pass current comment
+                                onRatingChanged = { newRating ->
+                                    rating = newRating  // Update the rating
+                                },
+                                onCommentChanged = { newComment ->
+                                    comment = newComment  // Update the comment
+                                }
                             )
                         },
                         buttonText = "Submit",
