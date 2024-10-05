@@ -10,6 +10,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 data class LoginRequest(val email: String, val password: String)
@@ -31,6 +32,19 @@ data class RegisterRequest(
     val phoneNumber: String,
     val gender: Int
 )
+
+data class UpdateUserRequest(
+    val username: String?,
+    val email: String?,
+    val role: Int?,
+    val firstName: String?,
+    val lastName: String?,
+    val address: String?,
+    val phoneNumber: String?,
+    val gender: Int?,
+    val isActive: Boolean?
+)
+
 
 interface ApiService {
     @POST("User/login")
@@ -54,6 +68,16 @@ interface ApiService {
     @GET("Order/customer/{customerId}")
     suspend fun getOrdersByCustomerId(@Path("customerId") customerId: String): Response<List<Order>>
 
+    @GET("Order/{id}")
+    suspend fun getOrderById(@Path("id") id: String): Response<Order>
+
     @GET("User/{id}")
     suspend fun getUserById(@Path("id") id: String): Response<User>
+
+    @PUT("User/{id}")
+    suspend fun updateUser(
+        @Path("id") id: String,
+        @Body request: UpdateUserRequest
+    ): Response<User>
+
 }
