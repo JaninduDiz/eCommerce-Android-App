@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.os.Build
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,34 +47,43 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.models.Order
+import com.example.shoppingapp.models.OrderRequest
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.CustomButton
 import com.example.shoppingapp.views.components.CustomModal
 import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.views.components.ModalType
-import java.time.LocalDateTime
+import kotlinx.coroutines.launch
 import java.util.Locale
+
+enum class ApiResponseStatus { SUCCESS, ERROR }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPrice: Double) {
-    var showModal by remember { mutableStateOf(false) }
-    var apiResponseStatus by remember { mutableStateOf<ApiResponseStatus?>(null) }  // State for API response status
-    var note by remember { mutableStateOf("") }
 
     val userSessionManager = UserSessionManager(LocalContext.current)
     val currentUser = userSessionManager.getUser()
 
     val orderState = OrderState()
-    var order: Order = Order("", "", emptyList(), 0, null, null, LocalDateTime.now())
+    val context = LocalContext.current
+
+    val deliveryCharge : Double = 2.0
+    var note by remember { mutableStateOf("") }
+    var showModal by remember { mutableStateOf(false) }
+    var showAddressModal by remember { mutableStateOf(false) }
+    var responseId by remember { mutableStateOf("") }
+    var apiResponseStatus by remember { mutableStateOf<ApiResponseStatus?>(null) }
+    var order: OrderRequest
 
     CustomTopAppBar(
         title = "Checkout",
@@ -86,11 +96,11 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            OrderSummary(totalItems = cartState.items.size, totalPrice = totalPrice)
+            OrderSummary(totalItems = cartState.items.size, totalPrice = totalPrice, deliveryCharge = deliveryCharge)
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (currentUser != null) {
+            if (currentUser.address != null) {
                 AddressSection(user = currentUser)
             }
 
@@ -123,18 +133,38 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
             CustomButton(
                 text = "Purchase Order",
                 onClick = {
-                    order = orderState.generateOrder(cartState, customerId = "customer_1123", note)         //TODO: Replace customerId with currentUser.id
-                    val success = simulateApiCall()
-                    apiResponseStatus =
-                        if (success) ApiResponseStatus.SUCCESS else ApiResponseStatus.ERROR
-                    showModal = true
+                    if (currentUser.address.isNullOrEmpty()) {
+                        showAddressModal = true
+                    } else {
+                        (context as ComponentActivity).lifecycleScope.launch {
+                            try {
+                              order = orderState.generateOrder(cartState, currentUser.id, note, totalPrice, deliveryCharge)
+                                val response = RetrofitInstance.api.createOrder(order)
+                                Log.d(TAG, "CheckoutScreen: order: ${order.items}")
+                                if (response.isSuccessful && response.body() != null) {
+                                    Log.d(TAG, "CheckoutScreen: Order placed successfully: ${response.body()}")
+                                    responseId = response.body()!!.id
+                                    apiResponseStatus = ApiResponseStatus.SUCCESS
+                                    showModal = true
+                                } else {
+                                    Log.d(TAG, "CheckoutScreen: Order placement failed: ${response.errorBody()}")
+                                    apiResponseStatus = ApiResponseStatus.ERROR
+                                    showModal = true
+                                }
+                            } catch (e: Exception) {
+                                Log.d(TAG, "CheckoutScreen: Order placement failed: ${e.message}")
+                                apiResponseStatus = ApiResponseStatus.ERROR
+                                showModal = true
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB98B73))
             )
         }
 
-        // Modal logic
+       // Order Confirmation Modal
         if (showModal) {
             CustomModal(
                 type = if (apiResponseStatus == ApiResponseStatus.SUCCESS) ModalType.SUCCESS else ModalType.ERROR,
@@ -144,9 +174,8 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
                 onPrimaryButtonClick = {
                     showModal = false
                     if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
-                        Log.d(TAG, "CheckoutScreen: Order placed successfully: $order")
-                        navController.navigate("orderDetails/${order.id}/true")
-                        cartState.clearCart()       //TODO: check this, this worked, not now
+                        //navController.navigate("orderDetails/${responseId}/true")
+                        cartState.clearCart()
                     }
                 },
                 primaryButtonStyle = if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
@@ -156,14 +185,24 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
                 tertiaryButtonText = null
             )
         }
+
+        // Address Null Modal
+        if (showAddressModal) {
+            CustomModal(
+                primaryButtonText = "Add",
+                onPrimaryButtonClick = {
+                    showAddressModal = false
+                    navController.navigate("profile")
+                },
+                primaryButtonStyle = ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146)),
+                text = "Please add a delivery address to proceed with your order.",
+                title = "Delivery Address Required",
+                type = ModalType.ERROR
+            )
+        }
     }
 }
 
-enum class ApiResponseStatus { SUCCESS, ERROR }
-fun simulateApiCall(): Boolean {
-    // Simulate an API call and return success or failure
-    return true // or false based on the simulated response
-}
 
 @Composable
 fun AddressSection(user: User) {
@@ -194,12 +233,14 @@ fun AddressSection(user: User) {
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text(
-                        text = user.addressLine1 + ", " + user.addressLine2,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                    Text(text = user.city + ", " + user.postalCode, fontSize = 12.sp, color = Color.Gray)
+                    user.address?.let {
+                        Text(
+                            text = it,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
+                    user.phoneNumber?.let { Text(text = it) }
                 }
             }
             Icon(
@@ -213,8 +254,8 @@ fun AddressSection(user: User) {
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun OrderSummary(totalItems: Int, totalPrice: Double) {
-    val deliveryCharge = 2
+fun OrderSummary(totalItems: Int, totalPrice: Double, deliveryCharge: Double = 2.0) {
+
     Text(
         text = "Order Summary",
         fontWeight = FontWeight.Bold,

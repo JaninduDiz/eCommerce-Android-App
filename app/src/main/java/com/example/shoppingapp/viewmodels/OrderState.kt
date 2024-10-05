@@ -8,38 +8,35 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderItem
-import java.time.LocalDateTime
+import com.example.shoppingapp.models.OrderRequest
 
 class OrderState {
 
-    private val orders = SnapshotStateList<Order>() // Store all orders here
+    private val orders = SnapshotStateList<OrderRequest>()
 
     private val currentOrder = mutableStateOf<Order?>(null)
 
-    // Create a new order from the cart state
     @RequiresApi(Build.VERSION_CODES.O)
-    fun generateOrder(cartState: CartState, customerId: String, note: String? = null): Order {
+    fun generateOrder(cartState: CartState, customerId: String, note: String? = null, totalAmount: Double, deliveryCharge: Double): OrderRequest {
         val orderItems = cartState.items.map { cartItem ->
             OrderItem(
-                product = cartItem.product,
+                productId = cartItem.product.productId,
                 quantity = cartItem.quantity.value,
+                unitPrice = cartItem.product.price,
+                vendorId = cartItem.product.vendorId,
                 isDelivered = false
             )
         }
-        Log.d(TAG, "GenerateOrder: Order items: $orderItems")
-        val order = Order(
-            id = generateOrderId(),  // remove this
+        val order = OrderRequest(
             customerId = customerId,
             items = orderItems,
-            status = 1,
-            cancellationReason = null,
+            status = 0,
+            cancellationReason = "",
             note = note,
-            createdAt = LocalDateTime.now()
+            totalValue = calculateOrderTotal(totalAmount, deliveryCharge)
         )
-
+        Log.d(TAG, "Order generated successfully: ${order.toString()}")
         orders.add(order)
-
-        currentOrder.value = order
         return order
     }
 
@@ -49,13 +46,21 @@ class OrderState {
     }
 
     // Fetch an order by its ID from the orders list
-    fun getOrderById(orderId: String): Order? {
-        return orders.find { it.id == orderId }
-    }
+//    fun getOrderById(orderId: String): Order? {
+//        return orders.find { it.id == orderId }
+//    }
 
     // Helper function to generate a unique order ID
     private fun generateOrderId(): String {
         return "order_" + System.currentTimeMillis()
+    }
+
+    //calculate orderTotal
+    private fun calculateOrderTotal(currentTotal: Double, deliveryCharge: Double): Double {
+        var total = 0.0
+        total += currentTotal + deliveryCharge
+
+        return total
     }
 
     // Clear the current order
