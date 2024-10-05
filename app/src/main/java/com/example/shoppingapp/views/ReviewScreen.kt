@@ -84,11 +84,11 @@ fun ReviewScreen(
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 16.dp)
                 ) {
-                    ProductImageSection()
+                    ProductImageSection(product.imageUrls[0])
                     Spacer(modifier = Modifier.height(16.dp))
                     ProductInfoSection(product)
                     Spacer(modifier = Modifier.height(16.dp))
-                    ProductDescriptionSection(product.description)
+                    product.description?.let { it1 -> ProductDescriptionSection(it1) }
                 }
 
                 if (showModal) {

@@ -1,64 +1,106 @@
 package com.example.shoppingapp.views
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.R
-import com.example.shoppingapp.viewmodels.CartState
+import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.models.Product
-import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.views.components.CircularIndicator
 import com.example.shoppingapp.views.components.CustomTopAppBar
 
 @Composable
 fun ProductDetailsScreen(
     navController: NavHostController,
-    productId: String?,
+    productId: String,
     cartState: CartState
 ) {
     val context = LocalContext.current  // Get the current context
-    val product = sampleProducts.find { it.productId == productId }
+    var product by remember { mutableStateOf<Product?>(null) }
+    var loading by remember { mutableStateOf(false) }
 
-    product?.let {
-        CustomTopAppBar(
-            title = product.name,
-            onNavigationClick = { navController.popBackStack() },
-            centeredHeader = true,
-            showActionIcon = true,
-            isHeaderPinned = true,
-            actionIcon = {
-                IconButton(onClick = { /* Handle favorite click */ }) {
-                    Icon(
-                        imageVector = Icons.Filled.FavoriteBorder,
-                        contentDescription = "Favorite"
-                    )
+    // Fetch product data using LaunchedEffect
+    LaunchedEffect(productId) {
+        if (productId.isNotEmpty()) {
+            try {
+                loading = true
+                val response = RetrofitInstance.api.getProductById(productId)
+                if (response.isSuccessful) {
+                    product = response.body()
+                    loading = false
                 }
+            } catch (e: Exception) {
+                loading = false
+                Log.e("ProductDetailsScreen", "Error fetching product: ${e.message}")
             }
-        ) { paddingValues ->
-            Scaffold(
-                bottomBar = {
+        }
+    }
+
+    // Custom Top App Bar with product name if available
+    CustomTopAppBar(
+        title = product?.name ?: "Loading...",  // Handle null product case
+        onNavigationClick = { navController.popBackStack() },
+        centeredHeader = true,
+        showActionIcon = true,
+        isHeaderPinned = true,
+        actionIcon = {
+            IconButton(onClick = { /* Handle favorite click */ }) {
+                Icon(
+                    imageVector = Icons.Filled.FavoriteBorder,
+                    contentDescription = "Favorite"
+                )
+            }
+        }
+    ) { paddingValues ->
+        Scaffold(
+            bottomBar = {
+                if (product != null) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -76,8 +118,8 @@ fun ProductDetailsScreen(
                         }
                         IconButton(
                             onClick = {
-                                cartState.addToCart(product)
-                                Toast.makeText(context, "${product.name} added to cart", Toast.LENGTH_SHORT).show()
+                                cartState.addToCart(product!!)
+                                Toast.makeText(context, "${product!!.name} added to cart", Toast.LENGTH_SHORT).show()
                             },
                             modifier = Modifier.size(48.dp)
                         ) {
@@ -88,38 +130,50 @@ fun ProductDetailsScreen(
                         }
                     }
                 }
-            ) { innerPadding ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(paddingValues)
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp)
-                ) {
-                    ProductImageSection()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ProductInfoSection(product)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ProductDescriptionSection(product.description)
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                // Loading state
+                if (loading) {
+                    CircularIndicator()
+                } else {
+                    // Product details
+                    if (product != null) {
+                        ProductImageSection(product!!.imageUrls[0])
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ProductInfoSection(product!!)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        product?.description?.let { description ->
+                            ProductDescriptionSection(description)
+                        }
+                    } else {
+                        // Product not found or error state
+                        Text(
+                            text = "Product not found",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
-    } ?: run {
-        Text(
-            text = "Product not found",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            textAlign = TextAlign.Center
-        )
     }
 }
 
+
 @Composable
-fun ProductImageSection() {
+fun ProductImageSection(imageURL: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -128,7 +182,7 @@ fun ProductImageSection() {
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background), // Replace with actual image
+            painter = rememberAsyncImagePainter(imageURL),
             contentDescription = "Product Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -177,7 +231,7 @@ fun ProductInfoSection(product: Product) {
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Category: ${product.category.name}",
+            text = "Category: ${product.category}",
             style = MaterialTheme.typography.titleMedium,
             color = Color.Gray
         )

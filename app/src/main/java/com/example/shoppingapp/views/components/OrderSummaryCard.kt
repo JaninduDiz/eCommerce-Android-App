@@ -20,9 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.Order
-import com.example.shoppingapp.models.sampleOrders
 import com.example.shoppingapp.views.orderStatusText
 import java.time.format.DateTimeFormatter
 
@@ -100,11 +98,11 @@ fun OrderSummaryCard(
 @Preview(showBackground = true)
 @Composable
 fun OrderSummaryCardPreview() {
-    val sampleOrder = sampleOrders.first()
-    val navController = rememberNavController()
-
-    OrderSummaryCard(
-        order = sampleOrder,
-        navController = navController,
-    )
+//    val sampleOrder = sampleOrders.first()
+//    val navController = rememberNavController()
+//
+//    OrderSummaryCard(
+//        order = sampleOrder,
+//        navController = navController,
+//    )
 }
