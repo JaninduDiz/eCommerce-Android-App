@@ -50,7 +50,8 @@ fun ProfileScreen(navController: NavController, userSessionManager: UserSessionM
     CustomTopAppBar(
         title = "Profile",
         onNavigationClick = { navController.popBackStack() },
-        centeredHeader = true
+        centeredHeader = true,
+        isHeaderPinned = true
     ) { paddingValues ->
         ProfileContent(paddingValues, currentUser, userSessionManager, navController)
     }
@@ -63,7 +64,7 @@ fun ProfileContent(
     userSessionManager: UserSessionManager,
     navController: NavController
 ) {
-    var isEditing by remember { mutableStateOf(true) } // To toggle between view and edit modes
+    var isEditing by remember { mutableStateOf(false) }
     var userName by remember { mutableStateOf(currentUser?.userName ?: "") }
     var emailAddress by remember { mutableStateOf(currentUser?.emailAddress ?: "") }
     var addressLine1 by remember { mutableStateOf(currentUser?.addressLine1 ?: "") }
@@ -223,37 +224,32 @@ fun ProfileTextField(
     label: String,
     isEditing: Boolean,
     onValueChange: (String) -> Unit,
-    isError: Boolean = false, // Boolean to indicate if there's an error
-    keyboardType: KeyboardType = KeyboardType.Text // Specify the keyboard type
+    isError: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
-    val commonModifier = Modifier
-        .fillMaxWidth()
-        .background(Color(0xFFf8f7ff), shape = RoundedCornerShape(16.dp))
-        .padding(vertical = 8.dp, horizontal = 16.dp) // Consistent padding for both modes
-
     if (isEditing) {
-        // When in editing mode, show the OutlinedTextField
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
-            enabled = true,  // Enable input
-            singleLine = true, // Single line input
-            isError = isError, // Set isError directly
+            enabled = true,
+            singleLine = true,
+            isError = isError,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent, shape = RoundedCornerShape(16.dp)),
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType), // Apply the correct KeyboardOptions
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = Color(0xFFf8f7ff),
                 unfocusedContainerColor = Color(0xFFf8f7ff),
                 focusedBorderColor = Color(0xFF9381ff),
                 unfocusedBorderColor = Color(0xFFf8f7ff),
                 cursorColor = Color(0xFF9381ff),
+                errorBorderColor = Color.Red
             )
         )
     } else {
-        // When not editing, show the Text view with the same modifier for consistent size
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -281,9 +277,9 @@ fun ActionButtonContainer(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth() // Ensures the FAB is aligned correctly in its parent
+            .fillMaxWidth()
             .padding(16.dp),
-        contentAlignment = Alignment.BottomEnd // Align the FAB to the bottom end
+        contentAlignment = Alignment.BottomEnd
     ) {
         ExtendedFloatingActionButton(
             onClick = {

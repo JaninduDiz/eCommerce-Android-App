@@ -49,7 +49,7 @@ fun CustomModal(
         text = {
             Text(
                 text = text,
-                color = textColor,
+                color = Color.Black,
                 fontSize = 16.sp
             )
         },

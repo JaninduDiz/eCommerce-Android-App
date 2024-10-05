@@ -1,12 +1,13 @@
 package com.example.shoppingapp.models
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.time.LocalDateTime
 
 
 data class OrderItem(
     val product: Product,
-    val quantity: MutableState<Int>,
+    val quantity: Int,
     val isDelivered: Boolean
 )
 
@@ -16,9 +17,11 @@ data class Order(
     val items: List<OrderItem>,
     val status: Int,
     val cancellationReason: String?,
-    val note: String?
+    var note: String?,
+    val createdAt: LocalDateTime
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 val sampleOrders = listOf(
     Order(
         id = "order_1727715349666",
@@ -35,7 +38,7 @@ val sampleOrders = listOf(
                     description = "Modern coffee table with glass top and wooden legs.",
                     stock = 9
                 ),
-                quantity = mutableIntStateOf(2),
+                quantity = 2,
                 isDelivered = false
             ),
             OrderItem(
@@ -49,13 +52,43 @@ val sampleOrders = listOf(
                     description = "Comfortable dining chair with cushioned seat.",
                     stock = 15
                 ),
-                quantity = mutableIntStateOf(4),
+                quantity = 4,
+                isDelivered = false
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "10",
+                    name = "Dining Chair",
+                    category = Category(categoryId = "3", name = "Dining Room Furniture"),
+                    vendorId = "vendor5",
+                    isActive = true,
+                    price = 79.99,
+                    description = "Comfortable dining chair with cushioned seat.",
+                    stock = 15
+                ),
+                quantity = 3,
+                isDelivered = false
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "10",
+                    name = "Dining Chair",
+                    category = Category(categoryId = "3", name = "Dining Room Furniture"),
+                    vendorId = "vendor5",
+                    isActive = true,
+                    price = 79.99,
+                    description = "Comfortable dining chair with cushioned seat.",
+                    stock = 15
+                ),
+                quantity = 1,
                 isDelivered = false
             )
+
         ),
         status = 1,
         cancellationReason = null,
-        note = null
+        note = "Deliver to the front porch.",
+        createdAt = LocalDateTime.of(2022, 1, 1, 10, 0)
     ),
     Order(
         id = "order_1727715349667",
@@ -72,7 +105,7 @@ val sampleOrders = listOf(
                     description = "King size bed with upholstered headboard and wooden frame.",
                     stock = 4
                 ),
-                quantity = mutableIntStateOf(1),
+                quantity = 5,
                 isDelivered = true
             ),
             OrderItem(
@@ -86,12 +119,241 @@ val sampleOrders = listOf(
                     description = "Modern nightstand with drawer and open shelf.",
                     stock = 10
                 ),
-                quantity = mutableIntStateOf(2),
+                quantity = 1,
                 isDelivered = true
             )
         ),
         status = 2,
         cancellationReason = null,
-        note = "Deliver to the second floor."
-    )
+        note = "Deliver to the second floor.",
+        createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
+    ),
+    Order(
+        id = "order_1727373349667",
+        customerId = "customer_456",
+        items = listOf(
+            OrderItem(
+                product = Product(
+                    productId = "20",
+                    name = "King Size Bed",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 999.99,
+                    description = "King size bed with upholstered headboard and wooden frame.",
+                    stock = 4
+                ),
+                quantity = 5,
+                isDelivered = true
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "21",
+                    name = "Nightstand",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 129.99,
+                    description = "Modern nightstand with drawer and open shelf.",
+                    stock = 10
+                ),
+                quantity = 1,
+                isDelivered = true
+            )
+        ),
+        status = 4,
+        cancellationReason = null,
+        note = "Deliver to the second floor.",
+        createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
+    ),
+    Order(
+        id = "order_17277134679667",
+        customerId = "customer_456",
+        items = listOf(
+            OrderItem(
+                product = Product(
+                    productId = "20",
+                    name = "King Size Bed",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 999.99,
+                    description = "King size bed with upholstered headboard and wooden frame.",
+                    stock = 4
+                ),
+                quantity = 5,
+                isDelivered = true
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "21",
+                    name = "Nightstand",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 129.99,
+                    description = "Modern nightstand with drawer and open shelf.",
+                    stock = 10
+                ),
+                quantity = 1,
+                isDelivered = true
+            )
+        ),
+        status = 2,
+        cancellationReason = null,
+        note = "Deliver to the second floor.",
+        createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
+    ),
+    Order(
+        id = "order_17273467217",
+        customerId = "customer_456",
+        items = listOf(
+            OrderItem(
+                product = Product(
+                    productId = "20",
+                    name = "King Size Bed",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 999.99,
+                    description = "King size bed with upholstered headboard and wooden frame.",
+                    stock = 4
+                ),
+                quantity = 5,
+                isDelivered = true
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "21",
+                    name = "Nightstand",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 129.99,
+                    description = "Modern nightstand with drawer and open shelf.",
+                    stock = 10
+                ),
+                quantity = 1,
+                isDelivered = true
+            )
+        ),
+        status = 1,
+        cancellationReason = null,
+        note = "Deliver to the second floor.",
+        createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
+    ),
+    Order(
+        id = "order_17277375367",
+        customerId = "customer_456",
+        items = listOf(
+            OrderItem(
+                product = Product(
+                    productId = "20",
+                    name = "King Size Bed",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 999.99,
+                    description = "King size bed with upholstered headboard and wooden frame.",
+                    stock = 4
+                ),
+                quantity = 5,
+                isDelivered = true
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "21",
+                    name = "Nightstand",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 129.99,
+                    description = "Modern nightstand with drawer and open shelf.",
+                    stock = 10
+                ),
+                quantity = 1,
+                isDelivered = true
+            )
+        ),
+        status = 0,
+        cancellationReason = null,
+        note = "Deliver to the second floor.",
+        createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
+    ),
+    Order(
+        id = "order_17277124525667",
+        customerId = "customer_456",
+        items = listOf(
+            OrderItem(
+                product = Product(
+                    productId = "20",
+                    name = "King Size Bed",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 999.99,
+                    description = "King size bed with upholstered headboard and wooden frame.",
+                    stock = 4
+                ),
+                quantity = 5,
+                isDelivered = true
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "21",
+                    name = "Nightstand",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 129.99,
+                    description = "Modern nightstand with drawer and open shelf.",
+                    stock = 10
+                ),
+                quantity = 1,
+                isDelivered = true
+            )
+        ),
+        status = 4,
+        cancellationReason = null,
+        note = "Deliver to the second floor.",
+        createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
+    ),
+    Order(
+        id = "order_17277154567",
+        customerId = "customer_456",
+        items = listOf(
+            OrderItem(
+                product = Product(
+                    productId = "20",
+                    name = "King Size Bed",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 999.99,
+                    description = "King size bed with upholstered headboard and wooden frame.",
+                    stock = 4
+                ),
+                quantity = 5,
+                isDelivered = true
+            ),
+            OrderItem(
+                product = Product(
+                    productId = "21",
+                    name = "Nightstand",
+                    category = Category(categoryId = "4", name = "Bedroom Furniture"),
+                    vendorId = "vendor3",
+                    isActive = true,
+                    price = 129.99,
+                    description = "Modern nightstand with drawer and open shelf.",
+                    stock = 10
+                ),
+                quantity = 1,
+                isDelivered = true
+            )
+        ),
+        status = 3,
+        cancellationReason = null,
+        note = "Deliver to the second floor.",
+        createdAt = LocalDateTime.of(2022, 1, 2, 10, 0)
+    ),
 )

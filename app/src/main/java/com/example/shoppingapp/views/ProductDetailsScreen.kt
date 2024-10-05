@@ -3,12 +3,12 @@ package com.example.shoppingapp.views
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -30,8 +30,8 @@ import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.views.components.CustomTopAppBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailsScreen(
     navController: NavHostController,
@@ -42,71 +42,67 @@ fun ProductDetailsScreen(
     val product = sampleProducts.find { it.productId == productId }
 
     product?.let {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = product.name) },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { /* Handle favorite click */ }) {
-                            Icon(
-                                imageVector = Icons.Filled.FavoriteBorder,
-                                contentDescription = "Favorite"
-                            )
-                        }
-                    }
-                )
-            },
-            bottomBar = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        onClick = { /* Handle Buy Now */ },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFCB997E))
-                    ) {
-                        Text(text = "Buy Now")
-                    }
-                    IconButton(
-                        onClick = {
-                            cartState.addToCart(product)
-                            Toast.makeText(context, "${product.name} added to cart", Toast.LENGTH_SHORT).show() // Show toast message
-                        },
-                        modifier = Modifier.size(48.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.ShoppingCart,
-                            contentDescription = "Add to Cart"
-                        )
-                    }
+        CustomTopAppBar(
+            title = product.name,
+            onNavigationClick = { navController.popBackStack() },
+            centeredHeader = true,
+            showActionIcon = true,
+            isHeaderPinned = true,
+            actionIcon = {
+                IconButton(onClick = { /* Handle favorite click */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.FavoriteBorder,
+                        contentDescription = "Favorite"
+                    )
                 }
             }
         ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                ProductImageSection()
-                Spacer(modifier = Modifier.height(16.dp))
-                ProductInfoSection(product)
-                Spacer(modifier = Modifier.height(16.dp))
-                ProductDescriptionSection(product.description)
+            Scaffold(
+                bottomBar = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = { /* Handle Buy Now */ },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFCB997E))
+                        ) {
+                            Text(text = "Buy Now")
+                        }
+                        IconButton(
+                            onClick = {
+                                cartState.addToCart(product)
+                                Toast.makeText(context, "${product.name} added to cart", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.ShoppingCart,
+                                contentDescription = "Add to Cart"
+                            )
+                        }
+                    }
+                }
+            ) { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
+                ) {
+                    ProductImageSection()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ProductInfoSection(product)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ProductDescriptionSection(product.description)
+                }
             }
         }
     } ?: run {
@@ -142,6 +138,7 @@ fun ProductImageSection() {
 
 @Composable
 fun ProductInfoSection(product: Product) {
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth()) {
         Row (modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -183,6 +180,15 @@ fun ProductInfoSection(product: Product) {
             text = "Category: ${product.category.name}",
             style = MaterialTheme.typography.titleMedium,
             color = Color.Gray
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Vendor: Isuru Stores",
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.Gray,
+            modifier = Modifier.clickable {
+                Toast.makeText(context, "Vendor clicked", Toast.LENGTH_SHORT).show()
+            }
         )
     }
 }

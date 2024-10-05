@@ -25,13 +25,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
-import com.example.shoppingapp.viewmodels.OrderState
 
 @Composable
 fun CartScreen(
     navController: NavController,
     cartState: CartState,
-    orderState: OrderState
 ) {
     Column(
         modifier = Modifier
@@ -94,10 +92,6 @@ fun CartScreen(
 
             Button(
                 onClick = {
-                    // Generate an order using the OrderState
-                    val order = orderState.generateOrder(cartState, customerId = "customer_1123")
-
-                    // Navigate to the CheckoutScreen and pass the order and total price
                     navController.navigate("checkoutScreen/$totalPrice")
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C)),
@@ -184,6 +178,6 @@ fun CartItemRow(
 @Composable
 fun CartScreenPreview() {
     ShoppingAppTheme {
-        CartScreen(navController = rememberNavController(), cartState = CartState(), orderState = OrderState())
+        CartScreen(navController = rememberNavController(), cartState = CartState())
     }
 }
