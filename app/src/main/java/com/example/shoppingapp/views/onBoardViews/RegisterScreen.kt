@@ -1,6 +1,8 @@
 // RegisterScreen.kt
 package com.example.shoppingapp.views.onBoardViews
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -177,7 +179,7 @@ fun RegisterScreen(navController: NavController) {
                         // Handle registration logic
                         (context as ComponentActivity).lifecycleScope.launch {
                             try {
-                                val response = RetrofitInstance.api.register(RegisterRequest(username, email, password, 3))
+                                val response = RetrofitInstance.api.register(RegisterRequest(username, email, password, 3, "", "", "", "", 0))
                                 if (response.isSuccessful && response.body() != null) {
                                     Toast.makeText(context, "Registration successful ", Toast.LENGTH_SHORT).show()
                                     navController.navigate("login") // Navigate to login screen after successful registration
@@ -186,6 +188,7 @@ fun RegisterScreen(navController: NavController) {
                                 }
                             } catch (e: Exception) {
                                 Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                Log.d(TAG, "RegisterScreen: Error: ${e.localizedMessage}")
                             }
                         }
                     }

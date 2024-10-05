@@ -3,7 +3,9 @@ package com.example.shoppingapp.Services
 
 import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Order
+import com.example.shoppingapp.models.OrderRequest
 import com.example.shoppingapp.models.Product
+import com.example.shoppingapp.models.User
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -11,36 +13,24 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 data class LoginRequest(val email: String, val password: String)
+
 data class LoginResponse(
     val id: String,
     val username: String,
-    val email: String
+    val email: String,
 )
+
 data class RegisterRequest(
     val username: String,
     val email: String,
     val password: String,
-    val role: Int
+    val role: Int,
+    val firstName: String,
+    val lastName: String,
+    val address: String,
+    val phoneNumber: String,
+    val gender: Int
 )
-
-data class OrderItem2(
-    val productId: String,
-    val vendorId: String,
-    val quantity: Int,
-    val isDelivered: Boolean,
-    val unitPrice: Double
-
-)
-
-data class OrderRequest(
-    val customerId: String,
-    val items: List<OrderItem2>,
-    val status: Int,
-    val cancellationReason: String?,
-    val note: String?,
-    val totalValue: Double
-)
-
 
 interface ApiService {
     @POST("User/login")
@@ -64,4 +54,6 @@ interface ApiService {
     @GET("Order/customer/{customerId}")
     suspend fun getOrdersByCustomerId(@Path("customerId") customerId: String): Response<List<Order>>
 
+    @GET("User/{id}")
+    suspend fun getUserById(@Path("id") id: String): Response<User>
 }

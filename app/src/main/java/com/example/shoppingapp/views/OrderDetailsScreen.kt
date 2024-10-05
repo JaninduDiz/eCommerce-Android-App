@@ -1,6 +1,5 @@
 package com.example.shoppingapp.views
 
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -22,18 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
-import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderItem
-import com.example.shoppingapp.models.sampleProducts
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.OrderState
-import java.time.LocalDateTime
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -223,7 +215,7 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                navController.navigate("reviewScreen/${orderItem.product.productId}")
+                navController.navigate("reviewScreen/${orderItem.productId}")
             },
         shape = RoundedCornerShape(8.dp),
     ) {
@@ -241,37 +233,37 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column {
-                Text(text = orderItem.product.name, fontWeight = FontWeight.Bold)
+//                Text(text = orderItem.product.name, fontWeight = FontWeight.Bold)
                 Text(text = "Quantity: ${orderItem.quantity}")
-                Text(text = "Price: $${orderItem.product.price}")
+                Text(text = "Price: $${orderItem.unitPrice}")
             }
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnrememberedMutableState")
-@Preview(showBackground = true)
-@Composable
-fun OrderDetailsScreenPreview() {
-    val sampleOrder = Order(
-        id = "order_1",
-        items = listOf(
-            OrderItem(product = sampleProducts[0], quantity = 1, isDelivered = false),
-            OrderItem(product = sampleProducts[1], quantity = 2, isDelivered = false)
-        ),
-        status = 1,
-        cancellationReason = null,
-        customerId = "customer_123",
-        note = null,
-        createdAt = LocalDateTime.now()
-    )
-
-    ShoppingAppTheme {
-        OrderDetailsScreen(
-            navController = rememberNavController(),
-            orderId = sampleOrder.id,
-            orderState = OrderState(),
-        )
-    }
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@SuppressLint("UnrememberedMutableState")
+//@Preview(showBackground = true)
+//@Composable
+//fun OrderDetailsScreenPreview() {
+//    val sampleOrder = Order(
+//        id = "order_1",
+//        items = listOf(
+//            OrderItem(product = sampleProducts[0], quantity = 1, isDelivered = false),
+//            OrderItem(product = sampleProducts[1], quantity = 2, isDelivered = false)
+//        ),
+//        status = 1,
+//        cancellationReason = null,
+//        customerId = "customer_123",
+//        note = null,
+//        createdAt = LocalDateTime.now()
+//    )
+//
+//    ShoppingAppTheme {
+//        OrderDetailsScreen(
+//            navController = rememberNavController(),
+//            orderId = sampleOrder.id,
+//            orderState = OrderState(),
+//        )
+//    }
+//}
