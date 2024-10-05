@@ -56,7 +56,9 @@ class MainActivity : ComponentActivity() {
                     composable("home") { HomeScreen(navController, cartState, orderState, productState, categoryState ) }
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
-                        ProductDetailsScreen(navController, productId, cartState)
+                        if (productId != null) {
+                            ProductDetailsScreen(navController, productId, cartState)
+                        }
                     }
                     composable("reviewScreen/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")

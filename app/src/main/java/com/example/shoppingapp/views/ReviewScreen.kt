@@ -84,7 +84,7 @@ fun ReviewScreen(
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 16.dp)
                 ) {
-                    ProductImageSection()
+                    ProductImageSection(product.imageUrls[0])
                     Spacer(modifier = Modifier.height(16.dp))
                     ProductInfoSection(product)
                     Spacer(modifier = Modifier.height(16.dp))

@@ -1,5 +1,6 @@
 package com.example.shoppingapp.views.tabViews
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.os.Build
 import android.util.Log
@@ -228,6 +229,7 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeContent(navController: NavController, categoryState: CategoryState, loading: Boolean = false) {
     val categories = categoryState.categories
@@ -242,12 +244,7 @@ fun HomeContent(navController: NavController, categoryState: CategoryState, load
     )
 
         if (loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularIndicator()
-            }
+            CircularIndicator()
         } else {
             Column {
                 // Section Title for Categories
@@ -282,7 +279,6 @@ fun HomeContent(navController: NavController, categoryState: CategoryState, load
                     )
                 }
             }
-
     }
 }
 
