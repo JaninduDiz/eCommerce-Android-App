@@ -6,25 +6,27 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.shoppingapp.session.UserSessionManager
+import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.viewmodels.OrderState
-import com.example.shoppingapp.views.tabViews.CartScreen
 import com.example.shoppingapp.views.CategoryScreen
 import com.example.shoppingapp.views.CheckoutScreen
-import com.example.shoppingapp.views.tabViews.HomeScreen
+import com.example.shoppingapp.views.OrderDetailsScreen
 import com.example.shoppingapp.views.ProductDetailsScreen
 import com.example.shoppingapp.views.ProfileScreen
-import com.example.shoppingapp.views.onBoardViews.LoginScreen
-import com.example.shoppingapp.views.OrderDetailsScreen
 import com.example.shoppingapp.views.ReviewScreen
+import com.example.shoppingapp.views.VendorScreen
+import com.example.shoppingapp.views.onBoardViews.LoginScreen
 import com.example.shoppingapp.views.onBoardViews.RegisterScreen
+import com.example.shoppingapp.views.tabViews.CartScreen
+import com.example.shoppingapp.views.tabViews.HomeScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -76,6 +78,10 @@ class MainActivity : ComponentActivity() {
                         val isBackHome = backStackEntry.arguments?.getString("isBackHome")?.toBoolean() ?: false
 
                         OrderDetailsScreen(navController, orderId, orderState, isBackHome)
+                    }
+                    composable("vendorScreen/{vendorId}") { backStackEntry ->
+                        val vendorId = backStackEntry.arguments?.getString("vendorId") ?: ""
+                        VendorScreen(navController, vendorId)
                     }
                 }
             }
