@@ -3,14 +3,10 @@ package com.example.shoppingapp.views
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -26,33 +22,29 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
-import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.models.Product
-
-import com.example.shoppingapp.models.sampleProducts
-import com.example.shoppingapp.views.tabViews.categoryColors
 
 @Composable
 fun CategoryScreen(navController: NavHostController, categoryId: String?) {
-    val category = categoryColors.keys.find { it.categoryId == categoryId }
-    val products = sampleProducts.filter { it.category.categoryId == categoryId }
-
-    CustomTopAppBar(
-        title = category?.name ?: "Products",
-        onNavigationClick = { navController.popBackStack() },
-    ) { paddingValues ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(1),
-            contentPadding = PaddingValues(16.dp),
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            items(products) { product ->
-                ProductCard(product = product) {
-                    navController.navigate("productDetails/${product.productId}")
-                }
-            }
-        }
-    }
+//    val category = categoryColors.keys.find { it.categoryId == categoryId }
+//    val products = sampleProducts.filter { it.category.categoryId == categoryId }
+//
+//    CustomTopAppBar(
+//        title = category?.name ?: "Products",
+//        onNavigationClick = { navController.popBackStack() },
+//    ) { paddingValues ->
+//        LazyVerticalGrid(
+//            columns = GridCells.Fixed(1),
+//            contentPadding = PaddingValues(16.dp),
+//            modifier = Modifier.padding(paddingValues)
+//        ) {
+//            items(products) { product ->
+//                ProductCard(product = product) {
+//                    navController.navigate("productDetails/${product.productId}")
+//                }
+//            }
+//        }
+//    }
 }
 
 @Composable
