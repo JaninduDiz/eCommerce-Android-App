@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.CategoryScreen
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
                 val cartState = remember { CartState() }
                 val orderState = remember { OrderState() }
                 val productState = remember { ProductState() }
+                val categoryState = remember { CategoryState() }
                 val userSessionManager = UserSessionManager(this)
                 val currentUser = userSessionManager.getUser()
 
@@ -51,7 +53,7 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(navController, userSessionManager) // pass the session manager
                     }
                     composable("register") { RegisterScreen(navController) }
-                    composable("home") { HomeScreen(navController, cartState, orderState, productState) }
+                    composable("home") { HomeScreen(navController, cartState, orderState, productState, categoryState ) }
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
                         ProductDetailsScreen(navController, productId, cartState)
@@ -94,7 +96,7 @@ class MainActivity : ComponentActivity() {
 fun DefaultPreview() {
     ShoppingAppTheme {
         val navController = rememberNavController()
-        HomeScreen(navController, CartState(), OrderState(), ProductState())
+        HomeScreen(navController, CartState(), OrderState(), ProductState(), CategoryState())
     }
 }
 

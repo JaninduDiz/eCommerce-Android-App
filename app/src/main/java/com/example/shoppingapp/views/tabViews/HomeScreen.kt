@@ -1,6 +1,8 @@
 package com.example.shoppingapp.views.tabViews
 
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -80,6 +82,7 @@ import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.viewmodels.ProductState
 
@@ -102,7 +105,7 @@ val categoryColors = mapOf(
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, cartState: CartState, orderState: OrderState ,productState: ProductState) {
+fun HomeScreen(navController: NavController, cartState: CartState, orderState: OrderState ,productState: ProductState , categoryState: CategoryState) {
     val items = listOf(
         BottomNavigationItem(
             title = "Home",
@@ -138,6 +141,8 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     var products by remember { mutableStateOf<List<Product>>(emptyList()) }
 
+    var categories by remember { mutableStateOf<List<Category>>(emptyList()) }
+
 
     // Fetch products
     LaunchedEffect(Unit) {
@@ -147,6 +152,21 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
                 products = response.body() ?: emptyList()
                 productState.addProducts(products)
 
+
+            }
+        } catch (e: Exception) {
+            // Handle error (e.g., show a message)
+        }
+    }
+
+    // Fetch categories
+    LaunchedEffect(Unit) {
+        try {
+            val response = RetrofitInstance.api.getCategories()
+            if (response.isSuccessful) {
+                categories = response.body() ?: emptyList()
+                Log.d(TAG, "HomeScreen: $categories")
+                categoryState.addCategories(categories)
 
             }
         } catch (e: Exception) {
@@ -251,7 +271,7 @@ fun HomeContent(navController: NavController) {
                 category = category,
                 color = categoryColors[category] ?: Color.Gray
             ) {
-                navController.navigate("categoryScreen/${category.categoryId}")
+                navController.navigate("categoryScreen/${category.id}")
             }
         }
     }
@@ -389,6 +409,6 @@ fun SectionTitle(title: String) {
 @Composable
 fun HomeScreenPreview() {
     ShoppingAppTheme {
-        HomeScreen(navController = rememberNavController(), cartState = CartState(), orderState = OrderState() , productState = ProductState())
+        HomeScreen(navController = rememberNavController(), cartState = CartState(), orderState = OrderState() , productState = ProductState() , categoryState = CategoryState())
     }
 }

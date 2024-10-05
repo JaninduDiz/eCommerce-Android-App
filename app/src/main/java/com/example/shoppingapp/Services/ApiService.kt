@@ -1,6 +1,7 @@
 // ApiService.kt
 package com.example.shoppingapp.Services
 
+import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Product
 import retrofit2.Response
 import retrofit2.http.Body
@@ -31,5 +32,8 @@ interface ApiService {
 
     @GET("Product/active")
     suspend fun getActiveProducts(): Response<List<Product>>
+
+    @GET("ProductCategory")
+    suspend fun getCategories(): Response<List<Category>>
 
 }
