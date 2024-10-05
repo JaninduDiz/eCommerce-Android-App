@@ -1,5 +1,9 @@
 package com.example.shoppingapp.views.onBoardViews
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,26 +34,22 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
-
-import androidx.compose.ui.platform.LocalContext
-import androidx.activity.ComponentActivity
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import android.widget.Toast
 import com.example.shoppingapp.Services.LoginRequest
-import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.session.UserSessionManager
+import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.utils.RetrofitInstance
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginScreen(navController: NavController, userSessionManager: UserSessionManager) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    val passwordVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -131,23 +132,23 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
                                 if (response.isSuccessful) {
                                     response.body()?.let { loginResponse ->
                                         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-                                        val responseBody = loginResponse
                                         val username = loginResponse.username
-                                        val emailAddreess = loginResponse.email
+                                        val emailAddress = loginResponse.email
+                                        val userId = loginResponse.id
 
                                         // Create the User object with username and null for other fields
                                         val loggedInUser = User(
+                                            id = userId,
                                             userName = username,
-                                            emailAddress = emailAddreess ,
-                                            addressLine1 = null,
-                                            addressLine2 = null,
-                                            city = null,
-                                            postalCode = null
+                                            email = emailAddress,
+                                            address = null,
+                                            phoneNumber = null,
+                                            firstName = null,
+                                            lastName = null
                                         )
-
+                                        Log.d(TAG, "LoginScreen: $loggedInUser")
                                         userSessionManager.saveUser(loggedInUser) // Save user details
                                         navController.navigate("home")
-                                         navController.navigate("home")
                                     }
                                 } else {
                                     Toast.makeText(context, "Login failed: ${response.message()}", Toast.LENGTH_SHORT).show()
