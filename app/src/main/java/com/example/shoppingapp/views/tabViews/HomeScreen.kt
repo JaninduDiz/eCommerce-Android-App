@@ -61,7 +61,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -70,7 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.R
+import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.models.bedroomFurnitureCategory
@@ -78,7 +77,6 @@ import com.example.shoppingapp.models.diningFurnitureCategory
 import com.example.shoppingapp.models.gamingFurnitureCategory
 import com.example.shoppingapp.models.livingRoomFurnitureCategory
 import com.example.shoppingapp.models.officeFurnitureCategory
-import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.viewmodels.CartState
@@ -134,30 +132,10 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         )
     )
 
-//    var selectedItemIndex by rememberSaveable {
-//        mutableIntStateOf(0)
-//    }
-
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
-    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
+
 
     var categories by remember { mutableStateOf<List<Category>>(emptyList()) }
-
-
-    // Fetch products
-    LaunchedEffect(Unit) {
-        try {
-            val response = RetrofitInstance.api.getActiveProducts()
-            if (response.isSuccessful) {
-                products = response.body() ?: emptyList()
-                productState.addProducts(products)
-
-
-            }
-        } catch (e: Exception) {
-            // Handle error (e.g., show a message)
-        }
-    }
 
     // Fetch categories
     LaunchedEffect(Unit) {
@@ -165,16 +143,28 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
             val response = RetrofitInstance.api.getCategories()
             if (response.isSuccessful) {
                 categories = response.body() ?: emptyList()
-                Log.d(TAG, "HomeScreen: $categories")
+                categoryState.clear()
                 categoryState.addCategories(categories)
-
             }
         } catch (e: Exception) {
-            // Handle error (e.g., show a message)
+            Log.d(TAG, "HomeScreen: ${e.message}, error fetching categories")
         }
     }
 
 
+    // Fetch products
+//    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
+//    LaunchedEffect(Unit) {
+//        try {
+//            val response = RetrofitInstance.api.getActiveProducts()
+//            if (response.isSuccessful) {
+//                products = response.body() ?: emptyList()
+//                productState.addProducts(products)
+//            }
+//        } catch (e: Exception) {
+//            // Handle error (e.g., show a message)
+//        }
+//    }
 
     Scaffold(
         topBar = {
@@ -236,7 +226,7 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         ) {
             item {
                 when (selectedItemIndex) {
-                    0 -> HomeContent(navController = navController)
+                    0 -> HomeContent(navController = navController, categoryState)
                     1 -> OrdersScreen(navController = navController)
                     2 -> CartScreen(navController = navController, cartState)
                     3 -> SearchScreen(navController = navController)
@@ -247,85 +237,53 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
 }
 
 @Composable
-fun HomeContent(navController: NavController) {
-    SectionTitle(title = "Trending Items")
+fun HomeContent(navController: NavController, categoryState: CategoryState) {
+    val categories = categoryState.categories
+
+//    SectionTitle(title = "Trending Items")
+//    LazyRow(
+//        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+//        horizontalArrangement = Arrangement.spacedBy(8.dp)
+//    ) {
+//        items(sampleProducts.take(5)) { product ->
+//            ItemCard(product = product) {
+//                navController.navigate("productDetails/${product.productId}")
+//            }
+//        }
+//    }
+
+    Column {
+        categories.forEach { category ->
+            CategorySection(
+                categoryName = category.name,
+                products = categories.flatMap { it.products },
+                navController = navController
+            )
+        }
+    }
+
+}
+
+@Composable
+fun CategorySection(
+    categoryName: String,
+    products: List<Product>,
+    navController: NavController
+) {
+
+    SectionTitle(title = categoryName)
+
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(sampleProducts.take(5)) { product ->
+        items(products.filter { it.category == categoryName }) { product ->
             ItemCard(product = product) {
                 navController.navigate("productDetails/${product.productId}")
             }
         }
     }
-
-    SectionTitle(title = "Categories")
-    LazyRow(
-        modifier = Modifier.padding(bottom = 20.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(categoryColors.keys.toList()) { category ->
-            CategoryCard(
-                category = category,
-                color = categoryColors[category] ?: Color.Gray
-            ) {
-                navController.navigate("categoryScreen/${category.id}")
-            }
-        }
-    }
-
-//    SectionTitle(title = "Home Appliances")
-//    LazyRow(
-//        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-//        horizontalArrangement = Arrangement.spacedBy(8.dp)
-//    ) {
-//        items(sampleProducts.filter { it.category == livingRoomFurnitureCategory || it.category == diningFurnitureCategory }) { product ->
-//            ItemCard(product = product) {
-//                navController.navigate("productDetails/${product.productId}")
-//            }
-//        }
-//    }
-
-//    SectionTitle(title = "Office Furniture")
-//    LazyRow(
-//        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-//        horizontalArrangement = Arrangement.spacedBy(8.dp)
-//    ) {
-//        items(sampleProducts.filter { it.category == officeFurnitureCategory }) { product ->
-//            ItemCard(product = product) {
-//                navController.navigate("productDetails/${product.productId}")
-//            }
-//        }
-//    }
-
-//    SectionTitle(title = "Bedroom Furniture")
-//    LazyRow(
-//        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-//        horizontalArrangement = Arrangement.spacedBy(8.dp)
-//    ) {
-//        items(sampleProducts.filter { it.category == bedroomFurnitureCategory }) { product ->
-//            ItemCard(product = product) {
-//                navController.navigate("productDetails/${product.productId}")
-//            }
-//        }
-//    }
-
-//    SectionTitle(title = "Gaming Furniture")
-//    LazyRow(
-//        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-//        horizontalArrangement = Arrangement.spacedBy(8.dp)
-//    ) {
-//        items(sampleProducts.filter { it.category == gamingFurnitureCategory }) { product ->
-//            ItemCard(product = product) {
-//                navController.navigate("productDetails/${product.productId}")
-//            }
-//        }
-//    }
 }
-
-
 
 @Composable
 fun CategoryCard(category: Category, color: Color, onClick: () -> Unit) {
@@ -370,7 +328,7 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
                 .background(Color.White)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background), // Placeholder image
+                painter = rememberAsyncImagePainter(product.imageUrls[0]),
                 contentDescription = product.name,
                 modifier = Modifier
                     .height(120.dp)
