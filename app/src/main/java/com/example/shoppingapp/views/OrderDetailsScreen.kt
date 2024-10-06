@@ -236,7 +236,7 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                navController.navigate("reviewScreen/${orderItem.productId}")
+                navController.navigate("reviewScreen/${orderItem.productId}/${orderItem.vendorId}")
             },
         shape = RoundedCornerShape(8.dp),
     ) {

@@ -96,8 +96,8 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (currentUser.address != null) {
-                AddressSection(user = currentUser)
+            if (!currentUser.address.isNullOrEmpty()) {
+                AddressSection(user = currentUser, navController = navController)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -201,8 +201,12 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
 
 
 @Composable
-fun AddressSection(user: User) {
-    Column {
+fun AddressSection(user: User, navController: NavController) {
+    Column (
+        modifier = Modifier.clickable {
+            navController.navigate("profile")
+        }
+    ) {
         Text(
             text = "Delivery Address",
             fontWeight = FontWeight.Bold,

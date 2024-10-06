@@ -2,12 +2,14 @@
 package com.example.shoppingapp.services
 
 import com.example.shoppingapp.models.Category
+import com.example.shoppingapp.models.LoginRequest
 import com.example.shoppingapp.models.LoginResponse
 import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderRequest
 import com.example.shoppingapp.models.Product
-import com.example.shoppingapp.models.Rating
 import com.example.shoppingapp.models.RegisterRequest
+import com.example.shoppingapp.models.Review
+import com.example.shoppingapp.models.ReviewRequest
 import com.example.shoppingapp.models.UpdateUserRequest
 import com.example.shoppingapp.models.User
 import retrofit2.Response
@@ -16,8 +18,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-
-data class LoginRequest(val email: String, val password: String)
 
 interface ApiService {
     @POST("User/login")
@@ -54,9 +54,11 @@ interface ApiService {
     ): Response<User>
 
     @GET("Rating/vendor/{vendorId}")
-    suspend fun getRatingsByVendorId(@Path("vendorId") vendorId: String): Response<List<Rating>>
+    suspend fun getRatingsByVendorId(@Path("vendorId") vendorId: String): Response<List<Review>>
 
     @GET("Product/vendor/{vendorId}")
     suspend fun getVendorProducts(@Path("vendorId") vendorId: String): Response<List<Product>>
 
+    @POST("Rating")
+    suspend fun addRating(@Body review: ReviewRequest): Response<String>
 }
