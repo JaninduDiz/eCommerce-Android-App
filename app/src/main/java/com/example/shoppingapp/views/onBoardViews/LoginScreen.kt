@@ -139,7 +139,7 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
                                         // Create the User object with username and null for other fields
                                         val loggedInUser = User(
                                             id = userId,
-                                            userName = username,
+                                            username = username,
                                             email = emailAddress,
                                             address = null,
                                             phoneNumber = null,

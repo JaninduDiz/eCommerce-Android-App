@@ -20,7 +20,7 @@ data class RegisterRequest(
 
 data class User(
     val id: String,
-    val userName: String,
+    val username: String,
     val firstName: String?,
     val lastName: String?,
     val email: String,

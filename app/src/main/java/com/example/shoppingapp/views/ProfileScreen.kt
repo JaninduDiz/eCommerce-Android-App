@@ -2,6 +2,8 @@ package com.example.shoppingapp.views
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -45,14 +47,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.shoppingapp.models.UpdateUserRequest
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.views.components.CustomTopAppBar
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -79,7 +84,7 @@ fun ProfileContent(
     val context = LocalContext.current
     var loading by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
-    var userName by remember { mutableStateOf(currentUser?.userName ?: "") }
+    var username by remember { mutableStateOf(currentUser?.username ?: "") }
     var email by remember { mutableStateOf(currentUser?.email ?: "") }
     var address by remember { mutableStateOf(currentUser?.address ?: "") }
     var phoneNumber by remember { mutableStateOf(currentUser?.phoneNumber ?: "") }
@@ -92,24 +97,30 @@ fun ProfileContent(
             val response = currentUser?.let { RetrofitInstance.api.getUserById(it.id) }
             if (response != null) {
                 if (response.isSuccessful) {
+                    Log.d(TAG, "ProfileContent: ${response.body()}")
                     response.body()?.let { user ->
                         val loggedInUser = User(
                             id = user.id,
-                            userName = user.userName,
+                            username = user.username,
                             email = user.email,
                             address = user.address,
                             phoneNumber = user.phoneNumber,
                             firstName = user.firstName,
                             lastName = user.lastName
                         )
-
                         userSessionManager.saveUser(loggedInUser)
+                        username = loggedInUser.username
+                        email = loggedInUser.email
+                        address = loggedInUser.address ?: ""
+                        phoneNumber = loggedInUser.phoneNumber ?: ""
+                        firstName = loggedInUser.firstName ?: ""
+                        lastName = loggedInUser.lastName ?: ""
                     }
                 }
             }
         } catch (e: Exception) {
+            Log.d(TAG, "ProfileContent: Error: ${e.localizedMessage}")
             loading = false
-            Log.d(TAG, "HomeScreen: ${e.message}, error fetching categories")
         }
     }
 
@@ -142,25 +153,25 @@ fun ProfileContent(
             }
 
             item {
-                // Profile Fields
                 ProfileTextField(
-                    value = userName,
-                    label = "Username",
-                    isEditing = isEditing,
-                    onValueChange = { userName = it },
-
+                    value = email,
+                    label = "Email Address",
+                    isEditing = false,
+                    onValueChange = { email = it },
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
             item {
+                // Profile Fields
                 ProfileTextField(
-                    value = email,
-                    label = "Email Address",
+                    value = username,
+                    label = "Username",
                     isEditing = isEditing,
-                    onValueChange = { email = it },
-                )
+                    onValueChange = { username = it },
+
+                    )
 
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -192,7 +203,7 @@ fun ProfileContent(
             item {
                 ProfileTextField(
                     value = address,
-                    label = "Address Line",
+                    label = "Address",
                     isEditing = isEditing,
                     onValueChange = { address = it },
                 )
@@ -206,7 +217,8 @@ fun ProfileContent(
                     label = "Phone Number",
                     isEditing = isEditing,
                     onValueChange = { phoneNumber = it },
-                    isError = phoneNumber.any { !it.isDigit() },
+                    isError = phoneNumber.any { !it.isDigit() } || phoneNumber.length > 10,
+                    placeholder = "07XXXXXXXX",
                     keyboardType = KeyboardType.Number
                 )
 
@@ -226,7 +238,7 @@ fun ProfileContent(
                     val updatedUser = currentUser?.let {
                         User(
                             id = it.id,
-                            userName = userName,
+                            username = username,
                             email = email,
                             address = address,
                             phoneNumber = phoneNumber,
@@ -236,28 +248,29 @@ fun ProfileContent(
                     }
                     if (updatedUser != null) {
                         userSessionManager.updateUser(updatedUser)
-//                        (context as ComponentActivity).lifecycleScope.launch {
-//                            try {
-//                                val updateUserRequest = UpdateUserRequest(
-//                                    username = updatedUser.userName,
-//                                    email = updatedUser.email,
-//                                    role = 3,
-//                                    firstName = updatedUser.firstName,
-//                                    lastName = updatedUser.lastName,
-//                                    address = updatedUser.address,
-//                                    phoneNumber = updatedUser.phoneNumber
-//                                )
-//                                val response = RetrofitInstance.api.updateUser(updatedUser.id, updateUserRequest)
-//                                if (response.isSuccessful) {
-//                                    Toast.makeText(context, "User update successful ", Toast.LENGTH_SHORT).show()
-//                                } else {
-//                                    Toast.makeText(context, "Update failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
-//                                }
-//                            } catch (e: Exception) {
-//                                Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
-//                                Log.d(TAG, "Update: Error: ${e.localizedMessage}")
-//                            }
-//                        }
+                        (context as ComponentActivity).lifecycleScope.launch {
+                            try {
+                                val updateUserRequest = UpdateUserRequest(
+                                    username = updatedUser.username,
+                                    email = updatedUser.email,
+                                    role = 3,
+                                    firstName = updatedUser.firstName,
+                                    lastName = updatedUser.lastName,
+                                    address = updatedUser.address,
+                                    phoneNumber = updatedUser.phoneNumber
+                                )
+                                val response = RetrofitInstance.api.updateUser(updatedUser.id, updateUserRequest)
+                                if (response.isSuccessful) {
+                                    Toast.makeText(context, "User update successful ", Toast.LENGTH_SHORT).show()
+
+                                } else {
+                                    Toast.makeText(context, "Update failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                Log.d(TAG, "Update: Error: ${e.localizedMessage}")
+                            }
+                        }
                     }
                     isEditing = false
                 },
@@ -289,6 +302,7 @@ fun ProfileTextField(
     isEditing: Boolean,
     onValueChange: (String) -> Unit,
     isError: Boolean = false,
+    placeholder: String? = "",
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
     if (isEditing) {
@@ -297,6 +311,7 @@ fun ProfileTextField(
             onValueChange = onValueChange,
             label = { Text(label) },
             enabled = true,
+            placeholder = { Text(placeholder ?: "") },
             singleLine = true,
             isError = isError,
             modifier = Modifier
@@ -370,7 +385,7 @@ fun ProfileScreenPreview() {
         val navController = rememberNavController()
         val mockUser = User(
             id = "1",
-            userName = "Mark Adam",
+            username = "Mark Adam",
             email = "markadam@hotmail.com",
             address = "123 Main St",
             phoneNumber = "1234567890",

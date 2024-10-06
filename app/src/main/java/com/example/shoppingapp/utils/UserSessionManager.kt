@@ -10,7 +10,7 @@ class UserSessionManager(context: Context) {
     fun saveUser(user: User) {
         prefs.edit().apply {
             putString("userId", user.id)
-            putString("userName", user.userName)
+            putString("userName", user.username)
             putString("email", user.email)
             putString("address", user.address)
             putString("phoneNumber", user.phoneNumber)
@@ -22,7 +22,7 @@ class UserSessionManager(context: Context) {
 
     fun getUser(): User {
         return User(
-            userName = prefs.getString("userName", "") ?: "",
+            username = prefs.getString("userName", "") ?: "",
             email = prefs.getString("email", "") ?: "",
             address = prefs.getString("address", "") ?: "",
             phoneNumber = prefs.getString("phoneNumber", "") ?: "",
@@ -34,7 +34,7 @@ class UserSessionManager(context: Context) {
 
     fun updateUser(updatedUser: User) {
         prefs.edit().apply {
-            putString("userName", updatedUser.userName)
+            putString("userName", updatedUser.username)
             putString("email", updatedUser.email)
             putString("address", updatedUser.address)
             putString("phoneNumber", updatedUser.phoneNumber)
