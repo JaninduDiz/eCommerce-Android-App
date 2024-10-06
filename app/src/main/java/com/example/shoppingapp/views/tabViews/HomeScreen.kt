@@ -326,7 +326,7 @@ fun CategoryCard(category: Category, color: Color, onClick: () -> Unit) {
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = color),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(16.dp)
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -352,7 +352,8 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
             .width(150.dp)
             .height(200.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier

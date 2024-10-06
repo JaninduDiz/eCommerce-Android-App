@@ -1,6 +1,6 @@
 package com.example.shoppingapp.utils
 
-import com.example.shoppingapp.Services.ApiService
+import com.example.shoppingapp.services.ApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

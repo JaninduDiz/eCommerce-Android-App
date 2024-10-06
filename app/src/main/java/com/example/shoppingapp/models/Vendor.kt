@@ -1,10 +1,9 @@
 package com.example.shoppingapp.models
 
-data class Vendor(
+data class Rating(
+    val id: String,
     val vendorId: String,
-    val name: String,
-    val imageUrl: String,
-    val avgRating: Float,
-    val totalReviews: Int,
-    val products: List<Product>
+    val customerId: String,
+    val stars: Int,
+    val comment: String
 )

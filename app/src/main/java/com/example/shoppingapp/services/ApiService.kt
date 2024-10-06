@@ -1,10 +1,11 @@
 // ApiService.kt
-package com.example.shoppingapp.Services
+package com.example.shoppingapp.services
 
 import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderRequest
 import com.example.shoppingapp.models.Product
+import com.example.shoppingapp.models.Rating
 import com.example.shoppingapp.models.User
 import retrofit2.Response
 import retrofit2.http.Body
@@ -41,23 +42,6 @@ data class UpdateUserRequest(
     val lastName: String?,
     val address: String?,
     val phoneNumber: String?,
-)
-
-data class Vendor(
-    val id: String,
-    val name: String,
-    val productIds: List<String>,
-    val averageRating: Float,
-    val totalRatings: Int
-)
-
-
-data class Rating(
-    val id: String,
-    val vendorId: String,
-    val customerId: String,
-    val stars: Int,
-    val comment: String
 )
 
 interface ApiService {
@@ -97,7 +81,7 @@ interface ApiService {
     @GET("Rating/vendor/{vendorId}")
     suspend fun getRatingsByVendorId(@Path("vendorId") vendorId: String): Response<List<Rating>>
 
-    @GET("Vendor/{vendorId}")
-    suspend fun getVendorById(@Path("vendorId") vendorId: String): Response<Vendor>
+    @GET("Product/vendor/{vendorId}")
+    suspend fun getVendorProducts(@Path("vendorId") vendorId: String): Response<List<Product>>
 
 }
