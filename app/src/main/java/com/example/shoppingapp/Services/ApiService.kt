@@ -43,6 +43,22 @@ data class UpdateUserRequest(
     val phoneNumber: String?,
 )
 
+data class Vendor(
+    val id: String,
+    val name: String,
+    val productIds: List<String>,
+    val averageRating: Float,
+    val totalRatings: Int
+)
+
+
+data class Rating(
+    val id: String,
+    val vendorId: String,
+    val customerId: String,
+    val stars: Int,
+    val comment: String
+)
 
 interface ApiService {
     @POST("User/login")
@@ -77,5 +93,11 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: UpdateUserRequest
     ): Response<User>
+
+    @GET("Rating/vendor/{vendorId}")
+    suspend fun getRatingsByVendorId(@Path("vendorId") vendorId: String): Response<List<Rating>>
+
+    @GET("Vendor/{vendorId}")
+    suspend fun getVendorById(@Path("vendorId") vendorId: String): Response<Vendor>
 
 }
