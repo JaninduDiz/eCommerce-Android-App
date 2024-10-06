@@ -2,10 +2,13 @@
 package com.example.shoppingapp.services
 
 import com.example.shoppingapp.models.Category
+import com.example.shoppingapp.models.LoginResponse
 import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderRequest
 import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.models.Rating
+import com.example.shoppingapp.models.RegisterRequest
+import com.example.shoppingapp.models.UpdateUserRequest
 import com.example.shoppingapp.models.User
 import retrofit2.Response
 import retrofit2.http.Body
@@ -15,34 +18,6 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 data class LoginRequest(val email: String, val password: String)
-
-data class LoginResponse(
-    val id: String,
-    val username: String,
-    val email: String,
-)
-
-data class RegisterRequest(
-    val username: String,
-    val email: String,
-    val password: String,
-    val role: Int,
-    val firstName: String,
-    val lastName: String,
-    val address: String,
-    val phoneNumber: String,
-    val gender: Int
-)
-
-data class UpdateUserRequest(
-    val username: String?,
-    val email: String?,
-    val role: Int?,
-    val firstName: String?,
-    val lastName: String?,
-    val address: String?,
-    val phoneNumber: String?,
-)
 
 interface ApiService {
     @POST("User/login")
