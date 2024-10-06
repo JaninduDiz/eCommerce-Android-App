@@ -9,8 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.Vendor
 import com.example.shoppingapp.models.sampleProducts
 import com.example.shoppingapp.views.components.CustomTopAppBar
+import kotlin.math.roundToInt
 
 @Composable
 fun VendorScreen(
@@ -69,6 +75,9 @@ fun VendorScreen(
                         text = "Vendor: ${vendorProducts.firstOrNull()?.vendorId ?: "Unknown"}",
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    StarRate(
+                        rating = 4.6.roundToInt()
                     )
                     Text(
                         text = "Rating: 4.5", // Replace with actual rating if available
@@ -116,6 +125,26 @@ fun VendorInfoSection(vendor: Vendor) {
             }
         }
     }
+}
+
+@Composable
+fun StarRate(
+    rating: Int
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center
+    ) {
+        (1..5).forEach { index ->
+            Icon(
+                imageVector = if (index <= rating) Icons.Filled.Star else Icons.Outlined.Star,
+                contentDescription = "Star $index",
+                tint = if (index <= rating) Color(0xFFFFD700) else Color.Gray,
+                modifier = Modifier
+                    .size(48.dp)
+            )
+        }
+    }
+
 }
 
 

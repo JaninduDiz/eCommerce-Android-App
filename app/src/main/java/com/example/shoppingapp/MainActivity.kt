@@ -24,6 +24,7 @@ import com.example.shoppingapp.views.OrderDetailsScreen
 import com.example.shoppingapp.views.ProductDetailsScreen
 import com.example.shoppingapp.views.ProfileScreen
 import com.example.shoppingapp.views.ReviewScreen
+import com.example.shoppingapp.views.VendorScreen
 import com.example.shoppingapp.views.onBoardViews.LoginScreen
 import com.example.shoppingapp.views.onBoardViews.RegisterScreen
 import com.example.shoppingapp.views.tabViews.CartScreen
@@ -84,6 +85,16 @@ class MainActivity : ComponentActivity() {
                         val isBackHome = backStackEntry.arguments?.getString("isBackHome")?.toBoolean() ?: false
 
                         OrderDetailsScreen(navController, orderId, orderState, isBackHome)
+                    }
+                    composable("reviewScreen/{productId}") { backStackEntry ->
+                        val productId = backStackEntry.arguments?.getString("productId")
+                        ReviewScreen(navController, productId)
+                    }
+                    composable("vendorDetails/{vendorId}") { backStackEntry ->
+                        val vendorId = backStackEntry.arguments?.getString("vendorId")
+                        if (vendorId != null) {
+                            VendorScreen(navController, vendorId)
+                        }
                     }
                 }
             }
