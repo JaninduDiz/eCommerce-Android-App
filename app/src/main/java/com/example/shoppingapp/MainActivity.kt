@@ -68,7 +68,8 @@ class MainActivity : ComponentActivity() {
                         val categoryId = backStackEntry.arguments?.getString("categoryId")
                         CategoryScreen(
                             navController = navController,
-                            categoryId = categoryId
+                            categoryId = categoryId,
+                            categoryState = categoryState
                         )
                     }
                     composable("cart") { CartScreen(navController, cartState) }

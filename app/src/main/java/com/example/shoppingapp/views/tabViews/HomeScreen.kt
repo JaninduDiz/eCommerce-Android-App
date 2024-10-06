@@ -233,7 +233,7 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
 @Composable
 fun HomeContent(navController: NavController, categoryState: CategoryState, loading: Boolean = false , productState: ProductState) {
     val categories = categoryState.categories
-    val sampleProducts = productState.products
+    val products = productState.products
 
     // List of colors
     val categoryColors = listOf(
@@ -254,7 +254,7 @@ fun HomeContent(navController: NavController, categoryState: CategoryState, load
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(sampleProducts) { product ->
+                items(products) { product ->
                     ItemCard(product = product) {
                         navController.navigate("productDetails/${product.productId}")
                     }

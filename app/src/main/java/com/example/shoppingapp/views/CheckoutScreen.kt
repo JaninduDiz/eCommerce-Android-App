@@ -254,7 +254,7 @@ fun AddressSection(user: User) {
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun OrderSummary(totalItems: Int, totalPrice: Double, deliveryCharge: Double = 2.0) {
+fun OrderSummary(totalItems: Int, totalPrice: Double, deliveryCharge: Double?) {
 
     Text(
         text = "Order Summary",
@@ -274,9 +274,11 @@ fun OrderSummary(totalItems: Int, totalPrice: Double, deliveryCharge: Double = 2
             SummaryRow(label = "Total Items", value = "$totalItems")
             SummaryRow(label = "Subtotal", value = String.format(Locale.getDefault(),"$%.2f", totalPrice))
             Spacer(modifier = Modifier.height(10.dp))
-            SummaryRow(label = "Delivery Charges", value = "$$deliveryCharge")
+            if (deliveryCharge != null) {
+                SummaryRow(label = "Delivery Charges", value = "$$deliveryCharge")
+            }
             Divider(modifier = Modifier.padding(vertical = 8.dp))
-            SummaryRow(label = "Total", value = String.format(Locale.getDefault(), "$%.2f", totalPrice + deliveryCharge), isBold = true)
+            SummaryRow(label = "Total", value = String.format(Locale.getDefault(), "$%.2f", totalPrice + (deliveryCharge ?: 0.0)), isBold = true)
         }
     }
 }

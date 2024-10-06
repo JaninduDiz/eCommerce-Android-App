@@ -37,8 +37,6 @@ fun OrderSummaryCard(
     order: Order,
     navController: NavController,
 ) {
-    val context = LocalContext.current
-
     var loading by remember { mutableStateOf(false) }
     val totalAmount = order.totalValue
     var firstProductName by remember { mutableStateOf<String?>(null) }
@@ -106,7 +104,7 @@ fun OrderSummaryCard(
                 Text(text = statusText, fontWeight = FontWeight.Bold, color = statusColor)
             }
             Text(
-                text = "Total: $totalAmount",
+                text = "Total: ${totalAmount + 2.0}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
@@ -115,6 +113,7 @@ fun OrderSummaryCard(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
+@Composable
 fun formatDateTime(dateTimeString: String): String {
     // Define the input date-time format
     val inputFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME

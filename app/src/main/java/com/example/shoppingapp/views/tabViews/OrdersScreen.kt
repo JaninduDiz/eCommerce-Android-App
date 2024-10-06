@@ -65,6 +65,9 @@ fun OrdersScreen(navController: NavController, orderState: OrderState) {
                     orderState.addOrder(orders)
                 }
                 loading = false
+            } else {
+                loading = false
+                Log.d(TAG, "OrderScreen: no orders found")
             }
         } catch (e: Exception) {
             loading = false
