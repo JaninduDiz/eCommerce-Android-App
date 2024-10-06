@@ -145,19 +145,19 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         }
     }
 
-    // Fetch products
-//    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
-//    LaunchedEffect(Unit) {
-//        try {
-//            val response = RetrofitInstance.api.getActiveProducts()
-//            if (response.isSuccessful) {
-//                products = response.body() ?: emptyList()
-//                productState.addProducts(products)
-//            }
-//        } catch (e: Exception) {
-//            // Handle error (e.g., show a message)
-//        }
-//    }
+//     Fetch products
+    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        try {
+            val response = RetrofitInstance.api.getActiveProducts()
+            if (response.isSuccessful) {
+                products = response.body() ?: emptyList()
+                productState.addProducts(products)
+            }
+        } catch (e: Exception) {
+            // Handle error (e.g., show a message)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -219,8 +219,8 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         ) {
             item {
                 when (selectedItemIndex) {
-                    0 -> HomeContent(navController = navController, categoryState, loading)
-                    1 -> OrdersScreen(navController = navController)
+                    0 -> HomeContent(navController = navController, categoryState, loading , productState)
+                    1 -> OrdersScreen(navController = navController, orderState)
                     2 -> CartScreen(navController = navController, cartState)
                     3 -> SearchScreen(navController = navController)
                 }
@@ -231,8 +231,9 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun HomeContent(navController: NavController, categoryState: CategoryState, loading: Boolean = false) {
+fun HomeContent(navController: NavController, categoryState: CategoryState, loading: Boolean = false , productState: ProductState) {
     val categories = categoryState.categories
+    val products = productState.products
 
     // List of colors
     val categoryColors = listOf(
@@ -243,42 +244,55 @@ fun HomeContent(navController: NavController, categoryState: CategoryState, load
         Color(0xFF6B705C)
     )
 
-        if (loading) {
-            CircularIndicator()
-        } else {
-            Column {
-                // Section Title for Categories
-                SectionTitle(title = "Categories", onClick = {})
+    if (loading) {
+        CircularIndicator()
+    } else {
+        Column {
 
-                // LazyRow to Display Categories
-                LazyRow(
-                    modifier = Modifier.padding(bottom = 20.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    itemsIndexed(categories) { index, category ->
-                        // Cycle colors using modulus operator
-                        val color = categoryColors[index % categoryColors.size]
-
-                        CategoryCard(
-                            category = category,
-                            color = color
-                        ) {
-                            navController.navigate("categoryScreen/${category.id}")
-                        }
+            SectionTitle(title = "Explore" , onClick = {})
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(products) { product ->
+                    ItemCard(product = product) {
+                        navController.navigate("productDetails/${product.productId}")
                     }
                 }
+            }
 
-                // Display products under each category
-                categories.forEach { category ->
-                    CategorySection(
-                        categoryName = category.name,
-                        products = category.products,
-                        navController = navController,
-                        onClick = { navController.navigate("categoryScreen/${category.id}") }
-                    )
+            // Section Title for Categories
+            SectionTitle(title = "Categories", onClick = {})
+
+            // LazyRow to Display Categories
+            LazyRow(
+                modifier = Modifier.padding(bottom = 20.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(categories) { index, category ->
+                    // Cycle colors using modulus operator
+                    val color = categoryColors[index % categoryColors.size]
+
+                    CategoryCard(
+                        category = category,
+                        color = color
+                    ) {
+                        navController.navigate("categoryScreen/${category.id}")
+                    }
                 }
             }
+
+            // Display products under each category
+            categories.forEach { category ->
+                CategorySection(
+                    categoryName = category.name,
+                    products = category.products,
+                    navController = navController,
+                    onClick = { navController.navigate("categoryScreen/${category.id}") }
+                )
+            }
+        }
     }
 }
 

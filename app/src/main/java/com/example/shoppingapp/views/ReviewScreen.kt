@@ -86,7 +86,7 @@ fun ReviewScreen(
                 ) {
                     ProductImageSection(product.imageUrls[0])
                     Spacer(modifier = Modifier.height(16.dp))
-                    ProductInfoSection(product)
+                    ProductInfoSection(product, navController)
                     Spacer(modifier = Modifier.height(16.dp))
                     product.description?.let { it1 -> ProductDescriptionSection(it1) }
                 }

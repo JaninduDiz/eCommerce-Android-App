@@ -76,6 +76,7 @@ fun ProfileContent(
     userSessionManager: UserSessionManager,
     navController: NavController
 ) {
+    val context = LocalContext.current
     var loading by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
     var userName by remember { mutableStateOf(currentUser?.userName ?: "") }
@@ -234,7 +235,29 @@ fun ProfileContent(
                         )
                     }
                     if (updatedUser != null) {
-                        userSessionManager.updateUser(updatedUser)          //TODO: Update user api call
+                        userSessionManager.updateUser(updatedUser)
+//                        (context as ComponentActivity).lifecycleScope.launch {
+//                            try {
+//                                val updateUserRequest = UpdateUserRequest(
+//                                    username = updatedUser.userName,
+//                                    email = updatedUser.email,
+//                                    role = 3,
+//                                    firstName = updatedUser.firstName,
+//                                    lastName = updatedUser.lastName,
+//                                    address = updatedUser.address,
+//                                    phoneNumber = updatedUser.phoneNumber
+//                                )
+//                                val response = RetrofitInstance.api.updateUser(updatedUser.id, updateUserRequest)
+//                                if (response.isSuccessful) {
+//                                    Toast.makeText(context, "User update successful ", Toast.LENGTH_SHORT).show()
+//                                } else {
+//                                    Toast.makeText(context, "Update failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+//                                }
+//                            } catch (e: Exception) {
+//                                Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+//                                Log.d(TAG, "Update: Error: ${e.localizedMessage}")
+//                            }
+//                        }
                     }
                     isEditing = false
                 },

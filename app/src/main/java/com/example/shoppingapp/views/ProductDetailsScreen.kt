@@ -148,7 +148,7 @@ fun ProductDetailsScreen(
                     if (product != null) {
                         ProductImageSection(product!!.imageUrls[0])
                         Spacer(modifier = Modifier.height(16.dp))
-                        ProductInfoSection(product!!)
+                        ProductInfoSection(product!!, navController)
                         Spacer(modifier = Modifier.height(16.dp))
                         product?.description?.let { description ->
                             ProductDescriptionSection(description)
@@ -191,7 +191,7 @@ fun ProductImageSection(imageURL: String) {
 }
 
 @Composable
-fun ProductInfoSection(product: Product) {
+fun ProductInfoSection(product: Product, navController: NavHostController) {
     val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth()) {
         Row (modifier = Modifier.fillMaxWidth(),
@@ -241,6 +241,7 @@ fun ProductInfoSection(product: Product) {
             style = MaterialTheme.typography.titleMedium,
             color = Color.Gray,
             modifier = Modifier.clickable {
+                navController.navigate("vendorDetails/${product.vendorId}")
                 Toast.makeText(context, "Vendor clicked", Toast.LENGTH_SHORT).show()
             }
         )
