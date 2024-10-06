@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.session.UserSessionManager
+import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.viewmodels.CategoryState

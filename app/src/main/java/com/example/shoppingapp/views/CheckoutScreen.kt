@@ -53,9 +53,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.OrderRequest
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.models.sampleProducts
-import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.CustomButton
