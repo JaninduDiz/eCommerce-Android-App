@@ -1,17 +1,12 @@
 package com.example.shoppingapp.viewmodels
 
 import android.annotation.SuppressLint
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.shoppingapp.models.CartItem
 import com.example.shoppingapp.models.Product
 
-// Data class representing a Cart Item
-data class CartItem(val product: Product, var quantity: MutableState<Int> = mutableIntStateOf(1))
 
-
-// CartState to manage cart items
 class CartState {
     val items: SnapshotStateList<CartItem> = mutableStateListOf()
 

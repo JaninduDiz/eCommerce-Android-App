@@ -49,9 +49,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.models.User
-import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.views.components.CustomTopAppBar
 
 

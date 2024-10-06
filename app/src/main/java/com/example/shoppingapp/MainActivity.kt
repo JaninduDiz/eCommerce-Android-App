@@ -12,12 +12,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.session.UserSessionManager
+import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.viewmodels.ProductState
+import com.example.shoppingapp.viewmodels.VendorState
 import com.example.shoppingapp.views.CategoryScreen
 import com.example.shoppingapp.views.CheckoutScreen
 import com.example.shoppingapp.views.OrderDetailsScreen
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
                 val cartState = remember { CartState() }
                 val orderState = remember { OrderState() }
                 val productState = remember { ProductState() }
+                val vendorState = remember { VendorState() }
                 val categoryState = remember { CategoryState() }
                 val userSessionManager = UserSessionManager(this)
                 val currentUser = userSessionManager.getUser()
@@ -58,7 +60,7 @@ class MainActivity : ComponentActivity() {
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
                         if (productId != null) {
-                            ProductDetailsScreen(navController, productId, cartState)
+                            ProductDetailsScreen(navController, productId, cartState, vendorState)
                         }
                     }
                     composable("reviewScreen/{productId}") { backStackEntry ->
@@ -93,7 +95,7 @@ class MainActivity : ComponentActivity() {
                     composable("vendorDetails/{vendorId}") { backStackEntry ->
                         val vendorId = backStackEntry.arguments?.getString("vendorId")
                         if (vendorId != null) {
-                            VendorScreen(navController, vendorId)
+                            VendorScreen(navController, vendorId, vendorState)
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-package com.example.shoppingapp.session
+package com.example.shoppingapp.utils
 
 import android.content.Context
 import android.content.SharedPreferences

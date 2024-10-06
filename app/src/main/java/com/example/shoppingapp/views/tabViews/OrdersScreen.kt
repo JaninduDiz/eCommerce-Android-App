@@ -38,9 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.OrderHistoryComponent
 import com.example.shoppingapp.views.components.OrderTrackingComponent

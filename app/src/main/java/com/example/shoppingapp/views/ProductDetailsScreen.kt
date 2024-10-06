@@ -12,14 +12,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -52,6 +51,7 @@ import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.viewmodels.VendorState
 import com.example.shoppingapp.views.components.CircularIndicator
 import com.example.shoppingapp.views.components.CustomTopAppBar
 
@@ -59,7 +59,8 @@ import com.example.shoppingapp.views.components.CustomTopAppBar
 fun ProductDetailsScreen(
     navController: NavHostController,
     productId: String,
-    cartState: CartState
+    cartState: CartState,
+    vendorState: VendorState
 ) {
     val context = LocalContext.current  // Get the current context
     var product by remember { mutableStateOf<Product?>(null) }
@@ -84,19 +85,13 @@ fun ProductDetailsScreen(
 
     // Custom Top App Bar with product name if available
     CustomTopAppBar(
-        title = product?.name ?: "Loading...",  // Handle null product case
-        onNavigationClick = { navController.popBackStack() },
+        title = "Product Details",
+        onNavigationClick = {
+            navController.popBackStack()
+            vendorState.clearVendorState() },
         centeredHeader = true,
         showActionIcon = true,
         isHeaderPinned = true,
-        actionIcon = {
-            IconButton(onClick = { /* Handle favorite click */ }) {
-                Icon(
-                    imageVector = Icons.Filled.FavoriteBorder,
-                    contentDescription = "Favorite"
-                )
-            }
-        }
     ) { paddingValues ->
         Scaffold(
             bottomBar = {
@@ -139,6 +134,7 @@ fun ProductDetailsScreen(
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
+                    .offset(y = (-36).dp)
             ) {
                 // Loading state
                 if (loading) {
@@ -148,11 +144,16 @@ fun ProductDetailsScreen(
                     if (product != null) {
                         ProductImageSection(product!!.imageUrls[0])
                         Spacer(modifier = Modifier.height(16.dp))
-                        ProductInfoSection(product!!, navController)
+                        ProductInfoSection(product!!)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        product?.vendorId?.let { vendorId ->
+                            SeeVendorDetails(vendorId, navController)
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                         product?.description?.let { description ->
                             ProductDescriptionSection(description)
                         }
+
                     } else {
                         // Product not found or error state
                         Text(
@@ -171,6 +172,19 @@ fun ProductDetailsScreen(
     }
 }
 
+@Composable
+fun SeeVendorDetails(vendorId: String, navController: NavHostController) {
+    Column {
+        Text(
+            text = "See Vendor >>>",
+            color = Color(0xFF023e8a),
+            fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
+            modifier = Modifier.clickable {
+                navController.navigate("vendorDetails/${vendorId}")
+            }
+        )
+    }
+}
 
 @Composable
 fun ProductImageSection(imageURL: String) {
@@ -191,8 +205,7 @@ fun ProductImageSection(imageURL: String) {
 }
 
 @Composable
-fun ProductInfoSection(product: Product, navController: NavHostController) {
-    val context = LocalContext.current
+fun ProductInfoSection(product: Product) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row (modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -212,38 +225,11 @@ fun ProductInfoSection(product: Product, navController: NavHostController) {
             ) }
 
         Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp)
-        ) {
-            Text(
-                text = "4.5",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "(20 Reviews)",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
+
         Text(
             text = "Category: ${product.category}",
             style = MaterialTheme.typography.titleMedium,
             color = Color.Gray
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Vendor: Isuru Stores",
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.Gray,
-            modifier = Modifier.clickable {
-                navController.navigate("vendorDetails/${product.vendorId}")
-                Toast.makeText(context, "Vendor clicked", Toast.LENGTH_SHORT).show()
-            }
         )
     }
 }
@@ -270,6 +256,6 @@ fun ProductDescriptionSection(description: String) {
 @Composable
 fun ProductScreenPreview() {
     ShoppingAppTheme {
-        ProductDetailsScreen(navController = rememberNavController(), productId = "1", cartState = CartState())
+        ProductDetailsScreen(navController = rememberNavController(), productId = "1", cartState = CartState(), vendorState = VendorState())
     }
 }

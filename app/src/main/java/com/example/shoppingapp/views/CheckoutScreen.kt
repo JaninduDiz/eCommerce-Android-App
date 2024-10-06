@@ -44,18 +44,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.OrderRequest
 import com.example.shoppingapp.models.User
-import com.example.shoppingapp.models.sampleProducts
-import com.example.shoppingapp.session.UserSessionManager
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.CustomButton
@@ -367,16 +363,3 @@ fun PaymentMethodSection() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnrememberedMutableState")
-@Preview(showBackground = true)
-@Composable
-fun CheckoutScreenPreview() {
-    ShoppingAppTheme {
-        CheckoutScreen(
-            navController = rememberNavController(),
-            cartState = CartState(),
-            totalPrice = (sampleProducts[0].price * 1 + sampleProducts[1].price * 2)
-        )
-    }
-}
