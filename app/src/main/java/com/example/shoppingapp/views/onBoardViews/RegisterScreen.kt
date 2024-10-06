@@ -1,6 +1,10 @@
 // RegisterScreen.kt
 package com.example.shoppingapp.views.onBoardViews
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +19,15 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -26,15 +35,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.Services.RegisterRequest
+import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -173,7 +179,7 @@ fun RegisterScreen(navController: NavController) {
                         // Handle registration logic
                         (context as ComponentActivity).lifecycleScope.launch {
                             try {
-                                val response = RetrofitInstance.api.register(RegisterRequest(username, email, password, 0))
+                                val response = RetrofitInstance.api.register(RegisterRequest(username, email, password, 3, "", "", "", "", 0))
                                 if (response.isSuccessful && response.body() != null) {
                                     Toast.makeText(context, "Registration successful ", Toast.LENGTH_SHORT).show()
                                     navController.navigate("login") // Navigate to login screen after successful registration
@@ -182,6 +188,7 @@ fun RegisterScreen(navController: NavController) {
                                 }
                             } catch (e: Exception) {
                                 Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                Log.d(TAG, "RegisterScreen: Error: ${e.localizedMessage}")
                             }
                         }
                     }

@@ -9,35 +9,37 @@ class UserSessionManager(context: Context) {
 
     fun saveUser(user: User) {
         prefs.edit().apply {
+            putString("userId", user.id)
             putString("userName", user.userName)
-            putString("emailAddress", user.emailAddress)
-            putString("addressLine1", user.addressLine1)
-            putString("addressLine2", user.addressLine2)
-            putString("city", user.city)
-            putString("postalCode", user.postalCode)
+            putString("email", user.email)
+            putString("address", user.address)
+            putString("phoneNumber", user.phoneNumber)
+            putString("firstName", user.firstName)
+            putString("lastName", user.lastName)
             apply()
         }
     }
 
-    fun getUser(): User? {
+    fun getUser(): User {
         return User(
             userName = prefs.getString("userName", "") ?: "",
-            emailAddress = prefs.getString("emailAddress", "") ?: "",
-            addressLine1 = prefs.getString("addressLine1", "") ?: "",
-            addressLine2 = prefs.getString("addressLine2", "") ?: "",
-            city = prefs.getString("city", "") ?: "",
-            postalCode = prefs.getString("postalCode", "") ?: ""
+            email = prefs.getString("email", "") ?: "",
+            address = prefs.getString("address", "") ?: "",
+            phoneNumber = prefs.getString("phoneNumber", "") ?: "",
+            firstName = prefs.getString("firstName", "") ?: "",
+            lastName = prefs.getString("lastName", "") ?: "",
+            id = prefs.getString("userId", "") ?: ""
         )
     }
 
     fun updateUser(updatedUser: User) {
         prefs.edit().apply {
             putString("userName", updatedUser.userName)
-            putString("emailAddress", updatedUser.emailAddress)
-            putString("addressLine1", updatedUser.addressLine1)
-            putString("addressLine2", updatedUser.addressLine2)
-            putString("city", updatedUser.city)
-            putString("postalCode", updatedUser.postalCode)
+            putString("email", updatedUser.email)
+            putString("address", updatedUser.address)
+            putString("phoneNumber", updatedUser.phoneNumber)
+            putString("firstName", updatedUser.firstName)
+            putString("lastName", updatedUser.lastName)
             apply()
         }
     }

@@ -15,14 +15,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.session.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.OrderState
+import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.CategoryScreen
 import com.example.shoppingapp.views.CheckoutScreen
 import com.example.shoppingapp.views.OrderDetailsScreen
 import com.example.shoppingapp.views.ProductDetailsScreen
 import com.example.shoppingapp.views.ProfileScreen
 import com.example.shoppingapp.views.ReviewScreen
-import com.example.shoppingapp.views.VendorScreen
 import com.example.shoppingapp.views.onBoardViews.LoginScreen
 import com.example.shoppingapp.views.onBoardViews.RegisterScreen
 import com.example.shoppingapp.views.tabViews.CartScreen
@@ -41,6 +42,8 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val cartState = remember { CartState() }
                 val orderState = remember { OrderState() }
+                val productState = remember { ProductState() }
+                val categoryState = remember { CategoryState() }
                 val userSessionManager = UserSessionManager(this)
                 val currentUser = userSessionManager.getUser()
 
@@ -50,10 +53,12 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(navController, userSessionManager) // pass the session manager
                     }
                     composable("register") { RegisterScreen(navController) }
-                    composable("home") { HomeScreen(navController, cartState, orderState) }
+                    composable("home") { HomeScreen(navController, cartState, orderState, productState, categoryState ) }
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
-                        ProductDetailsScreen(navController, productId, cartState)
+                        if (productId != null) {
+                            ProductDetailsScreen(navController, productId, cartState)
+                        }
                     }
                     composable("reviewScreen/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
@@ -63,7 +68,8 @@ class MainActivity : ComponentActivity() {
                         val categoryId = backStackEntry.arguments?.getString("categoryId")
                         CategoryScreen(
                             navController = navController,
-                            categoryId = categoryId
+                            categoryId = categoryId,
+                            categoryState = categoryState
                         )
                     }
                     composable("cart") { CartScreen(navController, cartState) }
@@ -79,10 +85,6 @@ class MainActivity : ComponentActivity() {
 
                         OrderDetailsScreen(navController, orderId, orderState, isBackHome)
                     }
-                    composable("vendorScreen/{vendorId}") { backStackEntry ->
-                        val vendorId = backStackEntry.arguments?.getString("vendorId") ?: ""
-                        VendorScreen(navController, vendorId)
-                    }
                 }
             }
         }
@@ -97,7 +99,7 @@ class MainActivity : ComponentActivity() {
 fun DefaultPreview() {
     ShoppingAppTheme {
         val navController = rememberNavController()
-        HomeScreen(navController, CartState(), OrderState())
+        HomeScreen(navController, CartState(), OrderState(), ProductState(), CategoryState())
     }
 }
 

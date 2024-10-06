@@ -1,7 +1,6 @@
 package com.example.shoppingapp.views
 
 import CustomModalBottomSheet
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -40,23 +39,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.R
-import com.example.shoppingapp.models.Order
 import com.example.shoppingapp.models.OrderItem
-import com.example.shoppingapp.models.sampleOrders
-import com.example.shoppingapp.models.sampleProducts
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.CustomButton
 import com.example.shoppingapp.views.components.CustomModal
 import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.views.components.ModalType
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.example.shoppingapp.views.components.formatDateTime
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +60,7 @@ fun OrderDetailsScreen(
     orderState: OrderState,
     isBackHome: Boolean? = false
 ) {
-    val order = sampleOrders.find { it.id == orderId } ?: sampleOrders[0]
+    val order = orderState.orders.find { it.id == orderId } ?: return
     var showModal by remember { mutableStateOf(false) }
     var showDrawer by remember { mutableStateOf(false) }
     var cancellationReason by remember { mutableStateOf("") }
@@ -115,11 +107,8 @@ fun OrderDetailsScreen(
                     // Order status and date placed
                     Text(text = "Order ID: ${order.id}", fontWeight = FontWeight.Bold)
                     Text(
-                        text = "Date Placed: ${
-                            order.createdAt.format(
-                                DateTimeFormatter.ofPattern("yyyy-MMM-dd @ hh:mm a")
-                            )
-                        }", fontWeight = FontWeight.Bold
+                        text = "Date Placed: ${formatDateTime(order.createdAt)}",
+                        fontWeight = FontWeight.Bold
                     )
                     val (statusText, statusColor) = orderStatusText(order.status)
                     Row(
@@ -145,7 +134,8 @@ fun OrderDetailsScreen(
 
                     OrderSummary(
                         totalItems = order.items.size,
-                        totalPrice = order.items.sumOf { item -> item.product.price * item.quantity }
+                        totalPrice = order.totalValue,
+                        deliveryCharge = 2.0
                     )
 
                     Spacer(modifier = Modifier.fillMaxWidth().height(16.dp))
@@ -246,7 +236,7 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                navController.navigate("reviewScreen/${orderItem.product.productId}")
+                navController.navigate("reviewScreen/${orderItem.productId}")
             },
         shape = RoundedCornerShape(8.dp),
     ) {
@@ -264,37 +254,37 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column {
-                Text(text = orderItem.product.name, fontWeight = FontWeight.Bold)
+//                Text(text = orderItem.product.name, fontWeight = FontWeight.Bold)
                 Text(text = "Quantity: ${orderItem.quantity}")
-                Text(text = "Price: $${orderItem.product.price}")
+                Text(text = "Price: $${orderItem.unitPrice}")
             }
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnrememberedMutableState")
-@Preview(showBackground = true)
-@Composable
-fun OrderDetailsScreenPreview() {
-    val sampleOrder = Order(
-        id = "order_1",
-        items = listOf(
-            OrderItem(product = sampleProducts[0], quantity = 1, isDelivered = false),
-            OrderItem(product = sampleProducts[1], quantity = 2, isDelivered = false)
-        ),
-        status = 1,
-        cancellationReason = null,
-        customerId = "customer_123",
-        note = null,
-        createdAt = LocalDateTime.now()
-    )
-
-    ShoppingAppTheme {
-        OrderDetailsScreen(
-            navController = rememberNavController(),
-            orderId = sampleOrder.id,
-            orderState = OrderState(),
-        )
-    }
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@SuppressLint("UnrememberedMutableState")
+//@Preview(showBackground = true)
+//@Composable
+//fun OrderDetailsScreenPreview() {
+//    val sampleOrder = Order(
+//        id = "order_1",
+//        items = listOf(
+//            OrderItem(product = sampleProducts[0], quantity = 1, isDelivered = false),
+//            OrderItem(product = sampleProducts[1], quantity = 2, isDelivered = false)
+//        ),
+//        status = 1,
+//        cancellationReason = null,
+//        customerId = "customer_123",
+//        note = null,
+//        createdAt = LocalDateTime.now()
+//    )
+//
+//    ShoppingAppTheme {
+//        OrderDetailsScreen(
+//            navController = rememberNavController(),
+//            orderId = sampleOrder.id,
+//            orderState = OrderState(),
+//        )
+//    }
+//}

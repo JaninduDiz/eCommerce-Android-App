@@ -1,55 +1,86 @@
 package com.example.shoppingapp.views.tabViews
 
+import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
-import com.example.shoppingapp.R
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavController
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import com.example.shoppingapp.viewmodels.CartState
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Product
-import com.example.shoppingapp.models.bedroomFurnitureCategory
-import com.example.shoppingapp.models.diningFurnitureCategory
-import com.example.shoppingapp.models.gamingFurnitureCategory
-import com.example.shoppingapp.models.livingRoomFurnitureCategory
-import com.example.shoppingapp.models.officeFurnitureCategory
-import com.example.shoppingapp.models.sampleProducts
+import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.OrderState
+import com.example.shoppingapp.viewmodels.ProductState
+import com.example.shoppingapp.views.components.CircularIndicator
 
 data class BottomNavigationItem(
     val title: String,
@@ -59,18 +90,10 @@ data class BottomNavigationItem(
     val badgeCount: Int? = null
 )
 
-val categoryColors = mapOf(
-    officeFurnitureCategory to Color(0xFFDDB892),
-    livingRoomFurnitureCategory to Color(0xFFDDBEA9),
-    diningFurnitureCategory to Color(0xFFB7B7A4),
-    bedroomFurnitureCategory to Color(0xFFA5A58D),
-    gamingFurnitureCategory to Color(0xFF6B705C)
-)
-
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, cartState: CartState, orderState: OrderState) {
+fun HomeScreen(navController: NavController, cartState: CartState, orderState: OrderState ,productState: ProductState , categoryState: CategoryState) {
     val items = listOf(
         BottomNavigationItem(
             title = "Home",
@@ -99,8 +122,41 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         )
     )
 
-    var selectedItemIndex by rememberSaveable {
-        mutableIntStateOf(0)
+    var loading by remember { mutableStateOf(false) }
+
+    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
+
+    var categories by remember { mutableStateOf<List<Category>>(emptyList()) }
+
+    // Fetch categories
+    LaunchedEffect(Unit) {
+        try {
+            loading = true
+            val response = RetrofitInstance.api.getCategories()
+            if (response.isSuccessful) {
+                categories = response.body() ?: emptyList()
+                categoryState.clear()
+                categoryState.addCategories(categories)
+                loading = false
+            }
+        } catch (e: Exception) {
+            loading = false
+            Log.d(TAG, "HomeScreen: ${e.message}, error fetching categories")
+        }
+    }
+
+//     Fetch products
+    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        try {
+            val response = RetrofitInstance.api.getActiveProducts()
+            if (response.isSuccessful) {
+                products = response.body() ?: emptyList()
+                productState.addProducts(products)
+            }
+        } catch (e: Exception) {
+            // Handle error (e.g., show a message)
+        }
     }
 
     Scaffold(
@@ -163,8 +219,8 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         ) {
             item {
                 when (selectedItemIndex) {
-                    0 -> HomeContent(navController = navController)
-                    1 -> OrdersScreen(navController = navController)
+                    0 -> HomeContent(navController = navController, categoryState, loading , productState)
+                    1 -> OrdersScreen(navController = navController, orderState)
                     2 -> CartScreen(navController = navController, cartState)
                     3 -> SearchScreen(navController = navController)
                 }
@@ -173,86 +229,93 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
-fun HomeContent(navController: NavController) {
-    SectionTitle(title = "Trending Items")
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(sampleProducts.take(5)) { product ->
-            ItemCard(product = product) {
-                navController.navigate("productDetails/${product.productId}")
-            }
-        }
-    }
+fun HomeContent(navController: NavController, categoryState: CategoryState, loading: Boolean = false , productState: ProductState) {
+    val categories = categoryState.categories
+    val products = productState.products
 
-    SectionTitle(title = "Categories")
-    LazyRow(
-        modifier = Modifier.padding(bottom = 20.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(categoryColors.keys.toList()) { category ->
-            CategoryCard(
-                category = category,
-                color = categoryColors[category] ?: Color.Gray
+    // List of colors
+    val categoryColors = listOf(
+        Color(0xFFDDB892),
+        Color(0xFFDDBEA9),
+        Color(0xFFB7B7A4),
+        Color(0xFFA5A58D),
+        Color(0xFF6B705C)
+    )
+
+    if (loading) {
+        CircularIndicator()
+    } else {
+        Column {
+
+            SectionTitle(title = "Explore" , onClick = {})
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                navController.navigate("categoryScreen/${category.categoryId}")
+                items(products) { product ->
+                    ItemCard(product = product) {
+                        navController.navigate("productDetails/${product.productId}")
+                    }
+                }
+            }
+
+            // Section Title for Categories
+            SectionTitle(title = "Categories", onClick = {})
+
+            // LazyRow to Display Categories
+            LazyRow(
+                modifier = Modifier.padding(bottom = 20.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(categories) { index, category ->
+                    // Cycle colors using modulus operator
+                    val color = categoryColors[index % categoryColors.size]
+
+                    CategoryCard(
+                        category = category,
+                        color = color
+                    ) {
+                        navController.navigate("categoryScreen/${category.id}")
+                    }
+                }
+            }
+
+            // Display products under each category
+            categories.forEach { category ->
+                CategorySection(
+                    categoryName = category.name,
+                    products = category.products,
+                    navController = navController,
+                    onClick = { navController.navigate("categoryScreen/${category.id}") }
+                )
             }
         }
     }
+}
 
-    SectionTitle(title = "Home Appliances")
+@Composable
+fun CategorySection(
+    onClick: () -> Unit = {},
+    categoryName: String,
+    products: List<Product>,
+    navController: NavController
+) {
+    SectionTitle(title = categoryName, onClick = onClick)
+
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(sampleProducts.filter { it.category == livingRoomFurnitureCategory || it.category == diningFurnitureCategory }) { product ->
-            ItemCard(product = product) {
-                navController.navigate("productDetails/${product.productId}")
-            }
-        }
-    }
-
-    SectionTitle(title = "Office Furniture")
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(sampleProducts.filter { it.category == officeFurnitureCategory }) { product ->
-            ItemCard(product = product) {
-                navController.navigate("productDetails/${product.productId}")
-            }
-        }
-    }
-
-    SectionTitle(title = "Bedroom Furniture")
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(sampleProducts.filter { it.category == bedroomFurnitureCategory }) { product ->
-            ItemCard(product = product) {
-                navController.navigate("productDetails/${product.productId}")
-            }
-        }
-    }
-
-    SectionTitle(title = "Gaming Furniture")
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(sampleProducts.filter { it.category == gamingFurnitureCategory }) { product ->
+        items(products.filter { it.category == categoryName }) { product ->
             ItemCard(product = product) {
                 navController.navigate("productDetails/${product.productId}")
             }
         }
     }
 }
-
-
 
 @Composable
 fun CategoryCard(category: Category, color: Color, onClick: () -> Unit) {
@@ -297,7 +360,7 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
                 .background(Color.White)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background), // Placeholder image
+                painter = rememberAsyncImagePainter(product.imageUrls[0]),
                 contentDescription = product.name,
                 modifier = Modifier
                     .height(120.dp)
@@ -323,11 +386,11 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
 
 
 @Composable
-fun SectionTitle(title: String) {
+fun SectionTitle(title: String, onClick: () -> Unit) {
     Text(
         text = title,
         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-        modifier = Modifier.padding(start = 16.dp)
+        modifier = Modifier.padding(start = 16.dp).clickable(onClick = { onClick() })
     )
 }
 
@@ -336,6 +399,6 @@ fun SectionTitle(title: String) {
 @Composable
 fun HomeScreenPreview() {
     ShoppingAppTheme {
-        HomeScreen(navController = rememberNavController(), cartState = CartState(), orderState = OrderState())
+        HomeScreen(navController = rememberNavController(), cartState = CartState(), orderState = OrderState() , productState = ProductState() , categoryState = CategoryState())
     }
 }

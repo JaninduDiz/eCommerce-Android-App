@@ -2,29 +2,42 @@ package com.example.shoppingapp.views.tabViews
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.R
-import com.example.shoppingapp.viewmodels.CartState
+import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.views.components.CustomButton
 
 @Composable
 fun CartScreen(
@@ -67,9 +80,9 @@ fun CartScreen(
         // Display each item in the cart
         cartState.items.forEach { cartItem ->
             CartItemRow(
-                imageRes = R.drawable.ic_launcher_background,  // Replace with actual product image resource
+                imageUrl = cartItem.product.imageUrls.first(),
                 name = cartItem.product.name,
-                brand = cartItem.product.category.name,
+                brand = cartItem.product.category,
                 price = "$${cartItem.product.price}",
                 quantity = cartItem.quantity.value,
                 onIncreaseClick = { cartState.increaseQuantity(cartItem.product) },
@@ -81,45 +94,51 @@ fun CartScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         if (cartState.items.isNotEmpty()) {
-            // Total Price Calculation
-            val totalPrice = cartState.items.sumOf { it.product.price * it.quantity.value }
-            Text(
-                text = "Total: $$totalPrice",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            Button(
-                onClick = {
-                    navController.navigate("checkoutScreen/$totalPrice")
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C)),
+            Spacer(modifier = Modifier.height(400.dp))
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(8.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                Text(text = "Checkout", color = Color.White, fontSize = 18.sp)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    val totalPrice = cartState.getTotalAmount()
+
+                    Text(
+                        text = "Total: $$totalPrice",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp).align(Alignment.Start)
+                    )
+
+                    // Checkout button
+                    CustomButton(
+                        onClick = {
+                            navController.navigate("checkoutScreen/$totalPrice")
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C)),
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Checkout"
+                    )
+                }
             }
         } else {
-            Button(
-                onClick = { /* Handle empty cart action */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C6644)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(text = "Your cart is empty", color = Color.White, fontSize = 18.sp)
-            }
+            Text(
+                text = "Your cart is empty",
+                color = Color.Black,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(top = 16.dp)
+            )
         }
     }
 }
 
 @Composable
 fun CartItemRow(
-    imageRes: Int,
+    imageUrl: String,
     name: String,
     brand: String,
     price: String,
@@ -139,7 +158,7 @@ fun CartItemRow(
     ) {
         // Product Image
         Image(
-            painter = painterResource(id = imageRes),
+            painter = rememberAsyncImagePainter(imageUrl),
             contentDescription = name,
             modifier = Modifier
                 .size(64.dp)

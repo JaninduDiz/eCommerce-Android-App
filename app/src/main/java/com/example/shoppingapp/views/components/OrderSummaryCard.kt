@@ -1,6 +1,7 @@
 package com.example.shoppingapp.views.components
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,18 +13,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.Order
-import com.example.shoppingapp.models.sampleOrders
+import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.views.orderStatusText
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -32,17 +37,26 @@ fun OrderSummaryCard(
     order: Order,
     navController: NavController,
 ) {
-    val context = LocalContext.current
-
-    // Format the date in "YYYY, MMM-DD at HH:mm"
-    val formattedDate = order.createdAt.format(DateTimeFormatter.ofPattern("yyyy, MMM-dd 'at' HH:mm"))
-
-    // Calculate total price
-    val totalAmount = order.items.sumOf { it.product.price * it.quantity }
-
-    // Extract the first product name
-    val firstProductName = order.items.first().product.name
+    var loading by remember { mutableStateOf(false) }
+    val totalAmount = order.totalValue
+    var firstProductName by remember { mutableStateOf<String?>(null) }
     val otherProductsCount = order.items.size - 1
+
+    // Fetch the product name for the first product
+    LaunchedEffect(order.items.first().productId) {
+        try {
+            loading = true
+            val response = RetrofitInstance.api.getProductById(order.items.first().productId)
+            if (response.isSuccessful) {
+                val product = response.body()
+                firstProductName = product?.name
+                loading = false
+            }
+        } catch (e: Exception) {
+            Log.e("OrderSummaryCard", "Error fetching product: ${e.message}")
+            loading = false
+        }
+    }
 
     // Title showing first product + other product count
     val title = if (otherProductsCount > 0) {
@@ -66,14 +80,16 @@ fun OrderSummaryCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            if (title != null) {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
             Text(
-                text = title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = "Placed on $formattedDate",
+                text = "Placed on ${formatDateTime(order.createdAt)}",
                 fontSize = 14.sp,
                 color = Color.Gray,
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -88,7 +104,7 @@ fun OrderSummaryCard(
                 Text(text = statusText, fontWeight = FontWeight.Bold, color = statusColor)
             }
             Text(
-                text = "Total: $${"%.2f".format(totalAmount)}",
+                text = "Total: ${totalAmount + 2.0}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
@@ -97,14 +113,17 @@ fun OrderSummaryCard(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
 @Composable
-fun OrderSummaryCardPreview() {
-    val sampleOrder = sampleOrders.first()
-    val navController = rememberNavController()
+fun formatDateTime(dateTimeString: String): String {
+    // Define the input date-time format
+    val inputFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
 
-    OrderSummaryCard(
-        order = sampleOrder,
-        navController = navController,
-    )
+    // Parse the input string to ZonedDateTime
+    val zonedDateTime = ZonedDateTime.parse(dateTimeString, inputFormatter)
+
+    // Define the desired output format
+    val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd 'at' HH:mm")
+
+    // Format the ZonedDateTime to the desired output format
+    return zonedDateTime.format(outputFormatter)
 }
