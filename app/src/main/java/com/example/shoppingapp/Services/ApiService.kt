@@ -41,8 +41,6 @@ data class UpdateUserRequest(
     val lastName: String?,
     val address: String?,
     val phoneNumber: String?,
-    val gender: Int?,
-    val isActive: Boolean?
 )
 
 
