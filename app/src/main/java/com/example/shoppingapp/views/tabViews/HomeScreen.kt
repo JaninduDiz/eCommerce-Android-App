@@ -155,7 +155,7 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
                 productState.addProducts(products)
             }
         } catch (e: Exception) {
-            // Handle error (e.g., show a message)
+            Log.d(TAG, "HomeScreen: ${e.message}, error fetching products")
         }
     }
 
@@ -212,26 +212,18 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
             }
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            item {
-                when (selectedItemIndex) {
-                    0 -> HomeContent(navController = navController, categoryState, loading , productState)
-                    1 -> OrdersScreen(navController = navController, orderState)
-                    2 -> CartScreen(navController = navController, cartState)
-                    3 -> SearchScreen(navController = navController)
-                }
-            }
+        when (selectedItemIndex) {
+            0 -> HomeContent(navController = navController, categoryState = categoryState, loading = loading, productState = productState, paddingValues = paddingValues)
+            1 -> OrdersScreen(navController = navController, orderState = orderState, paddingValues = paddingValues)
+            2 -> CartScreen(navController = navController, cartState = cartState, paddingValues = paddingValues)
+            3 -> SearchScreen(navController = navController, productState = productState, paddingValues = paddingValues)
         }
     }
 }
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun HomeContent(navController: NavController, categoryState: CategoryState, loading: Boolean = false , productState: ProductState) {
+fun HomeContent(navController: NavController, categoryState: CategoryState, loading: Boolean = false , productState: ProductState, paddingValues: PaddingValues) {
     val categories = categoryState.categories
     val products = productState.products
 
@@ -247,44 +239,51 @@ fun HomeContent(navController: NavController, categoryState: CategoryState, load
     if (loading) {
         CircularIndicator()
     } else {
-        Column {
-
-            SectionTitle(title = "Explore" , onClick = {})
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(products) { product ->
-                    ItemCard(product = product) {
-                        navController.navigate("productDetails/${product.productId}")
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize().padding(bottom = 20.dp)
+                .padding(paddingValues),
+            contentPadding = PaddingValues(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                SectionTitle(title = "Explore", onClick = {})
+            }
+            item {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(products) { product ->
+                        ItemCard(product = product) {
+                            navController.navigate("productDetails/${product.productId}")
+                        }
                     }
                 }
             }
+            item {
+                SectionTitle(title = "Categories", onClick = {})
+            }
+            item {
+                LazyRow(
+                    modifier = Modifier.padding(bottom = 20.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    itemsIndexed(categories) { index, category ->
+                        // Cycle colors using modulus operator
+                        val color = categoryColors[index % categoryColors.size]
 
-            // Section Title for Categories
-            SectionTitle(title = "Categories", onClick = {})
-
-            // LazyRow to Display Categories
-            LazyRow(
-                modifier = Modifier.padding(bottom = 20.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                itemsIndexed(categories) { index, category ->
-                    // Cycle colors using modulus operator
-                    val color = categoryColors[index % categoryColors.size]
-
-                    CategoryCard(
-                        category = category,
-                        color = color
-                    ) {
-                        navController.navigate("categoryScreen/${category.id}")
+                        CategoryCard(
+                            category = category,
+                            color = color
+                        ) {
+                            navController.navigate("categoryScreen/${category.id}")
+                        }
                     }
                 }
             }
-
-            // Display products under each category
-            categories.forEach { category ->
+            items(categories) { category ->
                 CategorySection(
                     categoryName = category.name,
                     products = category.products,
@@ -306,6 +305,7 @@ fun CategorySection(
     SectionTitle(title = categoryName, onClick = onClick)
 
     LazyRow(
+        modifier = Modifier.padding(bottom = 20.dp),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -391,7 +391,9 @@ fun SectionTitle(title: String, onClick: () -> Unit) {
     Text(
         text = title,
         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-        modifier = Modifier.padding(start = 16.dp).clickable(onClick = { onClick() })
+        modifier = Modifier
+            .padding(start = 16.dp)
+            .clickable(onClick = { onClick() })
     )
 }
 

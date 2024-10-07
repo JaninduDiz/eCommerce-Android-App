@@ -32,6 +32,4 @@ class ProductState  {
     fun clearProducts() {
         products.clear()
     }
-
-
 }

@@ -28,7 +28,6 @@ import com.example.shoppingapp.views.ReviewScreen
 import com.example.shoppingapp.views.VendorScreen
 import com.example.shoppingapp.views.onBoardViews.LoginScreen
 import com.example.shoppingapp.views.onBoardViews.RegisterScreen
-import com.example.shoppingapp.views.tabViews.CartScreen
 import com.example.shoppingapp.views.tabViews.HomeScreen
 
 
@@ -76,7 +75,6 @@ class MainActivity : ComponentActivity() {
                             categoryState = categoryState
                         )
                     }
-                    composable("cart") { CartScreen(navController, cartState) }
                     composable("checkoutScreen/{totalPrice}") { backStackEntry ->
                         val totalPrice = backStackEntry.arguments?.getString("totalPrice")?.toDoubleOrNull() ?: 0.0
                         CheckoutScreen(navController = navController, cartState, totalPrice = totalPrice)

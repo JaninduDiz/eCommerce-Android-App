@@ -5,13 +5,14 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -45,7 +46,7 @@ import com.example.shoppingapp.views.components.ShimmerComponents.OrderShimmerin
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun OrdersScreen(navController: NavController, orderState: OrderState) {
+fun OrdersScreen(navController: NavController, orderState: OrderState, paddingValues: PaddingValues) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var loading by remember { mutableStateOf(false) }
     val userSessionManager = UserSessionManager(LocalContext.current)
@@ -72,30 +73,39 @@ fun OrdersScreen(navController: NavController, orderState: OrderState) {
         }
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
             .offset(y = (-16).dp)
+            .padding(paddingValues)
     ) {
-        Text(
-            text = "Orders",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        item {
+            Text(
+                text = "Orders",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
 
-        OrderSelector(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
+        item {
+            OrderSelector(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
+        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         if (!loading) {
-            when (selectedTab) {
-                0 -> OrderTrackingComponent(navController, orderState)
-                1 -> OrderHistoryComponent(navController, orderState)
+            item {
+                when (selectedTab) {
+                    0 -> OrderTrackingComponent(navController, orderState)
+                    1 -> OrderHistoryComponent(navController, orderState)
+                }
             }
         } else {
-            for (i in 0..4) {
+            items(5) {
                 OrderShimmeringPlaceholder()
             }
         }
@@ -105,10 +115,10 @@ fun OrdersScreen(navController: NavController, orderState: OrderState) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
-    val activeButtonColor = Color(0xFF669bbc)  // Active button background color
+    val activeButtonColor = Color(0xFF669bbc)
     val inactiveButtonColor = Color.White
     val activeTextColor = Color.White
-    val inactiveTextColor = Color(0xFF3F4238)  // Darker text color for inactive
+    val inactiveTextColor = Color(0xFF3F4238)
 
     val tabs = listOf("Order Tracking", "Order History") // List of tab names
 
@@ -160,6 +170,6 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
 @Composable
 fun OrdersScreenPreview() {
     ShoppingAppTheme {
-        OrdersScreen(navController = rememberNavController(), orderState = OrderState())
+        OrdersScreen(navController = rememberNavController(), orderState = OrderState(), paddingValues = PaddingValues(0.dp))
     }
 }

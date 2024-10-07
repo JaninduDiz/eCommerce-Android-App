@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -43,75 +46,107 @@ import com.example.shoppingapp.views.components.CustomButton
 fun CartScreen(
     navController: NavController,
     cartState: CartState,
+    paddingValues: PaddingValues
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(paddingValues)
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
         ) {
-            Text(
-                text = "Cart",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            // Top section: Cart Title and Clear Button (Fixed at the top)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp), // Padding to separate from the edges
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Cart",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                )
 
-            if (cartState.items.isNotEmpty()) {
-                IconButton(
-                    onClick = { cartState.clearCart() },
-                    modifier = Modifier.size(24.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Clear Cart",
-                        tint = Color.Red,
-                        modifier = Modifier.size(24.dp)
+                if (cartState.items.isNotEmpty()) {
+                    IconButton(
+                        onClick = { cartState.clearCart() },
+                        modifier = Modifier.size(24.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Clear Cart",
+                            tint = Color.Red,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+            }
+
+            // Scrollable content: Cart Items
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f) // This ensures the list takes up the remaining space and is scrollable
+            ) {
+                items(cartState.items) { cartItem ->
+                    CartItemRow(
+                        imageUrl = cartItem.product.imageUrls.first(),
+                        name = cartItem.product.name,
+                        brand = cartItem.product.category,
+                        price = "$${cartItem.product.price}",
+                        quantity = cartItem.quantity.value,
+                        onIncreaseClick = { cartState.increaseQuantity(cartItem.product) },
+                        onDecreaseClick = { cartState.decreaseQuantity(cartItem.product) },
+                        onRemoveClick = { cartState.removeFromCart(cartItem.product) }
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                if (cartState.items.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+
+                        ) {
+                            Text(
+                                text = "Your cart is empty",
+                                color = Color.Black,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
                 }
             }
         }
 
-        // Display each item in the cart
-        cartState.items.forEach { cartItem ->
-            CartItemRow(
-                imageUrl = cartItem.product.imageUrls.first(),
-                name = cartItem.product.name,
-                brand = cartItem.product.category,
-                price = "$${cartItem.product.price}",
-                quantity = cartItem.quantity.value,
-                onIncreaseClick = { cartState.increaseQuantity(cartItem.product) },
-                onDecreaseClick = { cartState.decreaseQuantity(cartItem.product) },
-                onRemoveClick = { cartState.removeFromCart(cartItem.product) }
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
+        // Bottom section: Checkout Button (Fixed at the bottom)
         if (cartState.items.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(400.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
             ) {
+                val totalPrice = cartState.getTotalAmount()
+
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    val totalPrice = cartState.getTotalAmount()
-
                     Text(
                         text = "Total: $$totalPrice",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .padding(bottom = 8.dp).align(Alignment.Start)
+                            .padding(bottom = 8.dp)
+                            .align(Alignment.Start)
                     )
 
                     // Checkout button
@@ -125,13 +160,6 @@ fun CartScreen(
                     )
                 }
             }
-        } else {
-            Text(
-                text = "Your cart is empty",
-                color = Color.Black,
-                fontSize = 16.sp,
-                modifier = Modifier.padding(top = 16.dp)
-            )
         }
     }
 }
@@ -197,6 +225,6 @@ fun CartItemRow(
 @Composable
 fun CartScreenPreview() {
     ShoppingAppTheme {
-        CartScreen(navController = rememberNavController(), cartState = CartState())
+        CartScreen(navController = rememberNavController(), cartState = CartState(), paddingValues = PaddingValues(0.dp))
     }
 }
