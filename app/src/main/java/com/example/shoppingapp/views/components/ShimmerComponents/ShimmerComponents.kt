@@ -154,3 +154,58 @@ fun ShimmerProductItem() {
         }
     }
 }
+
+@Composable
+fun OrderShimmeringPlaceholder() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .shimmer(),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(20.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(14.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
+                    .height(16.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.3f)
+                    .height(18.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
+            )
+        }
+    }
+}

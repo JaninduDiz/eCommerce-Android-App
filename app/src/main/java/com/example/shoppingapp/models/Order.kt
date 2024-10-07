@@ -20,10 +20,10 @@ data class OrderRequest(
 data class Order(
     val id: String,
     val customerId: String,
-    val items: List<OrderItem>,
-    val status: Int,
-    val cancellationReason: String?,
+    var items: List<OrderItem>,
+    var status: Int,
+    var cancellationReason: String?,
     var note: String?,
-    val createdAt: String,
-    val totalValue: Double
+    var totalValue: Double,
+    val createdAt: String
 )

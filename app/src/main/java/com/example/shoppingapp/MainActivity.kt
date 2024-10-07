@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
                         val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
                         val isBackHome = backStackEntry.arguments?.getString("isBackHome")?.toBoolean() ?: false
 
-                        OrderDetailsScreen(navController, orderId, orderState, isBackHome)
+                        OrderDetailsScreen(navController, orderId, orderState, productState, isBackHome)
                     }
                     composable("vendorDetails/{vendorId}") { backStackEntry ->
                         val vendorId = backStackEntry.arguments?.getString("vendorId")

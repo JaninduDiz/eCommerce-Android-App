@@ -3,6 +3,8 @@ package com.example.shoppingapp.views
 import CustomModalBottomSheet
 import android.content.ContentValues.TAG
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.Product
@@ -55,7 +59,7 @@ fun ReviewScreen(
     navController: NavHostController,
     productId: String?,
     vendorId: String?,
-    productState: ProductState
+    productState: ProductState,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -131,6 +135,7 @@ fun ReviewScreen(
                         .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 16.dp)
+                        .offset(y = (-24).dp)
                 ) {
                     ProductImageSection(product!!.imageUrls[0])
                     Spacer(modifier = Modifier.height(16.dp))
@@ -172,22 +177,29 @@ fun ReviewScreen(
                         },
                         buttonText = "Submit",
                         onButtonClick = {
-                            val reviewRequest = ReviewRequest(
-                                vendorId = vendorId!!,
-                                customerId = currentUser.id,
-                                stars = rating,
-                                comment = comment
-                            )
                             scope.launch {
-//                                submitReview(reviewRequest).let { status ->
-//                                    if (status == ApiResponseStatus.SUCCESS) {
-//                                        Toast.makeText(context, "Review submitted successfully", Toast.LENGTH_SHORT).show()
-//                                        Log.d("ReviewScreen", "Review submitted successfully")
-//                                    } else {
-//                                        showDialog = true
-//                                        Log.e("ReviewScreen", "Failed to submit review")
-//                                    }
-//                                }
+                                (context as ComponentActivity).lifecycleScope.launch {
+                                    try {
+                                        val reviewRequest = ReviewRequest(
+                                            vendorId = vendorId!!,
+                                            customerId = currentUser.id,
+                                            stars = rating,
+                                            comment = comment
+                                        )
+                                        val response = RetrofitInstance.api.addRating(reviewRequest)
+                                        Log.d(TAG, "ReviewScreen: response: ${response.body()}")
+                                        if (response.isSuccessful) {
+                                            Toast.makeText(context, "Order cancellation successful ", Toast.LENGTH_SHORT).show()
+                                            Log.d(TAG, "ReviewScreen: response: ${response.body()}")
+                                        } else {
+                                            Toast.makeText(context, "Review failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                                            Log.e("submitReview", "Failed to submit review: ${response.errorBody()?.string()}")
+                                        }
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                        Log.e("submitReview", "Error submitting review: ${e.message}")
+                                    }
+                                }
                                 showModal = false
                             }
                             showModal = false
@@ -208,27 +220,6 @@ fun ReviewScreen(
         )
     }
 }
-
-//TODO: Implement submitReview function
-//suspend fun submitReview(
-//    reviewRequest: ReviewRequest
-//): ApiResponseStatus {
-//    return try {
-//        val response = RetrofitInstance.api.addRating(reviewRequest)
-//        Log.d(TAG, "submitReview: Response: ${response.body()}") // Log the raw response string
-//
-//        if (response.isSuccessful) {
-//            ApiResponseStatus.SUCCESS
-//        } else {
-//            Log.e("submitReview", "Failed to submit review: ${response.errorBody()?.string()}")
-//            ApiResponseStatus.ERROR
-//        }
-//    } catch (e: Exception) {
-//        Log.e("submitReview", "Error submitting review: ${e.message}")
-//        ApiResponseStatus.ERROR
-//    }
-//}
-
 
 @Preview(showBackground = true)
 @Composable

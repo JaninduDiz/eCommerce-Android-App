@@ -61,4 +61,7 @@ interface ApiService {
 
     @POST("Rating")
     suspend fun addRating(@Body review: ReviewRequest): Response<String>
+
+    @PUT("Order/{id}")
+    suspend fun updateOrder(@Path("id") id: String, @Body order: Order): Response<Order>
 }

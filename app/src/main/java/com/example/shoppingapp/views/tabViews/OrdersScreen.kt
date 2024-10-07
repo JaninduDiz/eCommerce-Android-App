@@ -5,7 +5,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -43,7 +41,7 @@ import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.views.components.OrderHistoryComponent
 import com.example.shoppingapp.views.components.OrderTrackingComponent
-import com.valentinilk.shimmer.shimmer
+import com.example.shoppingapp.views.components.ShimmerComponents.OrderShimmeringPlaceholder
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -156,60 +154,6 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
     }
 }
 
-@Composable
-fun OrderShimmeringPlaceholder() {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .shimmer(),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(20.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .height(14.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.4f)
-                    .height(16.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.3f)
-                    .height(18.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
-            )
-        }
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
