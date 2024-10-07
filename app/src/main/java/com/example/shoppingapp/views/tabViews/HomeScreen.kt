@@ -1,6 +1,5 @@
 package com.example.shoppingapp.views.tabViews
 
-import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.os.Build
 import android.util.Log
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,6 +63,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.shoppingapp.R
 import com.example.shoppingapp.models.Category
 import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
@@ -121,12 +123,16 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
             hasNews = false,
         )
     )
+    Log.d(TAG, "HomeScreen: ${categoryState.categories.map { category -> category.name }}")
 
     var loading by remember { mutableStateOf(false) }
 
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
     var categories by remember { mutableStateOf<List<Category>>(emptyList()) }
+
+
+
 
     // Fetch categories
     LaunchedEffect(Unit) {
@@ -163,11 +169,19 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         topBar = {
             TopAppBar(
                 windowInsets = WindowInsets.Companion.statusBars,
-                title = { Text(text = "Furniture Store") },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(150.dp)
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = { navController.navigate("profile")},
                         modifier = Modifier
-                            .background(Color(0xFFffcb69), shape = CircleShape)
+                            .background(Color(0xFFfed0bb), shape = CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Person,
@@ -215,15 +229,20 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
         when (selectedItemIndex) {
             0 -> HomeContent(navController = navController, categoryState = categoryState, loading = loading, productState = productState, paddingValues = paddingValues)
             1 -> OrdersScreen(navController = navController, orderState = orderState, paddingValues = paddingValues)
-            2 -> CartScreen(navController = navController, cartState = cartState, paddingValues = paddingValues)
+            2 -> CartScreen(navController = navController, cartState = cartState, paddingValues = paddingValues, categoryState = categoryState)
             3 -> SearchScreen(navController = navController, productState = productState, paddingValues = paddingValues)
         }
     }
 }
 
-@SuppressLint("SuspiciousIndentation")
 @Composable
-fun HomeContent(navController: NavController, categoryState: CategoryState, loading: Boolean = false , productState: ProductState, paddingValues: PaddingValues) {
+fun HomeContent(
+    navController: NavController,
+    categoryState: CategoryState,
+    loading: Boolean = false,
+    productState: ProductState,
+    paddingValues: PaddingValues
+) {
     val categories = categoryState.categories
     val products = productState.products
 
@@ -241,7 +260,8 @@ fun HomeContent(navController: NavController, categoryState: CategoryState, load
     } else {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize().padding(bottom = 20.dp)
+                .fillMaxSize()
+                .padding(bottom = 20.dp)
                 .padding(paddingValues),
             contentPadding = PaddingValues(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -249,59 +269,93 @@ fun HomeContent(navController: NavController, categoryState: CategoryState, load
             item {
                 SectionTitle(title = "Explore", onClick = {})
             }
+
+            // Handle the products LazyRow safely
             item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(products) { product ->
-                        ItemCard(product = product) {
-                            navController.navigate("productDetails/${product.productId}")
+                if (products.isEmpty()) {
+                    // Show a message or placeholder if no products are available
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "No products available", color = Color.Gray)
+                    }
+                } else {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(products) { product ->
+                            ItemCard(product = product) {
+                                navController.navigate("productDetails/${product.productId}")
+                            }
                         }
                     }
                 }
             }
+
             item {
                 SectionTitle(title = "Categories", onClick = {})
             }
-            item {
-                LazyRow(
-                    modifier = Modifier.padding(bottom = 20.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    itemsIndexed(categories) { index, category ->
-                        // Cycle colors using modulus operator
-                        val color = categoryColors[index % categoryColors.size]
 
-                        CategoryCard(
-                            category = category,
-                            color = color
-                        ) {
-                            navController.navigate("categoryScreen/${category.id}")
+            // Handle the categories LazyRow safely
+            item {
+                if (categories.isEmpty()) {
+                    // Show a message or placeholder if no categories are available
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "No categories available", color = Color.Gray)
+                    }
+                } else {
+                    LazyRow(
+                        modifier = Modifier.padding(bottom = 20.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        itemsIndexed(categories) { index, category ->
+                            // Cycle colors using modulus operator
+                            val color = categoryColors[index % categoryColors.size]
+
+                            CategoryCard(
+                                category = category,
+                                color = color
+                            ) {
+                                navController.navigate("categoryScreen/${category.id}")
+                            }
                         }
                     }
                 }
             }
+
+            // Handle categories and products in CategorySection safely
             items(categories) { category ->
-                CategorySection(
-                    categoryName = category.name,
-                    products = category.products,
-                    navController = navController,
-                    onClick = { navController.navigate("categoryScreen/${category.id}") }
-                )
+                val categoryProducts = products.filter { it.category == category.id }
+                    CategorySection(
+                        categoryName = category.name,
+                        products = categoryProducts,
+                        navController = navController,
+                        onClick = { navController.navigate("categoryScreen/${category.id}") },
+                        productState = productState,
+                        categoryId = category.id
+                    )
+
             }
         }
     }
 }
-
 @Composable
 fun CategorySection(
     onClick: () -> Unit = {},
     categoryName: String,
     products: List<Product>,
-    navController: NavController
+    navController: NavController,
+    productState: ProductState,
+    categoryId: String
 ) {
+    val products2 = productState.products
+
     SectionTitle(title = categoryName, onClick = onClick)
 
     LazyRow(
@@ -309,7 +363,7 @@ fun CategorySection(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(products.filter { it.category == categoryName }) { product ->
+        items(products2.filter { it.category == categoryId }) { product ->
             ItemCard(product = product) {
                 navController.navigate("productDetails/${product.productId}")
             }

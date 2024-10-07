@@ -26,12 +26,15 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.viewmodels.CategoryState
+import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.components.CustomTopAppBar
 
 @Composable
-fun CategoryScreen(navController: NavHostController, categoryId: String?, categoryState: CategoryState) {
+fun CategoryScreen(navController: NavHostController, categoryId: String?, categoryState: CategoryState, productState: ProductState) {
     val category = categoryState.categories.find { it.id == categoryId }
     val products = category?.products ?: emptyList()
+    val allProducts = productState.products
+    val filteredProducts = allProducts.filter { it.category == category?.id }
 
     CustomTopAppBar(
         title = category?.name ?: "Products",
@@ -41,7 +44,7 @@ fun CategoryScreen(navController: NavHostController, categoryId: String?, catego
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.padding(paddingValues)
         ) {
-            items(products) { product ->
+            items(filteredProducts) { product ->
                 ProductCard(product = product) {
                     navController.navigate("productDetails/${product.productId}")
                 }
@@ -89,5 +92,5 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun CategoryScreenPreview() {
-    CategoryScreen(navController = rememberNavController(), categoryId = "ae4b9c08-775f-4249-a7f9-47f2af16c2f4", CategoryState())
+    CategoryScreen(navController = rememberNavController(), categoryId = "ae4b9c08-775f-4249-a7f9-47f2af16c2f4", CategoryState(), ProductState())
 }

@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
                         if (productId != null) {
-                            ProductDetailsScreen(navController, productId, cartState, vendorState)
+                            ProductDetailsScreen(navController, productId, cartState, vendorState, categoryState)
                         }
                     }
                     composable("reviewScreen/{productId}/{vendorId}") { backStackEntry ->
@@ -72,7 +72,8 @@ class MainActivity : ComponentActivity() {
                         CategoryScreen(
                             navController = navController,
                             categoryId = categoryId,
-                            categoryState = categoryState
+                            categoryState = categoryState,
+                            productState = productState
                         )
                     }
                     composable("checkoutScreen/{totalPrice}") { backStackEntry ->

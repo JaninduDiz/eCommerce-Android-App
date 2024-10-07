@@ -40,13 +40,15 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.views.components.CustomButton
 
 @Composable
 fun CartScreen(
     navController: NavController,
     cartState: CartState,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    categoryState: CategoryState
 ) {
     Box(
         modifier = Modifier
@@ -97,7 +99,7 @@ fun CartScreen(
                     CartItemRow(
                         imageUrl = cartItem.product.imageUrls.first(),
                         name = cartItem.product.name,
-                        brand = cartItem.product.category,
+                        brand = categoryState.getCategoryNameById(cartItem.product.category),
                         price = "$${cartItem.product.price}",
                         quantity = cartItem.quantity.value,
                         onIncreaseClick = { cartState.increaseQuantity(cartItem.product) },
@@ -143,7 +145,7 @@ fun CartScreen(
                     Text(
                         text = "Total: $$totalPrice",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         modifier = Modifier
                             .padding(bottom = 8.dp)
                             .align(Alignment.Start)
@@ -154,7 +156,7 @@ fun CartScreen(
                         onClick = {
                             navController.navigate("checkoutScreen/$totalPrice")
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF52b788)),
                         modifier = Modifier.fillMaxWidth(),
                         text = "Checkout"
                     )
@@ -225,6 +227,6 @@ fun CartItemRow(
 @Composable
 fun CartScreenPreview() {
     ShoppingAppTheme {
-        CartScreen(navController = rememberNavController(), cartState = CartState(), paddingValues = PaddingValues(0.dp))
+        CartScreen(navController = rememberNavController(), cartState = CartState(), paddingValues = PaddingValues(0.dp), categoryState = CategoryState())
     }
 }
