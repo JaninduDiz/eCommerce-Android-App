@@ -5,5 +5,5 @@ data class Category(
     val id: String,
     val name: String,
     val isActive: Boolean,
-    val products: List<Product>
+    var products: List<Product>
 )

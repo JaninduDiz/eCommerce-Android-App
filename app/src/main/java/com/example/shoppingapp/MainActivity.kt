@@ -12,8 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.viewmodels.CartState
 import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.OrderState
@@ -28,7 +28,6 @@ import com.example.shoppingapp.views.ReviewScreen
 import com.example.shoppingapp.views.VendorScreen
 import com.example.shoppingapp.views.onBoardViews.LoginScreen
 import com.example.shoppingapp.views.onBoardViews.RegisterScreen
-import com.example.shoppingapp.views.tabViews.CartScreen
 import com.example.shoppingapp.views.tabViews.HomeScreen
 
 
@@ -60,37 +59,33 @@ class MainActivity : ComponentActivity() {
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
                         if (productId != null) {
-                            ProductDetailsScreen(navController, productId, cartState, vendorState)
+                            ProductDetailsScreen(navController, productId, cartState, vendorState, categoryState)
                         }
                     }
-                    composable("reviewScreen/{productId}") { backStackEntry ->
+                    composable("reviewScreen/{productId}/{vendorId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
-                        ReviewScreen(navController, productId)
+                        val vendorId = backStackEntry.arguments?.getString("vendorId")
+                        ReviewScreen(navController, productId, vendorId, productState)
                     }
                     composable("categoryScreen/{categoryId}") { backStackEntry ->
                         val categoryId = backStackEntry.arguments?.getString("categoryId")
                         CategoryScreen(
                             navController = navController,
                             categoryId = categoryId,
-                            categoryState = categoryState
+                            categoryState = categoryState,
+                            productState = productState
                         )
                     }
-                    composable("cart") { CartScreen(navController, cartState) }
                     composable("checkoutScreen/{totalPrice}") { backStackEntry ->
                         val totalPrice = backStackEntry.arguments?.getString("totalPrice")?.toDoubleOrNull() ?: 0.0
                         CheckoutScreen(navController = navController, cartState, totalPrice = totalPrice)
-
                     }
                     composable("profile") { ProfileScreen(navController , userSessionManager) }
                     composable("orderDetails/{orderId}/{isBackHome}") { backStackEntry ->
                         val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
                         val isBackHome = backStackEntry.arguments?.getString("isBackHome")?.toBoolean() ?: false
 
-                        OrderDetailsScreen(navController, orderId, orderState, isBackHome)
-                    }
-                    composable("reviewScreen/{productId}") { backStackEntry ->
-                        val productId = backStackEntry.arguments?.getString("productId")
-                        ReviewScreen(navController, productId)
+                        OrderDetailsScreen(navController, orderId, orderState, productState, isBackHome)
                     }
                     composable("vendorDetails/{vendorId}") { backStackEntry ->
                         val vendorId = backStackEntry.arguments?.getString("vendorId")

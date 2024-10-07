@@ -29,6 +29,11 @@ class CategoryState {
         return categories.find { it.id == id }
     }
 
+    // Function to get a category by id
+    fun getCategoryNameById(id: String): String {
+        return categories.find { it.id == id }?.name ?: ""
+    }
+
     // Function to clear all categories
     fun clear() {
         categories.clear()

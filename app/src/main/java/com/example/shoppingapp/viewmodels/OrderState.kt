@@ -51,10 +51,9 @@ class OrderState {
     }
 
     // Fetch an order by its ID from the orders list
-    fun getOrderById(orderId: String): Order? {
+    private fun getOrderById(orderId: String): Order? {
         return orders.find { it.id == orderId }
     }
-
 
     //calculate orderTotal
     private fun calculateOrderTotal(currentTotal: Double, deliveryCharge: Double): Double {
@@ -63,6 +62,21 @@ class OrderState {
 
         return total
     }
+
+    //cancel order
+    fun cancelOrder(orderId: String, updatedItems: List<OrderItem>, cancellationReason: String, totalAmount: Double): Order? {
+        val order = getOrderById(orderId)
+        order?.let {
+            it.totalValue = calculateOrderTotal(totalAmount, 2.0)
+            it.items = updatedItems
+            it.status = 4
+            it.cancellationReason = cancellationReason
+            orders.remove(it)
+            orders.add(it)
+        }
+        return order
+    }
+
 
     // Clear the current order
     fun clearOrder() {

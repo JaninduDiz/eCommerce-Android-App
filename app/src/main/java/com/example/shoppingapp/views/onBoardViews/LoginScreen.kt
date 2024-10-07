@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.shoppingapp.models.LoginRequest
 import com.example.shoppingapp.models.User
-import com.example.shoppingapp.services.LoginRequest
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.utils.UserSessionManager
@@ -139,7 +139,7 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
                                         // Create the User object with username and null for other fields
                                         val loggedInUser = User(
                                             id = userId,
-                                            userName = username,
+                                            username = username,
                                             email = emailAddress,
                                             address = null,
                                             phoneNumber = null,

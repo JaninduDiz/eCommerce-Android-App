@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.models.Product
-import com.example.shoppingapp.models.Rating
+import com.example.shoppingapp.models.Review
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.viewmodels.VendorState
@@ -63,13 +63,13 @@ fun VendorScreen(
     val scope = rememberCoroutineScope()
     var vendor by remember { mutableStateOf(vendorState.vendorDetails[vendorId]) } // Cached vendor details
     var vendorProducts by remember { mutableStateOf(vendorState.products[vendorId] ?: emptyList()) } // Cached products
-    var vendorRatings by remember { mutableStateOf(vendorState.ratings[vendorId] ?: emptyList()) } // Cached ratings
-    var loading by remember { mutableStateOf(vendor == null || vendorProducts.isEmpty() || vendorRatings.isEmpty()) }
+    var vendorReviews by remember { mutableStateOf(vendorState.ratings[vendorId] ?: emptyList()) } // Cached ratings
+    var loading by remember { mutableStateOf(vendor == null || vendorProducts.isEmpty() || vendorReviews.isEmpty()) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     // Fetch vendor details, products, and ratings only if not cached
     LaunchedEffect(vendorId) {
-        if (vendor == null || vendorProducts.isEmpty() || vendorRatings.isEmpty()) {
+        if (vendor == null || vendorProducts.isEmpty() || vendorReviews.isEmpty()) {
             scope.launch {
                 try {
                     // Fetch vendor details (as a User)
@@ -91,11 +91,11 @@ fun VendorScreen(
                     }
 
                     // Fetch vendor ratings
-                    if (vendorRatings.isEmpty()) {
+                    if (vendorReviews.isEmpty()) {
                         val ratingsResponse = RetrofitInstance.api.getRatingsByVendorId(vendorId)
                         if (ratingsResponse.isSuccessful) {
-                            vendorRatings = ratingsResponse.body() ?: emptyList()
-                            vendorState.ratings[vendorId] = vendorRatings // Cache ratings
+                            vendorReviews = ratingsResponse.body() ?: emptyList()
+                            vendorState.ratings[vendorId] = vendorReviews // Cache ratings
                         }
                     }
 
@@ -168,8 +168,8 @@ fun VendorScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                             ) {
-                                items(vendorRatings) { rating ->
-                                    RatingItem(rating = rating, vendorState = vendorState)
+                                items(vendorReviews) { review ->
+                                    ReviewItem(review = review, vendorState = vendorState)
                                 }
                             }
                         }
@@ -259,15 +259,15 @@ fun ProductList(
 }
 
 @Composable
-fun RatingItem(rating: Rating, vendorState: VendorState) {
-    var customerName by remember { mutableStateOf(vendorState.customerNames[rating.customerId]) }
+fun ReviewItem(review: Review, vendorState: VendorState) {
+    var customerName by remember { mutableStateOf(vendorState.customerNames[review.customerId]) }
     var isLoading by remember { mutableStateOf(customerName == null) }
 
-    LaunchedEffect(rating.customerId) {
+    LaunchedEffect(review.customerId) {
         if (customerName == null) {
-            val name = getCustomerName(rating.customerId)
+            val name = getCustomerName(review.customerId)
             customerName = name
-            vendorState.customerNames[rating.customerId] = name // Cache customer name
+            vendorState.customerNames[review.customerId] = name // Cache customer name
             isLoading = false
         } else {
             isLoading = false
@@ -282,7 +282,7 @@ fun RatingItem(rating: Rating, vendorState: VendorState) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                StarRate(rating = rating.stars)
+                StarRate(rating = review.stars)
                 Text(
                     text = "by $customerName",
                     style = MaterialTheme.typography.bodySmall,
@@ -290,7 +290,7 @@ fun RatingItem(rating: Rating, vendorState: VendorState) {
                 )
             }
             Text(
-                text = rating.comment,
+                text = review.comment,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(top = 4.dp)

@@ -96,8 +96,8 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (currentUser.address != null) {
-                AddressSection(user = currentUser)
+            if (!currentUser.address.isNullOrEmpty()) {
+                AddressSection(user = currentUser, navController = navController)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -136,7 +136,6 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
                             try {
                               order = orderState.generateOrder(cartState, currentUser.id, note, totalPrice, deliveryCharge)
                                 val response = RetrofitInstance.api.createOrder(order)
-                                Log.d(TAG, "CheckoutScreen: order: ${order.items}")
                                 if (response.isSuccessful && response.body() != null) {
                                     Log.d(TAG, "CheckoutScreen: Order placed successfully: ${response.body()}")
                                     responseId = response.body()!!.id
@@ -156,7 +155,7 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB98B73))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3d5a80))
             )
         }
 
@@ -165,12 +164,12 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
             CustomModal(
                 type = if (apiResponseStatus == ApiResponseStatus.SUCCESS) ModalType.SUCCESS else ModalType.ERROR,
                 title = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Order placed successfully!" else "Order placement failed!",
-                text = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Thank you for your order. You will receive a confirmation shortly." else "There was an issue placing your order. Please try again.",
+                text = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Thanks for shopping with us! You'll receive the order soon." else "There was an issue placing your order. Please try again.",
                 primaryButtonText = "OK",
                 onPrimaryButtonClick = {
                     showModal = false
                     if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
-                        //navController.navigate("orderDetails/${responseId}/true")
+                        //navController.navigate("orderDetails/${responseId}/false")
                         cartState.clearCart()
                     }
                 },
@@ -201,11 +200,15 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
 
 
 @Composable
-fun AddressSection(user: User) {
-    Column {
+fun AddressSection(user: User, navController: NavController) {
+    Column (
+        modifier = Modifier.clickable {
+            navController.navigate("profile")
+        }
+    ) {
         Text(
             text = "Delivery Address",
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Medium,
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -223,16 +226,16 @@ fun AddressSection(user: User) {
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFa57f60))
+                        .background(Color(0xFFc0d6df))
                         .padding(12.dp),
-                    tint = Color.White
+                    tint = Color(0xFFbc4749)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     user.address?.let {
                         Text(
                             text = it,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp
                         )
                     }
@@ -254,7 +257,7 @@ fun OrderSummary(totalItems: Int, totalPrice: Double, deliveryCharge: Double?) {
 
     Text(
         text = "Order Summary",
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         modifier = Modifier.padding(bottom = 16.dp)
     )
@@ -263,7 +266,7 @@ fun OrderSummary(totalItems: Int, totalPrice: Double, deliveryCharge: Double?) {
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -296,7 +299,7 @@ fun PaymentMethodSection() {
 
     Text(
         text = "Choose payment method",
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         modifier = Modifier.padding(bottom = 16.dp)
     )
@@ -314,12 +317,12 @@ fun PaymentMethodSection() {
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFc4a381))
+                .background(Color(0xFFc0d6df))
                 .padding(12.dp),
-            tint = Color.White
+            tint = Color.Blue
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = "Cash", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(text = "Cash", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
         Spacer(modifier = Modifier.weight(1f))
 
         if (selectedPaymentMethod == "Cash") {
@@ -344,12 +347,12 @@ fun PaymentMethodSection() {
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFc4a381))
+                .background(Color(0xFFc0d6df))
                 .padding(12.dp),
-            tint = Color.White
+            tint = Color.Blue
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = "Add new payment method", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(text = "Add new payment method", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
         Spacer(modifier = Modifier.weight(1f))
 
         if (selectedPaymentMethod == "Add New") {

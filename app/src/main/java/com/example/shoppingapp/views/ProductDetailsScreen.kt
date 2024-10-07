@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -51,6 +50,7 @@ import com.example.shoppingapp.models.Product
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.viewmodels.CartState
+import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.VendorState
 import com.example.shoppingapp.views.components.CircularIndicator
 import com.example.shoppingapp.views.components.CustomTopAppBar
@@ -60,11 +60,15 @@ fun ProductDetailsScreen(
     navController: NavHostController,
     productId: String,
     cartState: CartState,
-    vendorState: VendorState
+    vendorState: VendorState,
+    categoryState: CategoryState
 ) {
     val context = LocalContext.current  // Get the current context
     var product by remember { mutableStateOf<Product?>(null) }
     var loading by remember { mutableStateOf(false) }
+
+    val category = categoryState.categories.find { it.id == product?.category }
+    var categoryName = category?.name ?: ""
 
     // Fetch product data using LaunchedEffect
     LaunchedEffect(productId) {
@@ -105,11 +109,16 @@ fun ProductDetailsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Button(
-                            onClick = { /* Handle Buy Now */ },
+                            onClick = {
+                                cartState.addToCart(product!!)
+                                Toast.makeText(context, "${product!!.name} added to cart", Toast.LENGTH_SHORT).show()
+                                val totPrice = cartState.getTotalAmount()
+                                navController.navigate("checkoutScreen/${totPrice}")
+                            },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFCB997E))
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFffbf69))
                         ) {
-                            Text(text = "Buy Now")
+                            Text(text = "Buy Now", color = Color.Black)
                         }
                         IconButton(
                             onClick = {
@@ -134,7 +143,6 @@ fun ProductDetailsScreen(
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
-                    .offset(y = (-36).dp)
             ) {
                 // Loading state
                 if (loading) {
@@ -144,7 +152,7 @@ fun ProductDetailsScreen(
                     if (product != null) {
                         ProductImageSection(product!!.imageUrls[0])
                         Spacer(modifier = Modifier.height(16.dp))
-                        ProductInfoSection(product!!)
+                        ProductInfoSection(product!!, categoryName)
                         Spacer(modifier = Modifier.height(16.dp))
                         product?.vendorId?.let { vendorId ->
                             SeeVendorDetails(vendorId, navController)
@@ -205,7 +213,7 @@ fun ProductImageSection(imageURL: String) {
 }
 
 @Composable
-fun ProductInfoSection(product: Product) {
+fun ProductInfoSection(product: Product, categoryName: String = "") {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row (modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -227,7 +235,7 @@ fun ProductInfoSection(product: Product) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Category: ${product.category}",
+            text = "Category: $categoryName",
             style = MaterialTheme.typography.titleMedium,
             color = Color.Gray
         )
@@ -256,6 +264,6 @@ fun ProductDescriptionSection(description: String) {
 @Composable
 fun ProductScreenPreview() {
     ShoppingAppTheme {
-        ProductDetailsScreen(navController = rememberNavController(), productId = "1", cartState = CartState(), vendorState = VendorState())
+        ProductDetailsScreen(navController = rememberNavController(), productId = "1", cartState = CartState(), vendorState = VendorState(), categoryState = CategoryState())
     }
 }

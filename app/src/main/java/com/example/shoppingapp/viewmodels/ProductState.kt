@@ -15,6 +15,7 @@ class ProductState  {
 
     // Function to add a list of products at once
     fun addProducts(productList: List<Product>) {
+        clearProducts()
         products.addAll(productList)
     }
 
@@ -29,9 +30,7 @@ class ProductState  {
     }
 
     // Function to clear all products
-    fun clearProducts() {
+    private fun clearProducts() {
         products.clear()
     }
-
-
 }
