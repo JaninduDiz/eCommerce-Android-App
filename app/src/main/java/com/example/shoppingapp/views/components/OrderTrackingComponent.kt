@@ -8,14 +8,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.viewmodels.OrderState
+import com.example.shoppingapp.viewmodels.ProductState
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun OrderTrackingComponent(navController: NavController, orderState: OrderState) {
+fun OrderTrackingComponent(navController: NavController, orderState: OrderState, productState: ProductState) {
     val orders = orderState.orders.filter { it.status == 0 || it.status == 1 || it.status == 2 }
 
     for (order in orders) {
-        OrderSummaryCard(order = order, navController = navController)
+        OrderSummaryCard(order = order, navController = navController, productState = productState)
     }
 }
 
@@ -25,7 +26,7 @@ fun OrderTrackingComponent(navController: NavController, orderState: OrderState)
 fun OrderTrackingComponentPreview() {
     ShoppingAppTheme {
         OrderTrackingComponent(
-            navController = rememberNavController(), orderState = OrderState()
+            navController = rememberNavController(), orderState = OrderState(), productState = ProductState()
         )
     }
 }

@@ -1,7 +1,6 @@
 package com.example.shoppingapp.views.components
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.shoppingapp.models.Order
-import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.orderStatusText
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -36,27 +34,30 @@ import java.time.format.DateTimeFormatter
 fun OrderSummaryCard(
     order: Order,
     navController: NavController,
+    productState: ProductState
 ) {
     var loading by remember { mutableStateOf(false) }
     val totalAmount = order.totalValue
     var firstProductName by remember { mutableStateOf<String?>(null) }
     val otherProductsCount = order.items.size - 1
 
+    firstProductName = productState.products.find { it.productId == order.items.first().productId }?.name
+
     // Fetch the product name for the first product
-    LaunchedEffect(order.items.first().productId) {
-        try {
-            loading = true
-            val response = RetrofitInstance.api.getProductById(order.items.first().productId)
-            if (response.isSuccessful) {
-                val product = response.body()
-                firstProductName = product?.name
-                loading = false
-            }
-        } catch (e: Exception) {
-            Log.e("OrderSummaryCard", "Error fetching product: ${e.message}")
-            loading = false
-        }
-    }
+//    LaunchedEffect(order.items.first().productId) {
+//        try {
+//            loading = true
+//            val response = RetrofitInstance.api.getProductById(order.items.first().productId)
+//            if (response.isSuccessful) {
+//                val product = response.body()
+//                firstProductName = product?.name
+//                loading = false
+//            }
+//        } catch (e: Exception) {
+//            Log.e("OrderSummaryCard", "Error fetching product: ${e.message}")
+//            loading = false
+//        }
+//    }
 
     // Title showing first product + other product count
     val title = if (otherProductsCount > 0) {

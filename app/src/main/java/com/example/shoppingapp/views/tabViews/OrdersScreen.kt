@@ -40,13 +40,14 @@ import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.utils.UserSessionManager
 import com.example.shoppingapp.viewmodels.OrderState
+import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.components.OrderHistoryComponent
 import com.example.shoppingapp.views.components.OrderTrackingComponent
 import com.example.shoppingapp.views.components.ShimmerComponents.OrderShimmeringPlaceholder
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun OrdersScreen(navController: NavController, orderState: OrderState, paddingValues: PaddingValues) {
+fun OrdersScreen(navController: NavController, orderState: OrderState, paddingValues: PaddingValues, productState: ProductState) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var loading by remember { mutableStateOf(false) }
     val userSessionManager = UserSessionManager(LocalContext.current)
@@ -100,8 +101,8 @@ fun OrdersScreen(navController: NavController, orderState: OrderState, paddingVa
         if (!loading) {
             item {
                 when (selectedTab) {
-                    0 -> OrderTrackingComponent(navController, orderState)
-                    1 -> OrderHistoryComponent(navController, orderState)
+                    0 -> OrderTrackingComponent(navController, orderState, productState)
+                    1 -> OrderHistoryComponent(navController, orderState, productState)
                 }
             }
         } else {
@@ -172,6 +173,6 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
 @Composable
 fun OrdersScreenPreview() {
     ShoppingAppTheme {
-        OrdersScreen(navController = rememberNavController(), orderState = OrderState(), paddingValues = PaddingValues(0.dp))
+        OrdersScreen(navController = rememberNavController(), orderState = OrderState(), paddingValues = PaddingValues(0.dp), productState = ProductState())
     }
 }

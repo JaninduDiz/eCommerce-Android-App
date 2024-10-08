@@ -44,6 +44,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -151,6 +152,29 @@ fun OrderDetailsScreen(
 
                 items(order.items) { orderItem ->
                     OrderItemCard(orderItem, navController, getProductDetails, order.status)
+                }
+
+                if (order.note.isNullOrEmpty()) {
+                    item {
+                        order.note?.let {
+                            OutlinedTextField(
+                                value = it,
+                                onValueChange = { },
+                                label = { Text("Your note") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedContainerColor = Color(0xFFf8f7ff),
+                                    unfocusedContainerColor = Color(0xFFf8f7ff),
+                                    focusedBorderColor = Color(0xFF9381ff),
+                                    unfocusedBorderColor = Color(0xFFf8f7ff),
+                                    cursorColor = Color(0xFF9381ff),
+                                ),
+                                enabled = false
+                            )
+                        }
+                    }
                 }
 
                 item {
@@ -309,7 +333,7 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController, getProduct
             Spacer(modifier = Modifier.width(16.dp))
 
             Column {
-               Text(text = product.name, fontWeight = FontWeight.Bold)
+               Text(text = product.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(text = "Quantity: ${orderItem.quantity}")
                 Text(text = "Price: $${product.price}")
             }

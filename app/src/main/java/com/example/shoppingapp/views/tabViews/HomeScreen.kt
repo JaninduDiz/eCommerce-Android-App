@@ -67,6 +67,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -181,7 +182,7 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
                 actions = {
                     IconButton(onClick = { navController.navigate("profile")},
                         modifier = Modifier
-                            .background(Color(0xFFfed0bb), shape = CircleShape)
+                            .background(Color(0xFFfcbf49), shape = CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Person,
@@ -228,7 +229,7 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
     ) { paddingValues ->
         when (selectedItemIndex) {
             0 -> HomeContent(navController = navController, categoryState = categoryState, loading = loading, productState = productState, paddingValues = paddingValues)
-            1 -> OrdersScreen(navController = navController, orderState = orderState, paddingValues = paddingValues)
+            1 -> OrdersScreen(navController = navController, orderState = orderState, paddingValues = paddingValues, productState = productState)
             2 -> CartScreen(navController = navController, cartState = cartState, paddingValues = paddingValues, categoryState = categoryState)
             3 -> SearchScreen(navController = navController, productState = productState, paddingValues = paddingValues)
         }
@@ -332,6 +333,7 @@ fun HomeContent(
             // Handle categories and products in CategorySection safely
             items(categories) { category ->
                 val categoryProducts = products.filter { it.category == category.id }
+                if (categoryProducts.isNotEmpty()) {
                     CategorySection(
                         categoryName = category.name,
                         products = categoryProducts,
@@ -340,7 +342,7 @@ fun HomeContent(
                         productState = productState,
                         categoryId = category.id
                     )
-
+                }
             }
         }
     }
@@ -426,7 +428,8 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
             Text(
                 text = product.name,
                 style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
+                maxLines = 2, overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
