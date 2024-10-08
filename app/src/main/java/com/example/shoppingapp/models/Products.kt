@@ -1,5 +1,6 @@
 package com.example.shoppingapp.models
 
+// Product Model
 data class Product(
     val productId: String,
     val name: String,

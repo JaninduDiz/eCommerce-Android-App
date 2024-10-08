@@ -64,6 +64,8 @@ import com.example.shoppingapp.views.components.ShimmerComponents.ShimmerBuyNowS
 import com.example.shoppingapp.views.components.ShimmerComponents.ShimmerProductImageCarousel
 import com.example.shoppingapp.views.components.ShimmerComponents.ShimmerProductInfoSection
 
+
+// Product Details Screen
 @Composable
 fun ProductDetailsScreen(
     navController: NavHostController,
@@ -209,6 +211,8 @@ fun ProductDetailsScreen(
     }
 }
 
+// Composable functions for Product Details Screen
+// Product Image Carousel
 @Composable
 fun ProductImageCarousel(images: List<String>) {
     var currentIndex by remember { mutableIntStateOf(0) } // To track the current image index
@@ -285,6 +289,8 @@ fun ProductImageCarousel(images: List<String>) {
     }
 }
 
+
+// Product Info Section
 @Composable
 fun ProductInfoSection(product: Product, categoryName: String = "") {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -338,6 +344,7 @@ fun ProductInfoSection(product: Product, categoryName: String = "") {
     }
 }
 
+// Product Description Section
 @Composable
 fun ProductDescriptionSection(description: String) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -357,6 +364,7 @@ fun ProductDescriptionSection(description: String) {
     }
 }
 
+// See Vendor Details
 @Composable
 fun SeeVendorDetails(vendorId: String, navController: NavHostController) {
     Column {

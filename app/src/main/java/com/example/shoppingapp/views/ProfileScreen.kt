@@ -91,6 +91,7 @@ fun ProfileContent(
     var firstName by remember { mutableStateOf(currentUser?.firstName ?: "") }
     var lastName by remember { mutableStateOf(currentUser?.lastName ?: "") }
 
+    // Fetch user data from the API
     LaunchedEffect(Unit) {
         try {
             loading = true
