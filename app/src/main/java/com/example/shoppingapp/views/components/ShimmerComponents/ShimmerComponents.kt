@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -18,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -207,5 +210,108 @@ fun OrderShimmeringPlaceholder() {
                     .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
             )
         }
+    }
+}
+
+@Composable
+fun ShimmerProductImageCarousel() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp)
+            .shimmer(),  // Applying the shimmer effect
+        contentAlignment = Alignment.Center
+    ) {
+        // Card to mimic the image placeholder
+        Card(
+            modifier = Modifier
+                .fillMaxSize(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.LightGray) // Placeholder color for the shimmer effect
+            )
+        }
+    }
+}
+
+@Composable
+fun ShimmerProductInfoSection() {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // Placeholder for product name
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .height(30.dp)
+                .background(Color.LightGray.copy(alpha = 0.5f))
+                .shimmer()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Placeholder for product price
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.3f)
+                .height(20.dp)
+                .background(Color.LightGray.copy(alpha = 0.5f))
+                .shimmer()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Placeholder for category name
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .height(20.dp)
+                .background(Color.LightGray.copy(alpha = 0.5f))
+                .shimmer()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Placeholder for category name
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .height(20.dp)
+                .background(Color.LightGray.copy(alpha = 0.5f))
+                .shimmer()
+        )
+    }
+}
+
+@Composable
+fun ShimmerBuyNowSection() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Placeholder for the "Buy Now" button
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp)
+                .background(Color.LightGray.copy(alpha = 0.5f), shape = RoundedCornerShape(18.dp))
+                .shimmer()
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Placeholder for the "Add to Cart" icon button
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(Color.LightGray.copy(alpha = 0.5f), shape = CircleShape)
+                .shimmer()
+        )
     }
 }

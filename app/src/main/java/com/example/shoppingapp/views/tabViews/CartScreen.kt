@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -200,8 +201,8 @@ fun CartItemRow(
 
         // Product Name and Brand
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(text = brand, fontSize = 14.sp, color = Color.Gray)
+            Text(text = name, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = brand, fontSize = 14.sp, color = Color.Gray, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(text = price, fontSize = 16.sp, color = Color(0xFF6B705C))
         }
 

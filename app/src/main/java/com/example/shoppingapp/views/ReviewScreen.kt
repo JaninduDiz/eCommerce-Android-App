@@ -105,6 +105,7 @@ fun ReviewScreen(
             centeredHeader = true,
             showActionIcon = true,
             isHeaderPinned = true,
+
         ) { paddingValues ->
             Scaffold(
                 bottomBar = {
@@ -137,7 +138,7 @@ fun ReviewScreen(
                         .padding(horizontal = 16.dp)
                         .offset(y = (-24).dp)
                 ) {
-                    ProductImageSection(product!!.imageUrls[0])
+                    ProductImageCarousel(product!!.imageUrls)
                     Spacer(modifier = Modifier.height(16.dp))
                     ProductInfoSection(product!!)
                     Spacer(modifier = Modifier.height(16.dp))

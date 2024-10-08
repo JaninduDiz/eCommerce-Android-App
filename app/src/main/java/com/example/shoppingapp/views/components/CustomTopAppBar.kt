@@ -49,9 +49,10 @@ fun CustomTopAppBar(
                     ),
                     title = {
                         Text(
-                            text = title,
+                            text = if (title.length > 24) title.take(24) + "..." else title,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
+
                         )
                     },
                     navigationIcon = {
