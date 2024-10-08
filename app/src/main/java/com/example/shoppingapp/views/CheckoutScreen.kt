@@ -174,7 +174,7 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
                     }
                 },
                 primaryButtonStyle = if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
-                    ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C))
+                    ButtonDefaults.buttonColors(containerColor = Color(0xFF8ecae6))
                 } else ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146)),
                 secondaryButtonText = null,
                 tertiaryButtonText = null
