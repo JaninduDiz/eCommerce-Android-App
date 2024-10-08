@@ -61,6 +61,14 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.2")
     implementation("io.coil-kt:coil-compose:2.0.0")
     testImplementation("junit:junit:4.13.2")
+    // Retrofit for networking
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ( "com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Coroutines for asynchronous code
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
+    implementation("com.valentinilk.shimmer:compose-shimmer:1.3.1")
+
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.01.00"))

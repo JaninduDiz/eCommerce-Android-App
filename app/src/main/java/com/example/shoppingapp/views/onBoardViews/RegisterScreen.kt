@@ -1,5 +1,10 @@
+// RegisterScreen.kt
 package com.example.shoppingapp.views.onBoardViews
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,9 +35,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.shoppingapp.models.RegisterRequest
+
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.utils.RetrofitInstance
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -41,6 +52,8 @@ fun RegisterScreen(navController: NavController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     fun validateEmail(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -165,6 +178,20 @@ fun RegisterScreen(navController: NavController) {
                 onClick = {
                     if (!emailError && !passwordError) {
                         // Handle registration logic
+                        (context as ComponentActivity).lifecycleScope.launch {
+                            try {
+                                val response = RetrofitInstance.api.register(RegisterRequest(username, email, password, 3, "", "", "", "", 0))
+                                if (response.isSuccessful && response.body() != null) {
+                                    Toast.makeText(context, "Registration successful ", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("login") // Navigate to login screen after successful registration
+                                } else {
+                                    Toast.makeText(context, "Registration failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                Log.d(TAG, "RegisterScreen: Error: ${e.localizedMessage}")
+                            }
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

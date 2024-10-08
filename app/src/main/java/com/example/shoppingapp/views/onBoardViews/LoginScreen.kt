@@ -1,5 +1,9 @@
 package com.example.shoppingapp.views.onBoardViews
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,15 +34,24 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.shoppingapp.models.LoginRequest
+import com.example.shoppingapp.models.User
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.utils.UserSessionManager
+import kotlinx.coroutines.launch
+
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, userSessionManager: UserSessionManager) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    val passwordVisible by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -109,7 +123,44 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /* Handle login logic */ },
+                onClick = {
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
+                        // Launch coroutine for network call
+                        (context as ComponentActivity).lifecycleScope.launch {
+                            try {
+                                val response = RetrofitInstance.api.login(LoginRequest(email, password))
+                                if (response.isSuccessful) {
+                                    response.body()?.let { loginResponse ->
+                                        Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+                                        val username = loginResponse.username
+                                        val emailAddress = loginResponse.email
+                                        val userId = loginResponse.id
+
+                                        // Create the User object with username and null for other fields
+                                        val loggedInUser = User(
+                                            id = userId,
+                                            username = username,
+                                            email = emailAddress,
+                                            address = null,
+                                            phoneNumber = null,
+                                            firstName = null,
+                                            lastName = null
+                                        )
+                                        Log.d(TAG, "LoginScreen: $loggedInUser")
+                                        userSessionManager.saveUser(loggedInUser) // Save user details
+                                        navController.navigate("home")
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Login failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Login")
@@ -133,6 +184,9 @@ fun LoginScreen(navController: NavController) {
 fun LoginScreenPreview() {
     ShoppingAppTheme {
         val navController = rememberNavController() // A placeholder for NavController
-        LoginScreen(navController = navController)
+        val context = LocalContext.current
+        val userSessionManager = UserSessionManager(context = context ) // Create a mock instance of UserSessionManager
+
+        LoginScreen(navController = navController, userSessionManager = userSessionManager)
     }
 }

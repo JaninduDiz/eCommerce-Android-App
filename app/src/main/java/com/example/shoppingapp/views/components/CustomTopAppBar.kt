@@ -4,7 +4,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,24 +28,31 @@ fun CustomTopAppBar(
     showActionIcon: Boolean = false,
     actionIcon: @Composable (() -> Unit)? = null,
     centeredHeader: Boolean = false,
+    isHeaderPinned: Boolean = false,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    // Apply scrolling behavior only when isHeaderPinned is false
+    val scrollBehavior = if (isHeaderPinned) {
+        null  // No scrolling behavior when pinned
+    } else {
+        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = if (!isHeaderPinned) Modifier.nestedScroll(scrollBehavior!!.nestedScrollConnection) else Modifier,
         topBar = {
             if (centeredHeader) {
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color(0xFFFFE8D6),
+                        containerColor = Color(0xFFa2d2ff),
                         titleContentColor = Color(0xFF000000),
                     ),
                     title = {
                         Text(
-                            text = title,
+                            text = if (title.length > 24) title.take(24) + "..." else title,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
+
                         )
                     },
                     navigationIcon = {
@@ -61,7 +76,7 @@ fun CustomTopAppBar(
                         containerColor = Color(0xFFDDBEA9).copy(alpha = 0.8f),
                         titleContentColor = Color(0xFF000000),
 
-                    ),
+                        ),
                     title = {
                         Text(
                             text = title,
