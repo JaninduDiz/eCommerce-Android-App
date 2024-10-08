@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomModalBottomSheet(
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false), // Control the modal state
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
     onDismiss: () -> Unit = {},  // Dismiss callback
     sheetContent: @Composable () -> Unit,  // Content to render inside the modal
     buttonText: String = "Confirm",  // Button text
@@ -47,7 +47,7 @@ fun CustomModalBottomSheet(
             onDismiss()
         },
         sheetState = sheetState,
-        modifier = bottomSheetHeight,  // Dynamic height based on keyboard visibility
+        modifier = bottomSheetHeight,
     ) {
         // Box containing the sheet content
         Box(

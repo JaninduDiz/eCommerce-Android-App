@@ -1,9 +1,21 @@
 package com.example.shoppingapp.views
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,19 +41,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.shoppingapp.models.UpdateUserRequest
 import com.example.shoppingapp.models.User
-import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
-import com.example.shoppingapp.session.UserSessionManager
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
+import com.example.shoppingapp.utils.RetrofitInstance
+import com.example.shoppingapp.utils.UserSessionManager
+import com.example.shoppingapp.views.components.CustomTopAppBar
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -64,14 +81,49 @@ fun ProfileContent(
     userSessionManager: UserSessionManager,
     navController: NavController
 ) {
+    val context = LocalContext.current
+    var loading by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
-    var userName by remember { mutableStateOf(currentUser?.userName ?: "") }
-    var emailAddress by remember { mutableStateOf(currentUser?.emailAddress ?: "") }
-    var addressLine1 by remember { mutableStateOf(currentUser?.addressLine1 ?: "") }
-    var addressLine2 by remember { mutableStateOf(currentUser?.addressLine2 ?: "") }
-    var city by remember { mutableStateOf(currentUser?.city ?: "") }
-    var postalCode by remember { mutableStateOf(currentUser?.postalCode ?: "") }
+    var username by remember { mutableStateOf(currentUser?.username ?: "") }
+    var email by remember { mutableStateOf(currentUser?.email ?: "") }
+    var address by remember { mutableStateOf(currentUser?.address ?: "") }
+    var phoneNumber by remember { mutableStateOf(currentUser?.phoneNumber ?: "") }
+    var firstName by remember { mutableStateOf(currentUser?.firstName ?: "") }
+    var lastName by remember { mutableStateOf(currentUser?.lastName ?: "") }
 
+    // Fetch user data from the API
+    LaunchedEffect(Unit) {
+        try {
+            loading = true
+            val response = currentUser?.let { RetrofitInstance.api.getUserById(it.id) }
+            if (response != null) {
+                if (response.isSuccessful) {
+                    Log.d(TAG, "ProfileContent: ${response.body()}")
+                    response.body()?.let { user ->
+                        val loggedInUser = User(
+                            id = user.id,
+                            username = user.username,
+                            email = user.email,
+                            address = user.address,
+                            phoneNumber = user.phoneNumber,
+                            firstName = user.firstName,
+                            lastName = user.lastName
+                        )
+                        userSessionManager.saveUser(loggedInUser)
+                        username = loggedInUser.username
+                        email = loggedInUser.email
+                        address = loggedInUser.address ?: ""
+                        phoneNumber = loggedInUser.phoneNumber ?: ""
+                        firstName = loggedInUser.firstName ?: ""
+                        lastName = loggedInUser.lastName ?: ""
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "ProfileContent: Error: ${e.localizedMessage}")
+            loading = false
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -102,13 +154,36 @@ fun ProfileContent(
             }
 
             item {
+                ProfileTextField(
+                    value = email,
+                    label = "Email Address",
+                    isEditing = false,
+                    onValueChange = { email = it },
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            item {
                 // Profile Fields
                 ProfileTextField(
-                    value = userName,
+                    value = username,
                     label = "Username",
                     isEditing = isEditing,
-                    onValueChange = { userName = it },
+                    onValueChange = { username = it },
 
+                    )
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            item {
+                ProfileTextField(
+                    value = firstName,
+                    label = "First Name",
+                    isEditing = isEditing,
+                    onValueChange = { firstName = it },
+                    keyboardType = KeyboardType.Number
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -116,11 +191,22 @@ fun ProfileContent(
 
             item {
                 ProfileTextField(
-                    value = emailAddress,
-                    label = "Email Address",
+                    value = lastName,
+                    label = "Last Name",
                     isEditing = isEditing,
-                    onValueChange = { emailAddress = it },
+                    onValueChange = { lastName = it },
 
+                    )
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            item {
+                ProfileTextField(
+                    value = address,
+                    label = "Address",
+                    isEditing = isEditing,
+                    onValueChange = { address = it },
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -128,47 +214,12 @@ fun ProfileContent(
 
             item {
                 ProfileTextField(
-                    value = addressLine1,
-                    label = "Address Line 1",
+                    value = phoneNumber,
+                    label = "Phone Number",
                     isEditing = isEditing,
-                    onValueChange = { addressLine1 = it },
-
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            item {
-                ProfileTextField(
-                    value = addressLine2,
-                    label = "Address Line 2",
-                    isEditing = isEditing,
-                    onValueChange = { addressLine2 = it },
-
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            item {
-                ProfileTextField(
-                    value = city,
-                    label = "City",
-                    isEditing = isEditing,
-                    onValueChange = { city = it },
-
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            item {
-                ProfileTextField(
-                    value = postalCode,
-                    label = "Postal Code",
-                    isEditing = isEditing,
-                    onValueChange = { postalCode = it },
-                    isError = postalCode.any { !it.isDigit() },
+                    onValueChange = { phoneNumber = it },
+                    isError = phoneNumber.any { !it.isDigit() } || phoneNumber.length > 10,
+                    placeholder = "07XXXXXXXX",
                     keyboardType = KeyboardType.Number
                 )
 
@@ -182,19 +233,46 @@ fun ProfileContent(
                 .align(Alignment.BottomCenter) // Align at the bottom center
                 .padding(16.dp)
         ) {
-            // Floating Action Button Container (for Save/Edit)
             ActionButtonContainer(
                 isEditing = isEditing,
                 onSaveClick = {
-                    val updatedUser = User(
-                        userName = userName,
-                        emailAddress = emailAddress,
-                        addressLine1 = addressLine1,
-                        addressLine2 = addressLine2,
-                        city = city,
-                        postalCode = postalCode
-                    )
-                    userSessionManager.updateUser(updatedUser)
+                    val updatedUser = currentUser?.let {
+                        User(
+                            id = it.id,
+                            username = username,
+                            email = email,
+                            address = address,
+                            phoneNumber = phoneNumber,
+                            lastName = lastName,
+                            firstName = firstName,
+                        )
+                    }
+                    if (updatedUser != null) {
+                        userSessionManager.updateUser(updatedUser)
+                        (context as ComponentActivity).lifecycleScope.launch {
+                            try {
+                                val updateUserRequest = UpdateUserRequest(
+                                    username = updatedUser.username,
+                                    email = updatedUser.email,
+                                    role = 3,
+                                    firstName = updatedUser.firstName,
+                                    lastName = updatedUser.lastName,
+                                    address = updatedUser.address,
+                                    phoneNumber = updatedUser.phoneNumber
+                                )
+                                val response = RetrofitInstance.api.updateUser(updatedUser.id, updateUserRequest)
+                                if (response.isSuccessful) {
+                                    Toast.makeText(context, "User update successful ", Toast.LENGTH_SHORT).show()
+
+                                } else {
+                                    Toast.makeText(context, "Update failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                Log.d(TAG, "Update: Error: ${e.localizedMessage}")
+                            }
+                        }
+                    }
                     isEditing = false
                 },
                 onEditClick = { isEditing = true }
@@ -225,6 +303,7 @@ fun ProfileTextField(
     isEditing: Boolean,
     onValueChange: (String) -> Unit,
     isError: Boolean = false,
+    placeholder: String? = "",
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
     if (isEditing) {
@@ -233,6 +312,7 @@ fun ProfileTextField(
             onValueChange = onValueChange,
             label = { Text(label) },
             enabled = true,
+            placeholder = { Text(placeholder ?: "") },
             singleLine = true,
             isError = isError,
             modifier = Modifier
@@ -285,7 +365,7 @@ fun ActionButtonContainer(
             onClick = {
                 if (isEditing) onSaveClick() else onEditClick()
             },
-            containerColor = Color(0xFFB08968),
+            containerColor = Color(0xFF98c1d9),
             contentColor = Color.White
         ) {
             if (isEditing) {
@@ -304,7 +384,15 @@ fun ActionButtonContainer(
 fun ProfileScreenPreview() {
     ShoppingAppTheme {
         val navController = rememberNavController()
-        val mockUser = User(userName = "Mark Adam", emailAddress = "markadam@hotmail.com", addressLine1 = null, addressLine2 = null, city = null, postalCode = null)
+        val mockUser = User(
+            id = "1",
+            username = "Mark Adam",
+            email = "markadam@hotmail.com",
+            address = "123 Main St",
+            phoneNumber = "1234567890",
+            firstName = "Mark",
+            lastName = "Adam"
+        )
         val userSessionManager = UserSessionManager(context = LocalContext.current) // Mock instance
         userSessionManager.saveUser(mockUser) // Simulate user being logged in
         ProfileScreen(navController = navController, userSessionManager = userSessionManager)

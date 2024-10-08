@@ -1,20 +1,41 @@
 package com.example.shoppingapp.models
 
+data class LoginResponse(
+    val id: String,
+    val username: String,
+    val email: String,
+)
+
+data class LoginRequest(val email: String, val password: String)
+
+data class RegisterRequest(
+    val username: String,
+    val email: String,
+    val password: String,
+    val role: Int,
+    val firstName: String,
+    val lastName: String,
+    val address: String,
+    val phoneNumber: String,
+    val gender: Int
+)
+
 data class User(
-    val userName: String,
-    val emailAddress: String,
-    val addressLine1: String?,
-    val addressLine2: String?,
-    val city: String?,
-    val postalCode: String?
+    val id: String,
+    val username: String,
+    val firstName: String?,
+    val lastName: String?,
+    val email: String,
+    val address: String?,
+    val phoneNumber: String?,
 )
 
-val sampleUser = User(
-    userName = "john_doe",
-    emailAddress = "john.doe@example.com",
-    addressLine1 = "123 Main St",
-    addressLine2 = "Apt 4B",
-    city = "Springfield",
-    postalCode = "12345"
+data class UpdateUserRequest(
+    val username: String?,
+    val email: String?,
+    val role: Int?,
+    val firstName: String?,
+    val lastName: String?,
+    val address: String?,
+    val phoneNumber: String?,
 )
-

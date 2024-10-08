@@ -1,8 +1,11 @@
 package com.example.shoppingapp.views
 
 import CustomModalBottomSheet
-import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,26 +41,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.shoppingapp.R
-import com.example.shoppingapp.models.Order
+import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.models.OrderItem
-import com.example.shoppingapp.models.sampleOrders
-import com.example.shoppingapp.models.sampleProducts
-import com.example.shoppingapp.ui.theme.ShoppingAppTheme
+import com.example.shoppingapp.models.Product
+import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.viewmodels.OrderState
+import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.components.CustomButton
 import com.example.shoppingapp.views.components.CustomModal
 import com.example.shoppingapp.views.components.CustomTopAppBar
 import com.example.shoppingapp.views.components.ModalType
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.example.shoppingapp.views.components.formatDateTime
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,12 +69,25 @@ fun OrderDetailsScreen(
     navController: NavController,
     orderId: String,
     orderState: OrderState,
+    productState: ProductState,
     isBackHome: Boolean? = false
 ) {
-    val order = sampleOrders.find { it.id == orderId } ?: sampleOrders[0]
+    val context = LocalContext.current
+    val order = orderState.orders.find { it.id == orderId } ?: return
     var showModal by remember { mutableStateOf(false) }
     var showDrawer by remember { mutableStateOf(false) }
     var cancellationReason by remember { mutableStateOf("") }
+    val getProductDetails: (String) -> Product? = { productId -> productState.products.find { it.productId == productId } }
+    val getProductDetailsToUpdateOrder: (List<OrderItem>, ProductState) -> List<OrderItem> = { orderItems, productStated ->
+        orderItems.map { orderItem ->
+            val product = productStated.products.find { it.productId == orderItem.productId }
+            if (product != null) {
+                orderItem.copy(unitPrice = product.price)
+            } else {
+                orderItem
+            }
+        }
+    }
 
     CustomTopAppBar(
         title = "Order Details",
@@ -110,16 +126,14 @@ fun OrderDetailsScreen(
                     .padding(contentPadding)
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
+                    .offset(y = (-24).dp)
             ) {
                 item {
                     // Order status and date placed
                     Text(text = "Order ID: ${order.id}", fontWeight = FontWeight.Bold)
                     Text(
-                        text = "Date Placed: ${
-                            order.createdAt.format(
-                                DateTimeFormatter.ofPattern("yyyy-MMM-dd @ hh:mm a")
-                            )
-                        }", fontWeight = FontWeight.Bold
+                        text = "Date Placed: ${formatDateTime(order.createdAt)}",
+                        fontWeight = FontWeight.Bold
                     )
                     val (statusText, statusColor) = orderStatusText(order.status)
                     Row(
@@ -137,7 +151,30 @@ fun OrderDetailsScreen(
                 }
 
                 items(order.items) { orderItem ->
-                    OrderItemCard(orderItem, navController)
+                    OrderItemCard(orderItem, navController, getProductDetails, order.status)
+                }
+
+                if (order.note.isNullOrEmpty()) {
+                    item {
+                        order.note?.let {
+                            OutlinedTextField(
+                                value = it,
+                                onValueChange = { },
+                                label = { Text("Your note") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedContainerColor = Color(0xFFf8f7ff),
+                                    unfocusedContainerColor = Color(0xFFf8f7ff),
+                                    focusedBorderColor = Color(0xFF9381ff),
+                                    unfocusedBorderColor = Color(0xFFf8f7ff),
+                                    cursorColor = Color(0xFF9381ff),
+                                ),
+                                enabled = false
+                            )
+                        }
+                    }
                 }
 
                 item {
@@ -145,10 +182,13 @@ fun OrderDetailsScreen(
 
                     OrderSummary(
                         totalItems = order.items.size,
-                        totalPrice = order.items.sumOf { item -> item.product.price * item.quantity }
+                        totalPrice = order.totalValue,
+                        deliveryCharge = 2.0
                     )
 
-                    Spacer(modifier = Modifier.fillMaxWidth().height(16.dp))
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(16.dp))
 
                 }
 
@@ -160,6 +200,30 @@ fun OrderDetailsScreen(
                             text = "Are you sure you want to cancel this order?",
                             primaryButtonText = "Confirm",
                             onPrimaryButtonClick = {
+                                (context as ComponentActivity).lifecycleScope.launch {
+                                    try {
+                                        val updatedOrderItems = getProductDetailsToUpdateOrder(order.items, productState)
+                                        val updateOrder = orderState.cancelOrder(order.id, updatedOrderItems, cancellationReason, order.totalValue)
+
+                                        val response = updateOrder?.let {
+                                            Log.d(TAG, "OrderDetailsScreen: updatedOrder: $updateOrder")
+                                            RetrofitInstance.api.updateOrder(order.id, updateOrder)
+                                        }
+                                        Log.d(TAG, "OrderDetailsScreen: response: $response")
+                                        if (response != null) {
+                                            if (response.isSuccessful) {
+                                                Toast.makeText(context, "Order cancellation successful ", Toast.LENGTH_SHORT).show()
+                                                Log.d(TAG, "OrderDetailsScreen: response: ${response.body()}")
+                                            } else {
+                                                Toast.makeText(context, "Update failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                                                Log.d(TAG, "OrderDetailsScreen: Update failed: ${response.errorBody()?.string()}")
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                                        Log.d(TAG, "Update: Error: ${e.localizedMessage}")
+                                    }
+                                }
                                 showModal = false
                                 showDrawer = false
                                 // TODO: Implement cancel order logic
@@ -230,23 +294,28 @@ fun OrderDetailsScreen(
 @Composable
 fun orderStatusText(status: Int): Pair<String, Color> {
     return when (status) {
-        0 -> "Processing" to Color(0xFF673AB7) // Green
-        1 -> "Ready For Delivery" to Color(0xFF009688) // Amber
-        2 -> "Shipped" to Color(0xFF2196F3) // Blue
-        3 -> "Delivered" to Color(0xFF8BC34A) // Light Green
-        4 -> "Cancelled" to Color(0xFFF44336) // Red
-        else -> "Unknown" to Color(0xFF9E9E9E) // Grey
+        0 -> "Processing" to Color(0xFF673AB7)
+        1 -> "Ready For Delivery" to Color(0xFF009688)
+        2 -> "Shipped" to Color(0xFF2196F3)
+        3 -> "Delivered" to Color(0xFF8BC34A)
+        4 -> "Cancelled" to Color(0xFFF44336)
+        else -> "Unknown" to Color(0xFF9E9E9E)
     }
 }
 
 @Composable
-fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
+fun OrderItemCard(orderItem: OrderItem, navController: NavController, getProductDetails: (String) -> Product?, orderStatus: Int) {
+    val product = getProductDetails(orderItem.productId) ?: return
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                navController.navigate("reviewScreen/${orderItem.product.productId}")
+                if (orderStatus == 3) {
+                    navController.navigate("reviewScreen/${orderItem.productId}/${orderItem.vendorId}")
+                } else {
+                    navController.navigate("productDetails/${orderItem.productId}")
+                }
             },
         shape = RoundedCornerShape(8.dp),
     ) {
@@ -255,7 +324,7 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background), // Replace with actual image
+                painter = rememberAsyncImagePainter(product.imageUrls.first()),
                 contentDescription = "Product Image",
                 modifier = Modifier.size(64.dp),
                 contentScale = ContentScale.Crop
@@ -264,37 +333,10 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column {
-                Text(text = orderItem.product.name, fontWeight = FontWeight.Bold)
+               Text(text = product.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(text = "Quantity: ${orderItem.quantity}")
-                Text(text = "Price: $${orderItem.product.price}")
+                Text(text = "Price: $${product.price}")
             }
         }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnrememberedMutableState")
-@Preview(showBackground = true)
-@Composable
-fun OrderDetailsScreenPreview() {
-    val sampleOrder = Order(
-        id = "order_1",
-        items = listOf(
-            OrderItem(product = sampleProducts[0], quantity = 1, isDelivered = false),
-            OrderItem(product = sampleProducts[1], quantity = 2, isDelivered = false)
-        ),
-        status = 1,
-        cancellationReason = null,
-        customerId = "customer_123",
-        note = null,
-        createdAt = LocalDateTime.now()
-    )
-
-    ShoppingAppTheme {
-        OrderDetailsScreen(
-            navController = rememberNavController(),
-            orderId = sampleOrder.id,
-            orderState = OrderState(),
-        )
     }
 }

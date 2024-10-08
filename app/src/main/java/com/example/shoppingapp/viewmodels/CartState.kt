@@ -1,15 +1,12 @@
 package com.example.shoppingapp.viewmodels
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
+import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.shoppingapp.models.CartItem
 import com.example.shoppingapp.models.Product
 
-// Data class representing a Cart Item
-data class CartItem(val product: Product, var quantity: MutableState<Int> = mutableIntStateOf(1))
 
-// CartState to manage cart items
 class CartState {
     val items: SnapshotStateList<CartItem> = mutableStateListOf()
 
@@ -45,6 +42,15 @@ class CartState {
                 it.value -= 1
             }
         }
+    }
+
+    @SuppressLint("DefaultLocale")
+    fun getTotalAmount(): Double {
+        var total = 0.0
+        for (item in items) {
+            total += item.product.price * item.quantity.value
+        }
+        return String.format("%.2f", total).toDouble()
     }
 
     // Function to clear the cart
