@@ -55,6 +55,8 @@ import com.example.shoppingapp.viewmodels.VendorState
 import com.example.shoppingapp.views.components.CircularIndicator
 import com.example.shoppingapp.views.components.CustomTopAppBar
 
+
+// Product Details Screen
 @Composable
 fun ProductDetailsScreen(
     navController: NavHostController,
@@ -180,6 +182,10 @@ fun ProductDetailsScreen(
     }
 }
 
+
+// Composable functions for Product Details Screen
+
+// See Vendor Details
 @Composable
 fun SeeVendorDetails(vendorId: String, navController: NavHostController) {
     Column {
@@ -194,6 +200,8 @@ fun SeeVendorDetails(vendorId: String, navController: NavHostController) {
     }
 }
 
+
+// Product Image Section
 @Composable
 fun ProductImageSection(imageURL: String) {
     Card(
@@ -212,6 +220,8 @@ fun ProductImageSection(imageURL: String) {
     }
 }
 
+
+// Product Info Section
 @Composable
 fun ProductInfoSection(product: Product, categoryName: String = "") {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -241,6 +251,8 @@ fun ProductInfoSection(product: Product, categoryName: String = "") {
         )
     }
 }
+
+// Product Description Section
 
 @Composable
 fun ProductDescriptionSection(description: String) {

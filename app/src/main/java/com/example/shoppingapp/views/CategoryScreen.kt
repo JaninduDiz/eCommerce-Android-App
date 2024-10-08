@@ -29,6 +29,8 @@ import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.components.CustomTopAppBar
 
+
+// Category Screen
 @Composable
 fun CategoryScreen(navController: NavHostController, categoryId: String?, categoryState: CategoryState, productState: ProductState) {
     val category = categoryState.categories.find { it.id == categoryId }
@@ -52,6 +54,8 @@ fun CategoryScreen(navController: NavHostController, categoryId: String?, catego
         }
     }
 }
+
+// Product Card
 
 @Composable
 fun ProductCard(product: Product, onClick: () -> Unit) {

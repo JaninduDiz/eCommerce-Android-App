@@ -84,6 +84,7 @@ import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.components.CircularIndicator
 
+// Bottom navigation items
 data class BottomNavigationItem(
     val title: String,
     val selectedIcon: ImageVector,
@@ -92,6 +93,7 @@ data class BottomNavigationItem(
     val badgeCount: Int? = null
 )
 
+// Home screen composable
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -235,6 +237,8 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
     }
 }
 
+// Home content composable
+
 @Composable
 fun HomeContent(
     navController: NavController,
@@ -345,6 +349,8 @@ fun HomeContent(
         }
     }
 }
+
+// Category section composable
 @Composable
 fun CategorySection(
     onClick: () -> Unit = {},
@@ -371,6 +377,8 @@ fun CategorySection(
     }
 }
 
+
+// Category card composable
 @Composable
 fun CategoryCard(category: Category, color: Color, onClick: () -> Unit) {
     Card(
@@ -399,6 +407,7 @@ fun CategoryCard(category: Category, color: Color, onClick: () -> Unit) {
     }
 }
 
+// Item card composable
 @Composable
 fun ItemCard(product: Product, onClick: () -> Unit) {
     Card(
@@ -439,7 +448,7 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
     }
 }
 
-
+// Section title composable
 @Composable
 fun SectionTitle(title: String, onClick: () -> Unit) {
     Text(

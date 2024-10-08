@@ -40,6 +40,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ShoppingAppTheme {
+
+                // passing the session manager ,navigation controller and states
                 val navController = rememberNavController()
                 val cartState = remember { CartState() }
                 val orderState = remember { OrderState() }
@@ -52,7 +54,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController, startDestination = if (currentUser != null) "home" else "login") {
 
                     composable("login") {
-                        LoginScreen(navController, userSessionManager) // pass the session manager
+                        LoginScreen(navController, userSessionManager) // passing the session manager and navigation controoler
                     }
                     composable("register") { RegisterScreen(navController) }
                     composable("home") { HomeScreen(navController, cartState, orderState, productState, categoryState ) }
