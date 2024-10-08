@@ -1,9 +1,17 @@
 package com.example.shoppingapp.views.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,7 +40,7 @@ fun CustomModal(
 ) {
 
     val textColor = when (type) {
-        ModalType.SUCCESS -> Color(0xFF155724)  // Dark green for success text
+        ModalType.SUCCESS -> Color.Black  // Black for success text
         ModalType.ERROR -> Color(0xFF721C24)    // Dark red for error text
     }
 
@@ -42,7 +50,7 @@ fun CustomModal(
             Text(
                 text = if (title.isNotEmpty()) title else if (type == ModalType.SUCCESS) "Success" else "Error",
                 color = textColor,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp
             )
         },
