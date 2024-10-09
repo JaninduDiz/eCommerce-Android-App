@@ -296,7 +296,7 @@ fun orderStatusText(status: Int): Pair<String, Color> {
     return when (status) {
         0 -> "Processing" to Color(0xFF673AB7)
         1 -> "Ready For Delivery" to Color(0xFF009688)
-        2 -> "Shipped" to Color(0xFF2196F3)
+        2 -> "Partially Delivered" to Color(0xFF2196F3)
         3 -> "Delivered" to Color(0xFF8BC34A)
         4 -> "Cancelled" to Color(0xFFF44336)
         else -> "Unknown" to Color(0xFF9E9E9E)

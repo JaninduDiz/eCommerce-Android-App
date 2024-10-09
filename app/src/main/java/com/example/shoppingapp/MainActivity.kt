@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
                 val userSessionManager = UserSessionManager(this)
                 val currentUser = userSessionManager.getUser()
 
-                NavHost(navController, startDestination = if (currentUser != null) "home" else "login") {
+                NavHost(navController, startDestination = if (currentUser.id != "") "home" else "login") {
 
                     composable("login") {
                         LoginScreen(navController, userSessionManager) // passing the session manager and navigation controoler
@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
                     composable("reviewScreen/{productId}/{vendorId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId")
                         val vendorId = backStackEntry.arguments?.getString("vendorId")
-                        ReviewScreen(navController, productId, vendorId, productState)
+                        ReviewScreen(navController, productId, vendorId, productState , categoryState)
                     }
                     composable("categoryScreen/{categoryId}") { backStackEntry ->
                         val categoryId = backStackEntry.arguments?.getString("categoryId")

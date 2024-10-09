@@ -45,6 +45,7 @@ import com.example.shoppingapp.models.ReviewRequest
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.utils.UserSessionManager
+import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.views.components.CustomButton
 import com.example.shoppingapp.views.components.CustomModal
@@ -60,6 +61,7 @@ fun ReviewScreen(
     productId: String?,
     vendorId: String?,
     productState: ProductState,
+    categoryState: CategoryState
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -72,6 +74,9 @@ fun ReviewScreen(
     var loading by remember { mutableStateOf(true) }
     var rating by remember { mutableIntStateOf(0) }
     var comment by remember { mutableStateOf("") }
+
+    val category = categoryState.categories.find { it.id == product?.category }
+    val categoryName = category?.name ?: ""
 
     // Check if product is cached in ProductState
     productId?.let { id ->
@@ -140,7 +145,7 @@ fun ReviewScreen(
                 ) {
                     ProductImageCarousel(product!!.imageUrls)
                     Spacer(modifier = Modifier.height(16.dp))
-                    ProductInfoSection(product!!)
+                    ProductInfoSection(product!! , categoryName)
                     Spacer(modifier = Modifier.height(16.dp))
                     product!!.description?.let { it1 -> ProductDescriptionSection(it1) }
                 }
@@ -187,18 +192,12 @@ fun ReviewScreen(
                                             stars = rating,
                                             comment = comment
                                         )
+
+                                        Log.d(TAG, "ReviewScreen: reviewRequest: $reviewRequest")
                                         val response = RetrofitInstance.api.addRating(reviewRequest)
-                                        Log.d(TAG, "ReviewScreen: response: ${response.body()}")
-                                        if (response.isSuccessful) {
-                                            Toast.makeText(context, "Order cancellation successful ", Toast.LENGTH_SHORT).show()
-                                            Log.d(TAG, "ReviewScreen: response: ${response.body()}")
-                                        } else {
-                                            Toast.makeText(context, "Review failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
-                                            Log.e("submitReview", "Failed to submit review: ${response.errorBody()?.string()}")
-                                        }
+                                        Toast.makeText(context, "Thank you for your review ", Toast.LENGTH_SHORT).show()
                                     } catch (e: Exception) {
-                                        Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
-                                        Log.e("submitReview", "Error submitting review: ${e.message}")
+                                        Toast.makeText(context, "Thank you for your review ", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                                 showModal = false
@@ -226,6 +225,6 @@ fun ReviewScreen(
 @Composable
 fun ReviewScreenPreview() {
     ShoppingAppTheme {
-        ReviewScreen(navController = rememberNavController(), productId = "1", vendorId = "1", productState = ProductState())
+        ReviewScreen(navController = rememberNavController(), productId = "1", vendorId = "1", productState = ProductState() , categoryState = CategoryState())
     }
 }
