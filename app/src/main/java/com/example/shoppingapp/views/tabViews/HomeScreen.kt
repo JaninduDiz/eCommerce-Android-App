@@ -303,7 +303,7 @@ fun HomeContent(
                 SectionTitle(title = "Categories", onClick = {})
             }
 
-            val filteredcategories = categories.filter { it.isActive }
+            val filteredCategories = categories.filter { it.isActive }
 
             // Handle the categories LazyRow safely
             item {
@@ -321,7 +321,7 @@ fun HomeContent(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        itemsIndexed(filteredcategories) { index, category ->
+                        itemsIndexed(filteredCategories) { index, category ->
                             // Cycle colors using modulus operator
                             val color = categoryColors[index % categoryColors.size]
 
@@ -337,7 +337,7 @@ fun HomeContent(
             }
 
             // Handle categories and products in CategorySection safely
-            items(filteredcategories) { category ->
+            items(filteredCategories) { category ->
                 val categoryProducts = products.filter { it.category == category.id }
                 if (categoryProducts.isNotEmpty()) {
                     CategorySection(
