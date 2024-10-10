@@ -52,6 +52,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -252,13 +253,21 @@ fun HomeContent(
     val products = productState.products
 
     // List of colors
-    val categoryColors = listOf(
-        Color(0xFFDDB892),
-        Color(0xFFDDBEA9),
-        Color(0xFFB7B7A4),
-        Color(0xFFA5A58D),
-        Color(0xFF6B705C)
-    )
+    val categoryColors = remember {
+        listOf(
+            Color(0xFFDDB892),
+            Color(0xFFDDBEA9),
+            Color(0xFFB7B7A4),
+            Color(0xFFA5A58D),
+            Color(0xFF6B705C)
+        )
+    }
+
+    val filteredCategories by remember(categories) {
+        derivedStateOf {
+            categories.filter { it.isActive }
+        }
+    }
 
     if (loading) {
         CircularIndicator()
@@ -302,8 +311,6 @@ fun HomeContent(
             item {
                 SectionTitle(title = "Categories", onClick = {})
             }
-
-            val filteredCategories = categories.filter { it.isActive }
 
             // Handle the categories LazyRow safely
             item {
