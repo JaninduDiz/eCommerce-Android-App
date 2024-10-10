@@ -433,19 +433,20 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = product.name,
-                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
+            Column(
                 modifier = Modifier.padding(horizontal = 8.dp),
-                maxLines = 2, overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "$${product.price}",
-                style = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.padding(horizontal = 8.dp)
-
-            )
+            ) {
+                Text(
+                    text = product.name,
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
+                    maxLines = 2, overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "$${product.price}",
+                    style = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
+                )
+            }
         }
     }
 }

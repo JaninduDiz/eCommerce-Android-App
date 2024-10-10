@@ -61,7 +61,7 @@ fun OrdersScreen(navController: NavController, orderState: OrderState, paddingVa
             if (response.isSuccessful) {
                 val orders = response.body()
                 if (orders != null) {
-                    orderState.addOrder(orders)
+                    orderState.addOrders(orders)
                 }
                 loading = false
             } else {
@@ -131,7 +131,10 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .height(50.dp)
-            .background(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(50.dp))
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(50.dp)
+            )
             .shadow(8.dp, shape = RoundedCornerShape(50.dp)),
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(

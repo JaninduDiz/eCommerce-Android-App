@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -25,7 +24,13 @@ import com.example.shoppingapp.viewmodels.CategoryState
 import com.example.shoppingapp.viewmodels.OrderState
 import com.example.shoppingapp.viewmodels.ProductState
 import com.example.shoppingapp.viewmodels.VendorState
-import com.example.shoppingapp.views.*
+import com.example.shoppingapp.views.CategoryScreen
+import com.example.shoppingapp.views.CheckoutScreen
+import com.example.shoppingapp.views.OrderDetailsScreen
+import com.example.shoppingapp.views.ProductDetailsScreen
+import com.example.shoppingapp.views.ProfileScreen
+import com.example.shoppingapp.views.ReviewScreen
+import com.example.shoppingapp.views.VendorScreen
 import com.example.shoppingapp.views.onBoardViews.LoginScreen
 import com.example.shoppingapp.views.onBoardViews.RegisterScreen
 import com.example.shoppingapp.views.tabViews.HomeScreen
@@ -44,8 +49,6 @@ class MainActivity : ComponentActivity() {
         }
 
         val token = gettoken()
-
-
 
         setContent {
             ShoppingAppTheme {

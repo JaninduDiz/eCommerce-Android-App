@@ -217,7 +217,6 @@ fun OrderDetailsScreen(
                                         Log.d(TAG, "OrderDetailsScreen: response: $response")
                                         if (response != null) {
                                             if (response.isSuccessful) {
-                                                Toast.makeText(context, "Order cancellation successful ", Toast.LENGTH_SHORT).show()
                                                 Log.d(TAG, "OrderDetailsScreen: response: ${response.body()}")
                                             } else {
                                                 Toast.makeText(context, "Update failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
@@ -231,10 +230,9 @@ fun OrderDetailsScreen(
                                 }
                                 showModal = false
                                 showDrawer = false
-
                             },
                             primaryButtonStyle = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFc75146)
+                                containerColor = Color(0xFFf07167)
                             ),
                             secondaryButtonText = "Close",
                             onSecondaryButtonClick = {

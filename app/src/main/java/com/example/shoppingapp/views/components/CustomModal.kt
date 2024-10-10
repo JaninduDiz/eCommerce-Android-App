@@ -35,7 +35,7 @@ fun CustomModal(
     tertiaryButtonText: String? = null,
     onTertiaryButtonClick: (() -> Unit)? = null,
     primaryButtonStyle : ButtonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B705C)),
-    secondaryButtonStyle : ButtonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C6644)),
+    secondaryButtonStyle : ButtonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8d99ae)),
     tertiaryButtonStyle : ButtonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDDBEA9))
 ) {
 

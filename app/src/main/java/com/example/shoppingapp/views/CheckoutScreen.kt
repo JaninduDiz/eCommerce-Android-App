@@ -167,8 +167,8 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
                 onPrimaryButtonClick = {
                     showModal = false
                     if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
-                        //navController.navigate("orderDetails/${responseId}/false")
                         cartState.clearCart()
+                        navController.navigate("home")
                     }
                 },
                 primaryButtonStyle = if (apiResponseStatus == ApiResponseStatus.SUCCESS) {

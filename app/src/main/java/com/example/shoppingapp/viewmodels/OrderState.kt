@@ -40,7 +40,7 @@ class OrderState {
     }
 
     // Function to store user's orders
-    fun addOrder(order: List<Order>) {
+    fun addOrders(order: List<Order>) {
         orders.clear()
         orders.addAll(order)
     }
