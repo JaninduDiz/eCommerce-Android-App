@@ -21,6 +21,12 @@ import retrofit2.http.Path
 
 // API service Interface to define the API endpoints
 
+
+ data class tokenRequest(
+    val token: String,
+    val userId: String,
+ )
+
 interface ApiService {
 
     //login endpoint
@@ -81,4 +87,8 @@ interface ApiService {
     //update order endpoint
     @PUT("Order/{id}")
     suspend fun updateOrder(@Path("id") id: String, @Body order: Order): Response<Order>
+
+    // add customer token
+    @POST("User/addToken")
+    suspend fun addToken(@Body token: tokenRequest): Response<tokenRequest>
 }

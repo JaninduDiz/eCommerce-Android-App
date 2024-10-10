@@ -13,7 +13,7 @@ import com.example.shoppingapp.viewmodels.ProductState
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrderHistoryComponent(navController: NavController, orderState: OrderState, productState: ProductState) {
-    val orders = orderState.orders.filter { it.status == 3 || it.status == 4 }
+    val orders = orderState.orders.filter { it.status == 3 || it.status == 4 ||  it.status == 5 }
 
 
     for (order in orders) {

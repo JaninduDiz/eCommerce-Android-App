@@ -69,7 +69,7 @@ class OrderState {
         order?.let {
             it.totalValue = calculateOrderTotal(totalAmount, 2.0)
             it.items = updatedItems
-            it.status = 4
+            it.status = 5
             it.cancellationReason = cancellationReason
             orders.remove(it)
             orders.add(it)
