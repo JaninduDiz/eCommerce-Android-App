@@ -127,7 +127,6 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
             hasNews = false,
         )
     )
-    Log.d(TAG, "HomeScreen: ${categoryState.categories.map { category -> category.name }}")
 
     var loading by remember { mutableStateOf(false) }
 
@@ -135,30 +134,28 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
 
     var categories by remember { mutableStateOf<List<Category>>(emptyList()) }
 
+    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
 
-
-
-    // Fetch categories
-    LaunchedEffect(Unit) {
+    // Function to fetch categories
+    suspend fun fetchCategories(categoryState: CategoryState, onLoading: (Boolean) -> Unit) {
         try {
-            loading = true
+            onLoading(true)
             val response = RetrofitInstance.api.getCategories()
             if (response.isSuccessful) {
                 categories = response.body() ?: emptyList()
-                categoryState.clear()
                 categoryState.addCategories(categories)
-                loading = false
             }
         } catch (e: Exception) {
-            loading = false
             Log.d(TAG, "HomeScreen: ${e.message}, error fetching categories")
+        } finally {
+            onLoading(false)
         }
     }
 
-//     Fetch products
-    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
-    LaunchedEffect(Unit) {
+    // Function to fetch products
+    suspend fun fetchProducts(productState: ProductState, onLoading: (Boolean) -> Unit) {
         try {
+            onLoading(true)
             val response = RetrofitInstance.api.getActiveProducts()
             if (response.isSuccessful) {
                 products = response.body() ?: emptyList()
@@ -166,7 +163,15 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
             }
         } catch (e: Exception) {
             Log.d(TAG, "HomeScreen: ${e.message}, error fetching products")
+        } finally {
+            onLoading(false)
         }
+    }
+
+    // Use LaunchedEffect to initially load data
+    LaunchedEffect(Unit) {
+        fetchCategories(categoryState) { loading = it }
+        fetchProducts(productState) { loading = it }
     }
 
     Scaffold(
@@ -185,7 +190,7 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
                 actions = {
                     IconButton(onClick = { navController.navigate("profile")},
                         modifier = Modifier
-                            .background(Color(0xFFfcbf49), shape = CircleShape)
+                            .background(Color(0xFFa2d2ff), shape = CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Person,
@@ -240,7 +245,6 @@ fun HomeScreen(navController: NavController, cartState: CartState, orderState: O
 }
 
 // Home content composable
-
 @Composable
 fun HomeContent(
     navController: NavController,
@@ -271,6 +275,13 @@ fun HomeContent(
 
     if (loading) {
         CircularIndicator()
+    } else if (products.isEmpty() || categories.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "No products available", color = Color.Gray)
+        }
     } else {
         LazyColumn(
             modifier = Modifier
@@ -284,25 +295,14 @@ fun HomeContent(
                 SectionTitle(title = "Explore", onClick = {})
             }
 
-            // Handle the products LazyRow safely
             item {
-                if (products.isEmpty()) {
-                    // Show a message or placeholder if no products are available
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "No products available", color = Color.Gray)
-                    }
-                } else {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(products) { product ->
-                            ItemCard(product = product) {
-                                navController.navigate("productDetails/${product.productId}")
-                            }
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(products) { product ->
+                        ItemCard(product = product) {
+                            navController.navigate("productDetails/${product.productId}")
                         }
                     }
                 }
@@ -312,49 +312,39 @@ fun HomeContent(
                 SectionTitle(title = "Categories", onClick = {})
             }
 
-            // Handle the categories LazyRow safely
             item {
-                if (categories.isEmpty()) {
-                    // Show a message or placeholder if no categories are available
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "No categories available", color = Color.Gray)
-                    }
-                } else {
-                    LazyRow(
-                        modifier = Modifier.padding(bottom = 20.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        itemsIndexed(filteredCategories) { index, category ->
-                            // Cycle colors using modulus operator
-                            val color = categoryColors[index % categoryColors.size]
+                LazyRow(
+                    modifier = Modifier.padding(bottom = 20.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    itemsIndexed(filteredCategories) { index, category ->
+                        val color = categoryColors[index % categoryColors.size]
 
-                            CategoryCard(
-                                category = category,
-                                color = color
-                            ) {
-                                navController.navigate("categoryScreen/${category.id}")
-                            }
+                        CategoryCard(
+                            category = category,
+                            color = color
+                        ) {
+                            navController.navigate("categoryScreen/${category.id}")
                         }
                     }
                 }
             }
 
             // Handle categories and products in CategorySection safely
-            items(filteredCategories) { category ->
-                val categoryProducts = products.filter { it.category == category.id }
-                if (categoryProducts.isNotEmpty()) {
-                    CategorySection(
-                        categoryName = category.name,
-                        products = categoryProducts,
-                        navController = navController,
-                        onClick = { navController.navigate("categoryScreen/${category.id}") },
-                        productState = productState,
-                        categoryId = category.id
-                    )
+            if (filteredCategories.isNotEmpty()) {
+                items(filteredCategories) { category ->
+                    val categoryProducts = products.filter { it.category == category.id }
+                    if (categoryProducts.isNotEmpty()) {
+                        CategorySection(
+                            categoryName = category.name,
+                            products = categoryProducts,
+                            navController = navController,
+                            onClick = { navController.navigate("categoryScreen/${category.id}") },
+                            productState = productState,
+                            categoryId = category.id
+                        )
+                    }
                 }
             }
         }
@@ -388,7 +378,6 @@ fun CategorySection(
     }
 }
 
-
 // Category card composable
 @Composable
 fun CategoryCard(category: Category, color: Color, onClick: () -> Unit) {
@@ -412,6 +401,8 @@ fun CategoryCard(category: Category, color: Color, onClick: () -> Unit) {
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
+                maxLines = 3,
+                overflow = TextOverflow.Clip,
                 modifier = Modifier.padding(8.dp)
             )
         }
@@ -426,7 +417,6 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
             .width(150.dp)
             .height(200.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -445,14 +435,14 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = product.name,
-                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
                 modifier = Modifier.padding(horizontal = 8.dp),
                 maxLines = 2, overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "$${product.price}",
-                style = TextStyle(fontSize = 14.sp, color = Color(0xFF5e3023), fontWeight = FontWeight.SemiBold),
+                style = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold),
                 modifier = Modifier.padding(horizontal = 8.dp)
 
             )
@@ -465,7 +455,7 @@ fun ItemCard(product: Product, onClick: () -> Unit) {
 fun SectionTitle(title: String, onClick: () -> Unit) {
     Text(
         text = title,
-        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
         modifier = Modifier
             .padding(start = 16.dp)
             .clickable(onClick = { onClick() })

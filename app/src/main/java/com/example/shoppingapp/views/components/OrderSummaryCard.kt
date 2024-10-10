@@ -36,28 +36,11 @@ fun OrderSummaryCard(
     navController: NavController,
     productState: ProductState
 ) {
-    var loading by remember { mutableStateOf(false) }
     val totalAmount = order.totalValue
     var firstProductName by remember { mutableStateOf<String?>(null) }
     val otherProductsCount = order.items.size - 1
 
     firstProductName = productState.products.find { it.productId == order.items.first().productId }?.name
-
-    // Fetch the product name for the first product
-//    LaunchedEffect(order.items.first().productId) {
-//        try {
-//            loading = true
-//            val response = RetrofitInstance.api.getProductById(order.items.first().productId)
-//            if (response.isSuccessful) {
-//                val product = response.body()
-//                firstProductName = product?.name
-//                loading = false
-//            }
-//        } catch (e: Exception) {
-//            Log.e("OrderSummaryCard", "Error fetching product: ${e.message}")
-//            loading = false
-//        }
-//    }
 
     // Title showing first product + other product count
     val title = if (otherProductsCount > 0) {
@@ -76,7 +59,6 @@ fun OrderSummaryCard(
                 navController.navigate("orderDetails/${order.id}/false")
             },
         shape = RoundedCornerShape(8.dp),
-
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(

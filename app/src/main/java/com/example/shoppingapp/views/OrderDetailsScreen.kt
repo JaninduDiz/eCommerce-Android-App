@@ -78,6 +78,7 @@ fun OrderDetailsScreen(
     var showDrawer by remember { mutableStateOf(false) }
     var cancellationReason by remember { mutableStateOf("") }
     val getProductDetails: (String) -> Product? = { productId -> productState.products.find { it.productId == productId } }
+
     val getProductDetailsToUpdateOrder: (List<OrderItem>, ProductState) -> List<OrderItem> = { orderItems, productStated ->
         orderItems.map { orderItem ->
             val product = productStated.products.find { it.productId == orderItem.productId }
@@ -87,6 +88,12 @@ fun OrderDetailsScreen(
                 orderItem
             }
         }
+    }
+
+    val textFieldValue = if ((order.status in listOf(0, 1, 2, 3) && !order.note.isNullOrEmpty()) || (order.status in listOf(4, 5) && !order.cancellationReason.isNullOrEmpty())) {
+        order.note ?: order.cancellationReason
+    } else {
+        null
     }
 
     CustomTopAppBar(
@@ -154,26 +161,24 @@ fun OrderDetailsScreen(
                     OrderItemCard(orderItem, navController, getProductDetails, order.status)
                 }
 
-                if (!order.note.isNullOrEmpty()) {
+                 if (textFieldValue != null) {
                     item {
-                        order.note?.let {
-                            OutlinedTextField(
-                                value = it,
-                                onValueChange = { },
-                                label = { Text("Your note") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedContainerColor = Color(0xFFf8f7ff),
-                                    unfocusedContainerColor = Color(0xFFf8f7ff),
-                                    focusedBorderColor = Color(0xFF9381ff),
-                                    unfocusedBorderColor = Color(0xFFf8f7ff),
-                                    cursorColor = Color(0xFF9381ff),
-                                ),
-                                enabled = false
-                            )
-                        }
+                        OutlinedTextField(
+                            value = textFieldValue,
+                            onValueChange = { },
+                            label = { Text("Your note") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = Color(0xFFf8f7ff),
+                                unfocusedContainerColor = Color(0xFFf8f7ff),
+                                focusedBorderColor = Color(0xFF9381ff),
+                                unfocusedBorderColor = Color(0xFFf8f7ff),
+                                cursorColor = Color(0xFF9381ff),
+                            ),
+                            enabled = false
+                        )
                     }
                 }
 

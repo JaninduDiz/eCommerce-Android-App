@@ -324,7 +324,7 @@ fun ProductInfoSection(product: Product, categoryName: String = "") {
 
         Row (
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -345,6 +345,7 @@ fun ProductInfoSection(product: Product, categoryName: String = "") {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(0.3f),
+                    textAlign = TextAlign.End,
                 )
             }
         }

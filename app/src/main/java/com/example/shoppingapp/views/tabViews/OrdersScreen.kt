@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -117,10 +116,10 @@ fun OrdersScreen(navController: NavController, orderState: OrderState, paddingVa
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
-    val activeButtonColor = Color(0xFF669bbc)
-    val inactiveButtonColor = Color.White
-    val activeTextColor = Color.White
-    val inactiveTextColor = Color(0xFF3F4238)
+    val activeButtonColor = MaterialTheme.colorScheme.primary
+    val inactiveButtonColor = MaterialTheme.colorScheme.surface
+    val activeTextColor = MaterialTheme.colorScheme.onPrimary
+    val inactiveTextColor = MaterialTheme.colorScheme.onSurface
 
     val tabs = listOf("Order Tracking", "Order History") // List of tab names
 
@@ -132,7 +131,7 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .height(50.dp)
-            .background(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(50.dp))
+            .background(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(50.dp))
             .shadow(8.dp, shape = RoundedCornerShape(50.dp)),
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
@@ -141,9 +140,8 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
                 color = activeButtonColor
             )
         },
-        divider = {} // Remove default bottom divider
+        divider = {}
     ) {
-        // Loop through the tabs
         tabs.forEachIndexed { index, title ->
             Tab(
                 selected = selectedTab == index,
@@ -158,8 +156,8 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
                 text = {
                     Text(
                         text = title,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
                         color = if (selectedTab == index) activeTextColor else inactiveTextColor
                     )
                 }
