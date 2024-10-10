@@ -154,7 +154,7 @@ fun OrderDetailsScreen(
                     OrderItemCard(orderItem, navController, getProductDetails, order.status)
                 }
 
-                if (order.note.isNullOrEmpty()) {
+                if (!order.note.isNullOrEmpty()) {
                     item {
                         order.note?.let {
                             OutlinedTextField(

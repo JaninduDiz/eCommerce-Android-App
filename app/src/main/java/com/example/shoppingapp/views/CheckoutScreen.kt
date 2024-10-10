@@ -115,10 +115,8 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
                         .fillMaxWidth()
                         .padding(top = 16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFf8f7ff),
-                        unfocusedContainerColor = Color(0xFFf8f7ff),
                         focusedBorderColor = Color(0xFF9381ff),
-                        unfocusedBorderColor = Color(0xFFf8f7ff),
+                        unfocusedBorderColor = Color.LightGray,
                         cursorColor = Color(0xFF9381ff),
                     )
                 )
@@ -266,7 +264,6 @@ fun OrderSummary(totalItems: Int, totalPrice: Double, deliveryCharge: Double?) {
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

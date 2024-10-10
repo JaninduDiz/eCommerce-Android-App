@@ -76,7 +76,7 @@ fun OrderSummaryCard(
                 navController.navigate("orderDetails/${order.id}/false")
             },
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(

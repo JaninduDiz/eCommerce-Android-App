@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -131,7 +132,7 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .height(50.dp)
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(50.dp))
             .shadow(8.dp, shape = RoundedCornerShape(50.dp)),
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
@@ -157,7 +158,7 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
                 text = {
                     Text(
                         text = title,
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Normal,
                         color = if (selectedTab == index) activeTextColor else inactiveTextColor
                     )

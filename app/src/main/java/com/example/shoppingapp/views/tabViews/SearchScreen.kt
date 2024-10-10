@@ -127,7 +127,7 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.background,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -139,7 +139,7 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = product.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "$${product.price}", style = MaterialTheme.typography.bodySmall, color = Color(0xFF5e3023))
+                Text(text = "$${product.price}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             }
         }
     }

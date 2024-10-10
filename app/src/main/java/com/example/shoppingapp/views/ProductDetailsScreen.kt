@@ -47,6 +47,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -296,7 +297,7 @@ fun ProductInfoSection(product: Product, categoryName: String = "") {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -311,8 +312,8 @@ fun ProductInfoSection(product: Product, categoryName: String = "") {
                 text = "$${product.price}",
                 fontSize = 22.sp,
                 style = MaterialTheme.typography.headlineMedium.copy(
-                    color = Color(0xFF5e3023),
-                    fontWeight = FontWeight.Medium
+                    color = MaterialTheme.colorScheme.error,
+                    fontWeight = FontWeight.Bold
                 ),
                 modifier = Modifier.weight(0.3f),
                 textAlign = TextAlign.End,
@@ -329,7 +330,10 @@ fun ProductInfoSection(product: Product, categoryName: String = "") {
             Text(
                 text = "Category: $categoryName",
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.Gray
+                color = Color.Gray,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(0.7f),
             )
 
             if (product.stock < 10) {
@@ -337,7 +341,10 @@ fun ProductInfoSection(product: Product, categoryName: String = "") {
                 Text(
                     text = "Low Stock!",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.Red
+                    color = Color.Red,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(0.3f),
                 )
             }
         }
