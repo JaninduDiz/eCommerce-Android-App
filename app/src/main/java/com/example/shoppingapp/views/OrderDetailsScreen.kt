@@ -226,7 +226,7 @@ fun OrderDetailsScreen(
                                 }
                                 showModal = false
                                 showDrawer = false
-                                // TODO: Implement cancel order logic
+
                             },
                             primaryButtonStyle = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFFc75146)
@@ -299,6 +299,7 @@ fun orderStatusText(status: Int): Pair<String, Color> {
         2 -> "Partially Delivered" to Color(0xFF2196F3)
         3 -> "Delivered" to Color(0xFF8BC34A)
         4 -> "Cancelled" to Color(0xFFF44336)
+        5 -> "Requested to Cancel" to Color(0xFFF44336)
         else -> "Unknown" to Color(0xFF9E9E9E)
     }
 }

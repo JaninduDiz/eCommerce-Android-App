@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "651471813468",
+    "project_id": "liceria-ecom",
+    "storage_bucket": "liceria-ecom.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:651471813468:android:a1f19892494228ce50df99",
+        "android_client_info": {
+          "package_name": "com.example.shoppingapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4kOj7M1s9RVdFRk-dFyZ12Hl7lC-7UTo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
