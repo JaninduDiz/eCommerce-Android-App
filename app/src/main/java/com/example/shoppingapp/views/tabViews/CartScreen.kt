@@ -95,13 +95,12 @@ fun CartScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f) // This ensures the list takes up the remaining space and is scrollable
+                    .weight(1f) 
             ) {
                 items(cartState.items) { cartItem ->
                     CartItemRow(
                         imageUrl = cartItem.product.imageUrls.first(),
                         name = cartItem.product.name,
-                        brand = categoryState.getCategoryNameById(cartItem.product.category),
                         price = "$${cartItem.product.price}",
                         quantity = cartItem.quantity.value,
                         onIncreaseClick = { cartState.increaseQuantity(cartItem.product) },
@@ -171,7 +170,6 @@ fun CartScreen(
 fun CartItemRow(
     imageUrl: String,
     name: String,
-    brand: String,
     price: String,
     quantity: Int,
     onIncreaseClick: () -> Unit,
@@ -201,9 +199,8 @@ fun CartItemRow(
 
         // Product Name and Brand
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = name, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(text = brand, fontSize = 14.sp, color = Color.Gray, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(text = price, fontSize = 16.sp, color = Color(0xFF6B705C))
+            Text(text = name, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = price, fontSize = 12.sp, color = Color(0xFF6B705C))
         }
 
         // Quantity Control

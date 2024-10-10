@@ -159,7 +159,7 @@ fun OrderSelector(selectedTab: Int, onTabSelected: (Int) -> Unit) {
                 text = {
                     Text(
                         text = title,
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         color = if (selectedTab == index) activeTextColor else inactiveTextColor
                     )

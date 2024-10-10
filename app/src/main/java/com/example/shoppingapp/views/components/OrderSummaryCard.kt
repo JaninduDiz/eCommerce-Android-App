@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -69,29 +70,33 @@ fun OrderSummaryCard(
                     text = title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = 2.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip
                 )
             }
             Text(
                 text = "Placed on ${formatDateTime(order.createdAt)}",
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 color = Color.Gray,
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier.padding(bottom = 4.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Clip
             )
-
+            Text(
+                text = "Total: $${totalAmount + 2.0}",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp
+            )
             val (statusText, statusColor) = orderStatusText(order.status)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Absolute.Left
             ) {
-                Text(text = "Status: ", fontWeight = FontWeight.Bold)
-                Text(text = statusText, fontWeight = FontWeight.Bold, color = statusColor)
+                Text(text = "Status: ", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                Text(text = statusText, fontWeight = FontWeight.SemiBold, color = statusColor, fontSize = 12.sp)
             }
-            Text(
-                text = "Total: ${totalAmount + 2.0}",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
+
         }
     }
 }

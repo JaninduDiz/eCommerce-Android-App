@@ -16,6 +16,7 @@ class CategoryState {
 
     // Function to add a list of categories
     fun addCategories(categories: List<Category>) {
+        clearCategories()
         this.categories.addAll(categories)
     }
 
@@ -35,7 +36,7 @@ class CategoryState {
     }
 
     // Function to clear all categories
-    fun clear() {
+    fun clearCategories() {
         categories.clear()
     }
 

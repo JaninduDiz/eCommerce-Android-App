@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,8 +31,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -77,7 +80,6 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
     var note by remember { mutableStateOf("") }
     var showModal by remember { mutableStateOf(false) }
     var showAddressModal by remember { mutableStateOf(false) }
-    var responseId by remember { mutableStateOf("") }
     var apiResponseStatus by remember { mutableStateOf<ApiResponseStatus?>(null) }
     var order: OrderRequest
 
@@ -86,112 +88,157 @@ fun CheckoutScreen(navController: NavController,  cartState: CartState, totalPri
         onNavigationClick = { navController.popBackStack() },
         centeredHeader = true
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            OrderSummary(totalItems = cartState.items.size, totalPrice = totalPrice, deliveryCharge = deliveryCharge)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (!currentUser.address.isNullOrEmpty()) {
-                AddressSection(user = currentUser, navController = navController)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            PaymentMethodSection()
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Column {
-                OutlinedTextField(
-                    value = note,
-                    onValueChange = { note = it },
-                    label = { Text("Add note") },
+        Scaffold(
+            bottomBar = {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF9381ff),
-                        unfocusedBorderColor = Color.LightGray,
-                        cursorColor = Color(0xFF9381ff),
+                        .padding(horizontal = 20.dp, vertical = 28.dp)
+                        .background(MaterialTheme.colorScheme.surface),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    CustomButton(
+                        text = "Purchase Order",
+                        onClick = {
+                            if (currentUser.address.isNullOrEmpty() || currentUser.phoneNumber.isNullOrEmpty()) {
+                                showAddressModal = true
+                            } else {
+                                (context as ComponentActivity).lifecycleScope.launch {
+                                    try {
+                                        order = orderState.generateOrder(
+                                            cartState,
+                                            currentUser.id,
+                                            note,
+                                            totalPrice,
+                                            deliveryCharge
+                                        )
+                                        val response = RetrofitInstance.api.createOrder(order)
+                                        if (response.isSuccessful) {
+                                            Log.d(
+                                                TAG,
+                                                "CheckoutScreen: Order placed successfully: ${response.body()}"
+                                            )
+                                            apiResponseStatus = ApiResponseStatus.SUCCESS
+                                            showModal = true
+                                        } else {
+                                            Log.d(
+                                                TAG,
+                                                "CheckoutScreen: Order placement failed: ${response.errorBody()}"
+                                            )
+                                            apiResponseStatus = ApiResponseStatus.ERROR
+                                            showModal = true
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.d(
+                                            TAG,
+                                            "CheckoutScreen: Order placement failed: ${e.message}"
+                                        )
+                                        apiResponseStatus = ApiResponseStatus.ERROR
+                                        showModal = true
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3d5a80))
                     )
+                }
+            }
+        ) { innerPadding ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+            ) {
+                item {
+                    OrderSummary(
+                        totalItems = cartState.items.size,
+                        totalPrice = totalPrice,
+                        deliveryCharge = deliveryCharge
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                item {
+                    if (!currentUser.address.isNullOrEmpty()) {
+                        AddressSection(user = currentUser, navController = navController)
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                item {
+                    PaymentMethodSection()
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                item {
+                    OutlinedTextField(
+                        value = note,
+                        onValueChange = { note = it },
+                        label = { Text("Add note") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF9381ff),
+                            unfocusedBorderColor = Color.LightGray,
+                            cursorColor = Color(0xFF9381ff),
+                        )
+                    )
+                }
+
+            }
+
+            if (showAddressModal) {
+                CustomModal(
+                    primaryButtonText = "Add",
+                    onPrimaryButtonClick = {
+                        showAddressModal = false
+                        navController.navigate("profile")
+                    },
+                    primaryButtonStyle = ButtonDefaults.buttonColors(
+                        containerColor = Color(
+                            0xFFc75146
+                        )
+                    ),
+                    text = "Please add a delivery address and your contact number to proceed with your order.",
+                    title = "Delivery Address and Contact Number Required",
+                    type = ModalType.ERROR
                 )
             }
 
-            // Confirm Order Button
-            Spacer(modifier = Modifier.weight(1f))
-            CustomButton(
-                text = "Purchase Order",
-                onClick = {
-                    if (currentUser.address.isNullOrEmpty()) {
-                        showAddressModal = true
-                    } else {
-                        (context as ComponentActivity).lifecycleScope.launch {
-                            try {
-                              order = orderState.generateOrder(cartState, currentUser.id, note, totalPrice, deliveryCharge)
-                                val response = RetrofitInstance.api.createOrder(order)
-                                if (response.isSuccessful && response.body() != null) {
-                                    Log.d(TAG, "CheckoutScreen: Order placed successfully: ${response.body()}")
-                                    responseId = response.body()!!.id
-                                    apiResponseStatus = ApiResponseStatus.SUCCESS
-                                    showModal = true
-                                } else {
-                                    Log.d(TAG, "CheckoutScreen: Order placement failed: ${response.errorBody()}")
-                                    apiResponseStatus = ApiResponseStatus.ERROR
-                                    showModal = true
-                                }
-                            } catch (e: Exception) {
-                                Log.d(TAG, "CheckoutScreen: Order placement failed: ${e.message}")
-                                apiResponseStatus = ApiResponseStatus.ERROR
-                                showModal = true
-                            }
+            if (showModal) {
+                CustomModal(
+                    type = if (apiResponseStatus == ApiResponseStatus.SUCCESS) ModalType.SUCCESS else ModalType.ERROR,
+                    title = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Order placed successfully!" else "Order placement failed!",
+                    text = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Thanks for shopping with us! You'll receive the order soon." else "There was an issue placing your order. Please try again.",
+                    primaryButtonText = "OK",
+                    onPrimaryButtonClick = {
+                        showModal = false
+                        if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
+                            cartState.clearCart()
+                            navController.navigate("home")
                         }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3d5a80))
-            )
-        }
-
-       // Order Confirmation Modal
-        if (showModal) {
-            CustomModal(
-                type = if (apiResponseStatus == ApiResponseStatus.SUCCESS) ModalType.SUCCESS else ModalType.ERROR,
-                title = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Order placed successfully!" else "Order placement failed!",
-                text = if (apiResponseStatus == ApiResponseStatus.SUCCESS) "Thanks for shopping with us! You'll receive the order soon." else "There was an issue placing your order. Please try again.",
-                primaryButtonText = "OK",
-                onPrimaryButtonClick = {
-                    showModal = false
-                    if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
-                        cartState.clearCart()
-                        navController.navigate("home")
-                    }
-                },
-                primaryButtonStyle = if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
-                    ButtonDefaults.buttonColors(containerColor = Color(0xFF8ecae6))
-                } else ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146)),
-                secondaryButtonText = null,
-                tertiaryButtonText = null
-            )
-        }
-
-        // Address Null Modal
-        if (showAddressModal) {
-            CustomModal(
-                primaryButtonText = "Add",
-                onPrimaryButtonClick = {
-                    showAddressModal = false
-                    navController.navigate("profile")
-                },
-                primaryButtonStyle = ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146)),
-                text = "Please add a delivery address to proceed with your order.",
-                title = "Delivery Address Required",
-                type = ModalType.ERROR
-            )
+                    },
+                    primaryButtonStyle = if (apiResponseStatus == ApiResponseStatus.SUCCESS) {
+                        ButtonDefaults.buttonColors(containerColor = Color(0xFF8ecae6))
+                    } else ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146)),
+                    secondaryButtonText = null,
+                    tertiaryButtonText = null
+                )
+            }
         }
     }
 }
@@ -257,7 +304,7 @@ fun OrderSummary(totalItems: Int, totalPrice: Double, deliveryCharge: Double?) {
         text = "Order Summary",
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(bottom = 12.dp)
     )
     Card(
         modifier = Modifier

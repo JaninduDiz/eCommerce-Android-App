@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -93,7 +94,7 @@ fun OrderDetailsScreen(
     val textFieldValue = if ((order.status in listOf(0, 1, 2, 3) && !order.note.isNullOrEmpty()) || (order.status in listOf(4, 5) && !order.cancellationReason.isNullOrEmpty())) {
         order.note ?: order.cancellationReason
     } else {
-        null
+        ""
     }
 
     CustomTopAppBar(
@@ -124,6 +125,16 @@ fun OrderDetailsScreen(
                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFc75146))
                        )
                     }
+
+                    if (order.status == 3) {
+                        CustomButton(
+                            text = "Order Delivered",
+                            onClick = { },
+                            enabled = false,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3d5a80))
+                        )
+                    }
                 }
             }
         ) { contentPadding ->
@@ -137,21 +148,23 @@ fun OrderDetailsScreen(
             ) {
                 item {
                     // Order status and date placed
-                    Text(text = "Order ID: ${order.id}", fontWeight = FontWeight.Bold)
+                    Text(text = "Order ID: ${order.id}", fontWeight = FontWeight.SemiBold, fontSize = 13.sp )
                     Text(
                         text = "Date Placed: ${formatDateTime(order.createdAt)}",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp
                     )
                     val (statusText, statusColor) = orderStatusText(order.status)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        Text(text = "Status: ", fontWeight = FontWeight.Bold)
+                        Text(text = "Status: ", fontWeight = FontWeight.Medium, fontSize = 12.sp )
                         Text(
                             text = statusText,
-                            fontWeight = FontWeight.Bold,
-                            color = statusColor
+                            fontWeight = FontWeight.Medium,
+                            color = statusColor,
+                            fontSize = 12.sp
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -161,29 +174,31 @@ fun OrderDetailsScreen(
                     OrderItemCard(orderItem, navController, getProductDetails, order.status)
                 }
 
-                 if (textFieldValue != null) {
+                if (textFieldValue != "") {
                     item {
-                        OutlinedTextField(
-                            value = textFieldValue,
-                            onValueChange = { },
-                            label = { Text("Your note") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = Color(0xFFf8f7ff),
-                                unfocusedContainerColor = Color(0xFFf8f7ff),
-                                focusedBorderColor = Color(0xFF9381ff),
-                                unfocusedBorderColor = Color(0xFFf8f7ff),
-                                cursorColor = Color(0xFF9381ff),
-                            ),
-                            enabled = false
-                        )
+                        if (textFieldValue != null) {
+                            OutlinedTextField(
+                                value = textFieldValue,
+                                onValueChange = { },
+                                label = { Text("Your note") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedContainerColor = Color(0xFFf8f7ff),
+                                    unfocusedContainerColor = Color(0xFFf8f7ff),
+                                    focusedBorderColor = Color(0xFF9381ff),
+                                    unfocusedBorderColor = Color(0xFFf8f7ff),
+                                    cursorColor = Color(0xFF9381ff),
+                                ),
+                                enabled = false
+                            )
+                        }
                     }
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     OrderSummary(
                         totalItems = order.items.size,
@@ -194,7 +209,6 @@ fun OrderDetailsScreen(
                     Spacer(modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp))
-
                 }
 
                 item {
@@ -313,7 +327,7 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController, getProduct
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 4.dp)
             .clickable {
                 if (orderStatus == 3) {
                     navController.navigate("reviewScreen/${orderItem.productId}/${orderItem.vendorId}")
@@ -337,9 +351,9 @@ fun OrderItemCard(orderItem: OrderItem, navController: NavController, getProduct
             Spacer(modifier = Modifier.width(16.dp))
 
             Column {
-               Text(text = product.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = "Quantity: ${orderItem.quantity}")
-                Text(text = "Price: $${product.price}")
+                Text(text = product.name, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = "Quantity: ${orderItem.quantity}", fontSize = 12.sp)
+                Text(text = "Price: $${product.price}", fontSize = 12.sp)
             }
         }
     }

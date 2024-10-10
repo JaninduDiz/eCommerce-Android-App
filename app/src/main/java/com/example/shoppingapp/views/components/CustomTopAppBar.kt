@@ -1,6 +1,5 @@
 package com.example.shoppingapp.views.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -91,7 +90,6 @@ fun CustomTopAppBar(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
                                 tint = Color.Black,
-                                modifier = Modifier.background(Color.Black)
                             )
                         }
                     },

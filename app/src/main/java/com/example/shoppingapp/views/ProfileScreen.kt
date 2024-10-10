@@ -183,7 +183,6 @@ fun ProfileContent(
                     label = "First Name",
                     isEditing = isEditing,
                     onValueChange = { firstName = it },
-                    keyboardType = KeyboardType.Number
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

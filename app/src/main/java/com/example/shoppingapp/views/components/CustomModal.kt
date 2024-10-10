@@ -51,14 +51,14 @@ fun CustomModal(
                 text = if (title.isNotEmpty()) title else if (type == ModalType.SUCCESS) "Success" else "Error",
                 color = textColor,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp
+                fontSize = 16.sp
             )
         },
         text = {
             Text(
                 text = text,
                 color = Color.Black,
-                fontSize = 16.sp
+                fontSize = 14.sp
             )
         },
         confirmButton = {
