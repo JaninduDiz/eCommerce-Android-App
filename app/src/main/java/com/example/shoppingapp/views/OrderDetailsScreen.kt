@@ -144,27 +144,28 @@ fun OrderDetailsScreen(
                     .padding(contentPadding)
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp)
                     .offset(y = (-24).dp)
             ) {
                 item {
                     // Order status and date placed
-                    Text(text = "Order ID: ${order.id}", fontWeight = FontWeight.SemiBold, fontSize = 13.sp )
+                    Text(text = "Order ID: ${order.id}", fontWeight = FontWeight.SemiBold, fontSize = 16.sp )
                     Text(
                         text = "Date Placed: ${formatDateTime(order.createdAt)}",
                         fontWeight = FontWeight.Medium,
-                        fontSize = 12.sp
+                        fontSize = 14.sp
                     )
                     val (statusText, statusColor) = orderStatusText(order.status)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        Text(text = "Status: ", fontWeight = FontWeight.Medium, fontSize = 12.sp )
+                        Text(text = "Status: ", fontWeight = FontWeight.Medium, fontSize = 14.sp )
                         Text(
                             text = statusText,
                             fontWeight = FontWeight.Medium,
                             color = statusColor,
-                            fontSize = 12.sp
+                            fontSize = 14.sp
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))

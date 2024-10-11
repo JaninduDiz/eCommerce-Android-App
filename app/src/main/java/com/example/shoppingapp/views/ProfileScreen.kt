@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -116,6 +117,11 @@ fun ProfileContent(
         }
     }
 
+    // Reset the isEditing state when the screen is launched
+    LaunchedEffect (Unit) {
+        isEditing = false
+    }
+
     // Fetch user data from the API
     LaunchedEffect(Unit) {
         try {
@@ -159,8 +165,8 @@ fun ProfileContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-
+                .padding(16.dp)
+                .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {

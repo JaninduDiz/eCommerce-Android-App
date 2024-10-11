@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -54,7 +55,7 @@ fun CustomModalBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .weight(1f),
+                .weight(1f).imePadding(),
             contentAlignment = Alignment.TopStart
         ) {
             sheetContent()
