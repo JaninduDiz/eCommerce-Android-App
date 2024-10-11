@@ -10,14 +10,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -39,8 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.shoppingapp.R
 import com.example.shoppingapp.models.RegisterRequest
-
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import kotlinx.coroutines.launch
@@ -51,17 +56,23 @@ fun RegisterScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    var usernameError by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
     fun validateEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        return email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     fun validatePassword(password: String): Boolean {
         return password.length >= 6
+    }
+
+    fun validateUsername(username: String): Boolean {
+        return username.isNotEmpty()
     }
 
     Box(
@@ -89,9 +100,13 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Username Input
             BasicTextField(
                 value = username,
-                onValueChange = { username = it },
+                onValueChange = {
+                    username = it
+                    usernameError = !validateUsername(it)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White, MaterialTheme.shapes.small)
@@ -108,9 +123,18 @@ fun RegisterScreen(navController: NavController) {
                     innerTextField()
                 }
             )
+            if (usernameError) {
+                Text(
+                    text = "Username is required",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 10.dp),
+                    style = TextStyle(fontSize = 14.sp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Email Input
             BasicTextField(
                 value = email,
                 onValueChange = {
@@ -135,56 +159,75 @@ fun RegisterScreen(navController: NavController) {
             )
             if (emailError) {
                 Text(
-                    text = "Invalid email format",
-                    color = Color.Red,
-                    style = TextStyle(fontSize = 14.sp)
+                    text = if (email.isEmpty()) "Email is required" else "Invalid email format",
+                    style = TextStyle(fontSize = 14.sp),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 10.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            BasicTextField(
-                value = password,
-                onValueChange = {
-                    password = it
-                    passwordError = !validatePassword(it)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, MaterialTheme.shapes.small)
-                    .padding(16.dp),
-                textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                singleLine = true,
-                decorationBox = { innerTextField ->
-                    if (password.isEmpty()) {
-                        Text(
-                            text = "Password",
-                            style = TextStyle(color = Color.Gray, fontSize = 18.sp)
-                        )
+            // Password Input with Visibility Toggle
+            Box(modifier = Modifier.fillMaxWidth()) {
+                BasicTextField(
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        passwordError = !validatePassword(it)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White, MaterialTheme.shapes.small)
+                        .padding(16.dp),
+                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    singleLine = true,
+                    decorationBox = { innerTextField ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                if (password.isEmpty()) {
+                                    Text(
+                                        text = "Password",
+                                        style = TextStyle(color = Color.Gray, fontSize = 18.sp)
+                                    )
+                                }
+                                innerTextField()
+                            }
+                            IconButton(onClick = { passwordVisible = !passwordVisible }, modifier = Modifier.size(24.dp)) {
+                                Icon(
+                                    painter = if (passwordVisible) painterResource(R.drawable.baseline_visibility_off_24) else painterResource(R.drawable.baseline_visibility_24),
+                                    contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                )
+                            }
+                        }
                     }
-                    innerTextField()
-                }
-            )
+                )
+            }
             if (passwordError) {
                 Text(
-                    text = "Password must be at least 6 characters",
-                    color = Color.Red,
-                    style = TextStyle(fontSize = 14.sp)
+                    text = if (password.isEmpty()) "Password is required" else "Password must be at least 6 characters",
+                    style = TextStyle(fontSize = 14.sp),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 10.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
+            // Register Button
             Button(
                 onClick = {
-                    if (!emailError && !passwordError) {
+                    if (!usernameError && !emailError && !passwordError) {
                         // Handle registration logic
                         (context as ComponentActivity).lifecycleScope.launch {
                             try {
                                 val response = RetrofitInstance.api.register(RegisterRequest(username, email, password, 3, "", "", "", "", 0))
                                 if (response.isSuccessful && response.body() != null) {
-                                    Toast.makeText(context, "Registration successful ", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
                                     navController.navigate("login") // Navigate to login screen after successful registration
                                 } else {
                                     Toast.makeText(context, "Registration failed: ${response.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
@@ -197,16 +240,17 @@ fun RegisterScreen(navController: NavController) {
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !emailError && !passwordError
+                enabled = !usernameError && !emailError && !passwordError
             ) {
                 Text(text = "Register")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Navigate to Login Text
             Text(
                 text = "Already have an account? Login",
-                color = Color.Blue,
+                color = Color(0xFF0077b6),
                 modifier = Modifier.clickable {
                     navController.popBackStack()
                 }

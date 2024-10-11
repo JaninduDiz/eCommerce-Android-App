@@ -1,7 +1,5 @@
 package com.example.shoppingapp.views.onBoardViews
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -9,14 +7,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -38,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.shoppingapp.R
 import com.example.shoppingapp.models.LoginRequest
 import com.example.shoppingapp.models.User
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
@@ -50,9 +54,19 @@ import kotlinx.coroutines.launch
 fun LoginScreen(navController: NavController, userSessionManager: UserSessionManager) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val passwordVisible by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+
+    fun validateEmail(email: String): Boolean {
+        return email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    fun validatePassword(password: String): Boolean {
+        return password.isNotEmpty()
+    }
 
     Box(
         modifier = Modifier
@@ -79,9 +93,13 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Email Input
             BasicTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    emailError = !validateEmail(it)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White, MaterialTheme.shapes.small)
@@ -98,36 +116,76 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
                     innerTextField()
                 }
             )
+            if (emailError) {
+                Text(
+                    text = if (email.isEmpty()) "Please enter your email!" else "Invalid email format",
+                    style = TextStyle(fontSize = 14.sp),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            BasicTextField(
-                value = password,
-                onValueChange = { password = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, MaterialTheme.shapes.small)
-                    .padding(16.dp),
-                textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                singleLine = true,
-                decorationBox = { innerTextField ->
-                    if (password.isEmpty()) {
-                        Text(
-                            text = "Password",
-                            style = TextStyle(color = Color.Gray, fontSize = 18.sp)
-                        )
+            // Password Input with Visibility Toggle
+            Box(modifier = Modifier.fillMaxWidth()) {
+                BasicTextField(
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        passwordError = !validatePassword(it)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White, MaterialTheme.shapes.small)
+                        .padding(16.dp),
+                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    singleLine = true,
+                    decorationBox = { innerTextField ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                if (password.isEmpty()) {
+                                    Text(
+                                        text = "Password",
+                                        style = TextStyle(color = Color.Gray, fontSize = 18.sp)
+                                    )
+                                }
+                                innerTextField()
+                            }
+                            IconButton(
+                                onClick = { passwordVisible = !passwordVisible },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    painter = if (passwordVisible) painterResource(R.drawable.baseline_visibility_off_24) else painterResource(
+                                        R.drawable.baseline_visibility_24),
+                                    contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                )
+                            }
+                        }
                     }
-                    innerTextField()
-                }
-            )
+                )
+            }
+            if (passwordError) {
+                Text(
+                    text = "Password is required",
+                    style = TextStyle(fontSize = 14.sp),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Login Button
             Button(
+                enabled = !emailError && password.isNotEmpty(),
                 onClick = {
-                    if (email.isNotEmpty() && password.isNotEmpty()) {
-                        // Launch coroutine for network call
+                    if (!emailError && !passwordError) {
                         (context as ComponentActivity).lifecycleScope.launch {
                             try {
                                 val response = RetrofitInstance.api.login(LoginRequest(email, password))
@@ -138,7 +196,6 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
                                         val emailAddress = loginResponse.email
                                         val userId = loginResponse.id
 
-                                        // Create the User object with username and null for other fields
                                         val loggedInUser = User(
                                             id = userId,
                                             username = username,
@@ -148,7 +205,6 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
                                             firstName = null,
                                             lastName = null
                                         )
-                                        Log.d(TAG, "LoginScreen: $loggedInUser")
                                         userSessionManager.saveUser(loggedInUser) // Save user details
                                         navController.navigate("home")
                                     }
@@ -170,9 +226,10 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Navigate to Register
             Text(
                 text = "No account? Register",
-                color = Color.Blue,
+                color = Color(0xFF0077b6),
                 modifier = Modifier.clickable {
                     navController.navigate("register")
                 }
@@ -180,7 +237,6 @@ fun LoginScreen(navController: NavController, userSessionManager: UserSessionMan
         }
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
