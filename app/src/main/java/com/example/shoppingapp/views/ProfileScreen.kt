@@ -56,7 +56,9 @@ import com.example.shoppingapp.models.User
 import com.example.shoppingapp.ui.theme.ShoppingAppTheme
 import com.example.shoppingapp.utils.RetrofitInstance
 import com.example.shoppingapp.utils.UserSessionManager
+import com.example.shoppingapp.views.components.CustomModal
 import com.example.shoppingapp.views.components.CustomTopAppBar
+import com.example.shoppingapp.views.components.ModalType
 import kotlinx.coroutines.launch
 
 
@@ -84,12 +86,35 @@ fun ProfileContent(
     val context = LocalContext.current
     var loading by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
+    var showDModal by remember { mutableStateOf(false) }
+    var showLModal by remember { mutableStateOf(false) }
     var username by remember { mutableStateOf(currentUser?.username ?: "") }
     var email by remember { mutableStateOf(currentUser?.email ?: "") }
     var address by remember { mutableStateOf(currentUser?.address ?: "") }
     var phoneNumber by remember { mutableStateOf(currentUser?.phoneNumber ?: "") }
     var firstName by remember { mutableStateOf(currentUser?.firstName ?: "") }
     var lastName by remember { mutableStateOf(currentUser?.lastName ?: "") }
+
+    suspend fun deactivateUser(userId: String): Result<String> {
+        return try {
+            // Make the API call to deactivate the user
+            val response = RetrofitInstance.api.deactivateUser(userId)
+
+            if (response.isSuccessful) { Log.d(TAG, "deactivateUser: ${response.body()}")
+                // Return the success message from the response body
+                response.body()?.let {
+                    Result.success(it.message)
+                } ?: Result.failure(Exception("Unknown error occurred"))
+
+            } else {
+                // Return failure with the error message
+                Result.failure(Exception("Deactivation failed: ${response.errorBody()?.string()}"))
+            }
+        } catch (e: Exception) {
+            // Handle exceptions and return as failure result
+            Result.failure(Exception("Error: ${e.localizedMessage}"))
+        }
+    }
 
     // Fetch user data from the API
     LaunchedEffect(Unit) {
@@ -279,17 +304,85 @@ fun ProfileContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Logout Button
+            // Deactivate Button
             Button(
                 onClick = {
-                    userSessionManager.logout() // Logout user
-                    navController.navigate("login") // Navigate back to login screen
+                    showDModal = true
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFfcbf49)),
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(text = "Sign Out", color = Color(0xFFb23a48), fontSize = 16.sp)
+                Text(text = "Deactivate", color = Color.Black, fontSize = 16.sp)
+            }
+
+            // Sign Out Button
+            Button(
+                onClick = {
+                    showLModal = true
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFa30b37)),
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Sign Out", color = Color.White, fontSize = 16.sp)
+            }
+
+            if (showDModal) {
+                CustomModal(
+                    type = ModalType.ERROR,
+                    title = "Deactivate Account?",
+                    text = "This cannot be undone. Are you sure you want to deactivate your account?",
+                    primaryButtonText = "Confirm",
+                    onPrimaryButtonClick = {
+                        (context as ComponentActivity).lifecycleScope.launch {
+                            val userId = currentUser?.id ?: ""
+                            if (userId.isNotEmpty()) {
+                                val result = deactivateUser(userId)
+
+                                result.onSuccess {
+                                    userSessionManager.logout()
+                                    navController.navigate("login")
+                                    Toast.makeText(context, "User deactivated successfully", Toast.LENGTH_SHORT).show()
+                                }.onFailure { error ->
+                                    Toast.makeText(context, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(context, "Error: Invalid user ID", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        showDModal = false
+                    },
+                    primaryButtonStyle = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFa30b37)
+                    ),
+                    secondaryButtonText = "Close",
+                    onSecondaryButtonClick = {
+                        showDModal = false
+
+                    },
+                )
+            }
+
+            if (showLModal) {
+                CustomModal(
+                    type = ModalType.ERROR,
+                    title = "Sign Out?",
+                    text = "Are you sure you want to sign out?",
+                    primaryButtonText = "Sign Out",
+                    onPrimaryButtonClick = {
+                        userSessionManager.logout() // Logout user
+                        navController.navigate("login") // Navigate back to login screen
+                        showLModal = false
+                    },
+                    primaryButtonStyle = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFa30b37)
+                    ),
+                    secondaryButtonText = "Close",
+                    onSecondaryButtonClick = {
+                        showLModal = false
+                    },
+                )
             }
         }
     }
