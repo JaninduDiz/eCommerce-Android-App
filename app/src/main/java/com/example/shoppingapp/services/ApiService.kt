@@ -27,6 +27,10 @@ import retrofit2.http.Path
     val userId: String,
  )
 
+data class deactivationResponse(
+    val message: String,
+ )
+
 interface ApiService {
 
     //login endpoint
@@ -91,4 +95,9 @@ interface ApiService {
     // add customer token
     @POST("User/addToken")
     suspend fun addToken(@Body token: tokenRequest): Response<tokenRequest>
+
+    // Deactivate user by ID endpoint
+    @POST("User/{id}/deactivate")
+    suspend fun deactivateUser(@Path("id") id: String): Response<deactivationResponse>
+
 }
